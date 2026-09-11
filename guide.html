@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.guide">Гайд для студентов — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .step-card {
+            background: var(--bg-panel); backdrop-filter: blur(14px);
+            border: 1px solid var(--line); border-radius: var(--radius);
+            padding: 22px 24px; margin-bottom: 16px;
+        }
+        .step-card h3 { margin-top: 0; }
+        .step-card p { color: var(--text-dim); font-size: 14.5px; margin-bottom: 10px; }
+        .step-card p strong { color: var(--text); }
+        .plant-dot {
+            display: inline-block; width: 10px; height: 10px;
+            border-radius: 50%; margin-right: 8px;
+        }
+        details {
+            background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 12px;
+        }
+        details summary {
+            cursor: pointer; font-weight: 600; font-size: 14.5px;
+        }
+        details summary:hover { color: var(--accent); }
+        details p { color: var(--text-dim); font-size: 14px; margin: 10px 0 0; }
+        details p strong { color: var(--text); }
+        .fmt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+        .fmt-card {
+            background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 18px;
+            border-top: 3px solid var(--fc, var(--accent));
+        }
+        .fmt-card h4 { font-size: 15px; margin-bottom: 6px; }
+        .fmt-card p { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+        .fmt-card a { font-size: 12.5px; color: var(--accent); margin-right: 10px; }
+        .fmt-card a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" class="active" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main class="article" style="padding-top:48px; max-width:860px;">
+        <h1 style="font-size:38px;font-weight:800;letter-spacing:-.03em;margin-bottom:6px;" data-i18n="guide.h1">
+            Сад за 5 минут</h1>
+        <p class="sec-sub" data-i18n="guide.sub">Гайд для студентов: что кликать, как читать растения и как не заблудиться. Никаких знаний о сетях не нужно.</p>
+
+        <div style="margin-bottom:30px;">
+            <a href="explore.html" class="btn btn-primary"><span data-icon="sprout"></span><span data-i18n="guide.open">Открыть сад</span></a>
+        </div>
+
+        <h2 class="sec-title" style="font-size:24px;" data-i18n="guide.route">Маршрут: 5 шагов</h2>
+        <p class="sec-sub" data-i18n="guide.route.sub">Делай по порядку. Каждый шаг — одно действие.</p>
+
+        <div class="step-card">
+            <h3><span class="step-num">1</span><span data-i18n="guide.s1.t">Осмотрись</span></h3>
+            <p data-i18n-html="guide.s1.p1">Ты в саду. Каждая светящаяся фигура — <strong>сетевой протокол</strong> (правило, по которому компьютеры общаются).</p>
+            <p data-i18n-html="guide.s1.p2">Управление мышью: <strong>колесо</strong> — приблизить, <strong>тянуть фон</strong> — осмотреться, <strong>двойной клик</strong> — вернуться назад.</p>
+        </div>
+
+        <div class="step-card">
+            <h3><span class="step-num">2</span><span data-i18n="guide.s2.t">Кликни самое большое дерево слева</span></h3>
+            <p data-i18n-html="guide.s2.p1">Это <strong>IPv4</strong> — фундамент интернета. Справа откроется <strong>карточка</strong>. В ней сверху вниз:</p>
+            <p data-i18n-html="guide.s2.p2">номер RFC и год → название → статус → описание человеческим языком → <strong>связи</strong> («зависит от», «используется в») → ссылка на оригинальный документ.</p>
+            <p data-i18n-html="guide.s2.p3"><a href="explore.html#rfc0791" style="color:var(--accent);">Открыть IPv4 в саду →</a></p>
+        </div>
+
+        <div class="step-card">
+            <h3><span class="step-num">3</span><span data-i18n="guide.s3.t">Пройди по корням</span></h3>
+            <p data-i18n-html="guide.s3.p1">В карточке IPv4 найди раздел <strong>«Используется в»</strong> и кликни <strong>TCP</strong>. Камера сама подлетит к нему.</p>
+            <p data-i18n-html="guide.s3.p2">Пунктирные линии между растениями означают <strong>«построен на основе»</strong>: TCP растёт из IPv4, а HTTP — из TCP. Целое дерево зависимостей!</p>
+            <p data-i18n-html="guide.s3.p3"><a href="explore.html#rfc0793" style="color:var(--accent);">Открыть TCP в саду →</a></p>
+        </div>
+
+        <div class="step-card">
+            <h3><span class="step-num">4</span><span data-i18n="guide.s4.t">Включи фильтры</span></h3>
+            <p data-i18n-html="guide.s4.p1">Вверху экрана — кнопки. Нажми <strong>Transport</strong>: останутся только 3 растения (TCP, UDP, QUIC). Нажми <strong>Все уровни</strong> — всё вернётся.</p>
+            <p data-i18n-html="guide.s4.p2">В строке поиска набери <strong>http</strong> — останутся 4 протокола. Клавиша <strong>Esc</strong> закрывает карточку, клавиша <strong>/</strong> ставит курсор в поиск.</p>
+        </div>
+
+        <div class="step-card">
+            <h3><span class="step-num">5</span><span data-i18n="guide.s5.t">Проверь себя</span></h3>
+            <p data-i18n-html="guide.s5.p1">Три задания. Ответы спрятаны — сначала попробуй сам в <a href="explore.html" style="color:var(--accent);">саду</a>.</p>
+        </div>
+
+        <details>
+            <summary data-i18n="guide.t1.sum">Задание 1: какой протокол самый «большой» и почему?</summary>
+            <p data-i18n-html="guide.t1.ans">Подсказка: размер растения = количество связей. Ответ: <strong>TCP</strong> — у него больше всех зависимостей (на нём стоят HTTP, SMTP, SSH и другие). Найди самое крупное растение-«лиану» в середине сада.</p>
+        </details>
+        <details>
+            <summary data-i18n="guide.t2.sum">Задание 2: пройди путь письма — от почтовой программы до проводов</summary>
+            <p data-i18n-html="guide.t2.ans">Ответ: <strong>SMTP → TCP → IPv4</strong>. Найди SMTP поиском, открой карточку и иди вниз по разделу «Зависит от»: SMTP зависит от TCP, а TCP — от IPv4.</p>
+        </details>
+        <details>
+            <summary data-i18n="guide.t3.sum">Задание 3: что общего у HTTP/2 и HTTP/3?</summary>
+            <p data-i18n-html="guide.t3.ans">Ответ: оба — «цветы» прикладного слоя, оба заменили предыдущую версию. Но HTTP/2 стоит на <strong>TCP</strong>, а HTTP/3 — на <strong>QUIC</strong>. Сравни их карточки: раздел «Зависит от».</p>
+        </details>
+
+        <h2 class="sec-title" style="font-size:24px; margin-top:44px;" data-i18n="guide.fmt.title">Справочник форматов</h2>
+        <p class="sec-sub" data-i18n="guide.fmt.sub">Всё, что растёт в саду: 5 видов растений, 7 ярусов, 3 статуса, связи и частицы. Рядом с протоколами живут железо, ОС, виртуализация, языки и ИИ — по тем же правилам.</p>
+
+        <h3 data-i18n="guide.plant.title">Виды растений — кто есть кто</h3>
+        <div class="fmt-grid" style="margin-bottom:26px;">
+            <div class="fmt-card" style="--fc:#4ade80;">
+                <h4><span data-icon="tree"></span> <span data-i18n="guide.plant.tree.t">Дерево — фундамент</span></h4>
+                <p data-i18n="guide.plant.tree.d">Базовые протоколы, на которых всё стоит: адресация, маршрутизация, шифрование.</p>
+                <a href="explore.html#rfc0791">IPv4</a><a href="explore.html#rfc8200">IPv6</a><a href="explore.html#rfc8446">TLS 1.3</a>
+            </div>
+            <div class="fmt-card" style="--fc:#22d3ee;">
+                <h4><span data-icon="vine"></span> <span data-i18n="guide.plant.vine.t">Лиана — транспорт</span></h4>
+                <p data-i18n="guide.plant.vine.d">Доставляют данные между машинами, обвивая фундамент. Светящийся кабель с импульсами.</p>
+                <a href="explore.html#rfc0793">TCP</a><a href="explore.html#rfc0768">UDP</a><a href="explore.html#rfc9000">QUIC</a>
+            </div>
+            <div class="fmt-card" style="--fc:#a78bfa;">
+                <h4><span data-icon="flower"></span> <span data-i18n="guide.plant.flower.t">Цветок — для человека</span></h4>
+                <p data-i18n="guide.plant.flower.d">Прикладные протоколы: то, чем пользуются люди и программы. Кристалл-антенна.</p>
+                <a href="explore.html#rfc2616">HTTP/1.1</a><a href="explore.html#rfc1035">DNS</a><a href="explore.html#rfc5321">SMTP</a>
+            </div>
+            <div class="fmt-card" style="--fc:#f59e0b;">
+                <h4><span data-icon="mushroom"></span> <span data-i18n="guide.plant.mushroom.t">Гриб-хаб — сервисы</span></h4>
+                <p data-i18n="guide.plant.mushroom.d">Служебные узлы: почта, время, файлы, обход NAT. Купол-сервер на стойке.</p>
+                <a href="explore.html#rfc5905">NTP</a><a href="explore.html#rfc0959">FTP</a><a href="explore.html#rfc5766">ICE</a>
+            </div>
+            <div class="fmt-card" style="--fc:#34d399;">
+                <h4><span data-icon="sprout"></span> <span data-i18n="guide.plant.sprout.t">Росток — малыши</span></h4>
+                <p data-i18n="guide.plant.sprout.d">Маленькие вспомогательные протоколы: диагностика, имена, автонастройка. LED на плате.</p>
+                <a href="explore.html#rfc0792">ICMP</a><a href="explore.html#rfc2131">DHCP</a><a href="explore.html#rfc3986">URI</a>
+            </div>
+        </div>
+
+        <h3 data-i18n="guide.an.title">Анатомия растения</h3>
+        <p class="sec-sub" data-i18n="guide.an.sub">Каждое растение собрано из пяти слоёв — и каждый живёт по-своему.</p>
+        <div class="fmt-grid" style="margin-bottom:26px;">
+            <div class="fmt-card" style="--fc:#4ade80;">
+                <h4><span data-icon="dependency"></span> <span data-i18n="guide.an.roots.t">Корни — связи</span></h4>
+                <p data-i18n="guide.an.roots.d">Светящиеся нити вниз — зависимости растения. Тускнеют, когда растение вне фокуса.</p>
+            </div>
+            <div class="fmt-card" style="--fc:#22d3ee;">
+                <h4><span data-icon="stack"></span> <span data-i18n="guide.an.stem.t">Стебель — жизнь</span></h4>
+                <p data-i18n="guide.an.stem.d">Слегка качается, внутри бегут частицы-соки снизу вверх.</p>
+            </div>
+            <div class="fmt-card" style="--fc:#34d399;">
+                <h4><span data-icon="sprout"></span> <span data-i18n="guide.an.leaves.t">Листья — дыхание</span></h4>
+                <p data-i18n="guide.an.leaves.d">Кристаллические пластины раскрываются и закрываются не в такт друг другу.</p>
+            </div>
+            <div class="fmt-card" style="--fc:#a78bfa;">
+                <h4><span data-icon="flower"></span> <span data-i18n="guide.an.flower.t">Цветок — антенна</span></h4>
+                <p data-i18n="guide.an.flower.d">Лепестки медленно вращаются, ядро пульсирует. В фокусе цветок раскрывается шире.</p>
+            </div>
+            <div class="fmt-card" style="--fc:#f59e0b;">
+                <h4><span data-icon="packet"></span> <span data-i18n="guide.an.fruits.t">Плоды — польза</span></h4>
+                <p data-i18n="guide.an.fruits.d">Светящиеся сферы: сколько узлов стоит на этом. Клик по плоду открывает карточку.</p>
+            </div>
+        </div>
+
+        <h3 data-i18n="guide.layer.title">Ярусы — этажи сада</h3>
+        <div class="fmt-grid" style="margin-bottom:26px;">
+            <div class="fmt-card" style="--fc:#a78bfa;">
+                <h4><span class="plant-dot" style="background:#a78bfa;"></span>7 · Application — <span data-i18n="guide.layer.app.t">прикладной</span></h4>
+                <p data-i18n="guide.layer.app.d">Верхний этаж: HTTP, DNS, почта. То, что видят приложения.</p>
+                <a href="explore.html?layer=application" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#f59e0b;">
+                <h4><span class="plant-dot" style="background:#f59e0b;"></span>6 · Presentation — <span data-i18n="guide.layer.pr.t">защита</span></h4>
+                <p data-i18n="guide.layer.pr.d">Шифрование и безопасность: TLS, хеши паролей. Замки на дверях.</p>
+                <a href="explore.html?layer=presentation" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#f472b6;">
+                <h4><span class="plant-dot" style="background:#f472b6;"></span>5 · Session — <span data-i18n="guide.layer.se.t">сессии</span></h4>
+                <p data-i18n="guide.layer.se.d">Цветы сессий: SIP, SDP, OAuth. Бутоны раскрыты, пока сессия жива.</p>
+                <a href="explore.html?layer=session" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#22d3ee;">
+                <h4><span class="plant-dot" style="background:#22d3ee;"></span>4 · Transport — <span data-i18n="guide.layer.tr.t">транспортный</span></h4>
+                <p data-i18n="guide.layer.tr.d">Середина: TCP, UDP, QUIC. Доставка данных целиком и по порядку (или быстро).</p>
+                <a href="explore.html?layer=transport" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#4ade80;">
+                <h4><span class="plant-dot" style="background:#4ade80;"></span>3 · Network — <span data-i18n="guide.layer.nw.t">сетевой</span></h4>
+                <p data-i18n="guide.layer.nw.d">Низ: IPv4, IPv6, BGP. Адреса и дороги, по которым бегут пакеты.</p>
+                <a href="explore.html?layer=network" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#a3e635;">
+                <h4><span class="plant-dot" style="background:#a3e635;"></span>2 · Link — <span data-i18n="guide.layer.li.t">канальный</span></h4>
+                <p data-i18n="guide.layer.li.d">Мох и травы: ARP, коммутаторы. Кадры и MAC-адреса локальной сети.</p>
+                <a href="explore.html?layer=link" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#fb9235;">
+                <h4><span class="plant-dot" style="background:#fb9235;"></span>1 · Physical — <span data-i18n="guide.layer.ph.t">физический</span></h4>
+                <p data-i18n="guide.layer.ph.d">Почва: модемы и Wi-Fi. Провода, воздух и гудки dial-up.</p>
+                <a href="explore.html?layer=physical" data-i18n="guide.layer.show">Показать слой →</a>
+            </div>
+        </div>
+
+        <h3 data-i18n="guide.status.title">Статусы — жив ли протокол</h3>
+        <p style="margin-bottom:20px;" data-i18n-html="guide.status.p">
+            <span class="badge st-active">активен</span>&nbsp; — стандарт живой, используется прямо сейчас (TCP, DNS).<br><br>
+            <span class="badge st-updated">обновлён</span>&nbsp; — работает, но есть более новая версия (HTTP/1.1 → HTTP/2).<br><br>
+            <span class="badge st-legacy">устарел</span>&nbsp; — музейный экспонат, почти не используется (FTP).
+        </p>
+
+        <h3 data-i18n="guide.rel.title">Связи и частицы</h3>
+        <p data-i18n-html="guide.rel.p1"><strong>Пунктирная линия</strong> между растениями = «зависит от». Градиент цвета показывает, кто с кем связан.</p>
+        <p data-i18n-html="guide.rel.p2">В карточке четыре вида связей: <strong>зависит от</strong> (корни), <strong>используется в</strong> (ветви), <strong>заменил</strong> / <strong>заменён на</strong> (история).</p>
+        <div class="code-block">пример пути пакета:
+HTTP/2 → TCP → IPv4
+(цветок → лиана → дерево,
+ сверху вниз — как вода по корням)</div>
+        <p data-i18n-html="guide.rel.p3"><strong>Светящиеся точки</strong>, бегущие по линиям, — частицы данных: так пакет проходит стек протоколов.</p>
+
+        <h3 data-i18n="guide.faq.title">Частые вопросы</h3>
+        <details>
+            <summary data-i18n="guide.faq1.sum">Я ничего не знаю о сетях. С чего начать?</summary>
+            <p data-i18n-html="guide.faq1.ans">С шагов 1–3 выше. Потом открой <a href="learn.html" style="color:var(--accent);">Обучение</a> — там разбор на примере открытия сайта.</p>
+        </details>
+        <details>
+            <summary data-i18n="guide.faq2.sum">Что за номер RFC?</summary>
+            <p data-i18n-html="guide.faq2.ans"><strong>RFC (Request for Comments)</strong> — номер официального документа-стандарта. Первый вышел в 1969 году. В карточке есть ссылка «Читать оригинальный RFC».</p>
+        </details>
+        <details>
+            <summary data-i18n="guide.faq3.sum">Как поделиться конкретным протоколом?</summary>
+            <p data-i18n-html="guide.faq3.ans">Открой его карточку и нажми кнопку «поделиться» вверху — ссылка с хешем (например, <span class="mono">explore.html#rfc0793</span>) скопируется в буфер.</p>
+        </details>
+
+        <h2 class="sec-title" style="font-size:24px; margin-top:44px;" data-i18n="guide.gloss.title">Глоссарий за минуту</h2>
+        <p class="sec-sub" data-i18n="guide.gloss.sub">Слова, которые встретятся в саду.</p>
+        <div class="fmt-grid" style="margin-bottom:26px;">
+            <div class="fmt-card"><h4 data-i18n="guide.g1.t">Пакет</h4><p data-i18n="guide.g1.d">Кусочек данных в конверте с адресами «от» и «кому». Всё в сети ездит пакетами.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g2.t">IP-адрес</h4><p data-i18n="guide.g2.d">Адрес компьютера в сети. IPv4: 4 числа (192.168.1.1). IPv6: длинный, с двоеточиями.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g3.t">Порт</h4><p data-i18n="guide.g3.d">Номер «двери» в компьютере: 80 — веб, 25 — почта. IP выбирает дом, порт — дверь.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g4.t">Сокет</h4><p data-i18n="guide.g4.d">IP + порт вместе. Точный адрес программы, а не просто машины.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g5.t">Handshake</h4><p data-i18n="guide.g5.d">Рукопожатие: стороны договариваются, прежде чем слать данные (у TCP — тройное).</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g6.t">Стек</h4><p data-i18n="guide.g6.d">Слои протоколов друг над другом: каждый пользуется нижним. HTTP → TCP → IP.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g7.t">NAT</h4><p data-i18n="guide.g7.d">Переводчик адресов на роутере: прячет домашние адреса за одним внешним.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g8.t">DNS</h4><p data-i18n="guide.g8.d">Телефонная книга интернета: имя → IP-адрес.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g9.t">Шифрование</h4><p data-i18n="guide.g9.d">Перемешивание данных так, чтобы чужой видел шум. Расшифровать может только свой.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g10.t">Токен</h4><p data-i18n="guide.g10.d">Пропуск вместо пароля: сайт верит токену, а пароль не видит.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g11.t">Зависимость</h4><p data-i18n="guide.g11.d">«Стоит на»: протокол не работает без нижнего. Пунктир в саду.</p></div>
+            <div class="fmt-card"><h4 data-i18n="guide.g12.t">RFC</h4><p data-i18n="guide.g12.d">Номер документа-стандарта. Первый — 1969 год. Ссылка на оригинал есть в каждой карточке.</p></div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:24px; margin-top:44px;" data-i18n="guide.next.title">Что дальше</h2>
+        <div class="fmt-grid" style="margin-bottom:26px;">
+            <div class="fmt-card" style="--fc:#34d399;">
+                <h4><span data-icon="quiz"></span> <span data-i18n="guide.qz.t">Квиз</span></h4><p data-i18n="guide.qz.d">10 вопросов по саду: угадай протокол по описанию.</p>
+                <a href="quiz.html" data-i18n="guide.qz.a">Играть →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#22d3ee;">
+                <h4><span data-icon="stats"></span> <span data-i18n="guide.st.t">Статистика</span></h4><p data-i18n="guide.st.d">Сад в цифрах: хабы, слои, рекорды.</p>
+                <a href="stats.html" data-i18n="guide.st.a">Смотреть →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#a78bfa;">
+                <h4><span data-icon="cheatsheet"></span> <span data-i18n="guide.cs.t">Шпаргалка</span></h4><p data-i18n="guide.cs.d">Все 72 объекта сада одной таблицей для печати.</p>
+                <a href="cheatsheet.html" data-i18n="guide.cs.a">Открыть →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#f59e0b;">
+                <h4><span data-icon="teacher"></span> <span data-i18n="guide.tc.t">Преподавателю</span></h4><p data-i18n="guide.tc.d">Готовые лабораторные с ответами и оценками.</p>
+                <a href="teacher.html" data-i18n="guide.tc.a">Взять →</a>
+            </div>
+            <div class="fmt-card" style="--fc:#e879f9;">
+                <h4><span data-icon="book"></span> <span data-i18n="guide.en.t">Энциклопедия</span></h4><p data-i18n="guide.en.d">Истории, разновидности и практика всех 72 объектов — целиком на сайте.</p>
+                <a href="encyclopedia.html" data-i18n="guide.en.a">Читать →</a>
+            </div>
+        </div>
+
+        <div style="margin:40px 0 20px; display:flex; gap:14px; flex-wrap:wrap;">
+            <a href="explore.html" class="btn btn-primary"><span data-icon="sprout"></span><span data-i18n="guide.cta1">В сад — применять знания</span></a>
+            <a href="timeline.html" class="btn btn-secondary" data-i18n="guide.cta2">История по годам</a>
+        </div>
+    </main>
+
+    <footer>
+        <div><h4>RFC Garden</h4><p data-i18n="foot.open">Open Source · данные из публичных RFC IETF</p></div>
+        <div><h4 data-i18n="foot.newcomers">Новичкам</h4><a href="guide.html" data-i18n="guide.h1">Гайд за 5 минут</a><a href="learn.html" data-i18n="nav.learn">Обучение</a></div>
+    </footer>
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.contribute">Вклад — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" class="active" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main class="article" style="padding-top:48px;">
+        <h1 style="font-size:36px;font-weight:800;letter-spacing:-.03em;" data-i18n="c.h1">Посадить свой протокол</h1>
+        <p class="sec-sub" data-i18n="c.sub">Сад растёт из данных. Один JSON-объект — новое растение.</p>
+
+        <h3><span class="step-num">1</span><span data-i18n="c.step1.t">Выберите RFC</span></h3>
+        <p data-i18n-html="c.step1.p">Найдите протокол на
+        <a href="https://www.rfc-editor.org/search" target="_blank" rel="noopener"
+           style="color:var(--accent);">rfc-editor.org</a>,
+        которого ещё нет в саду.</p>
+
+        <h3><span class="step-num">2</span><span data-i18n="c.step2.t">Опишите растение</span></h3>
+        <p data-i18n-html="c.step2.p">Добавьте объект в конец массива <code class="mono">protocols</code>
+        в <code class="mono">PROTOCOLS.json</code> и <code class="mono">js/data.js</code>:</p>
+        <div class="code-block">{
+  "id": "rfc9001",
+  "number": 9001,
+  "name": "TLS 1.3",
+  "fullName": "Transport Layer Security",
+  "year": 2018,
+  "status": "active",          // active | updated | legacy
+  "layer": "presentation",     // application | transport | network
+  "category": "security",
+  "plant": "tree",             // tree | vine | flower | mushroom | sprout
+  "description": "Шифрование соединений человеческим языком.",
+  "dependsOn": ["rfc0793"],    // id протоколов-оснований
+  "usedBy": [],
+  "replaces": [],              // какие RFC заменяет
+  "replacedBy": [],            // чем сам заменён
+  "color": "#4DD0E1"
+}</div>
+
+        <h3><span class="step-num">3</span><span data-i18n="c.step3.t">Отправьте PR</span></h3>
+        <p data-i18n-html="c.step3.p">Fork → ветка → коммит → Pull Request в
+        <a href="https://github.com/kidjinbruh-del/rfc-garden" target="_blank"
+           rel="noopener" style="color:var(--accent);">репозиторий проекта</a>.
+        Сад пересчитает размеры и связи автоматически.</p>
+
+        <h3 data-i18n="c.rules.t">Правила посадки</h3>
+        <p data-i18n-html="c.rules.p">Описание — человеческим языком, без канцелярита. Цвет — контрастный
+        к уже занятым. <code class="mono">dependsOn</code> — только существующие id.
+        Один PR — один протокол.</p>
+    </main>
+
+    <footer>
+        <div><h4>RFC Garden</h4><p data-i18n="foot.mit">Open Source · MIT</p></div>
+    </footer>
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>

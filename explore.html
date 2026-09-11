@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.explore">Сад — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style> body { overflow: hidden; } </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5-0 3-2 5-5 5zm0 0c0-3-2-5-5-5 0 3 2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" class="active" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <div class="garden-page">
+        <canvas id="gardenCanvas" role="img" aria-label="Интерактивный сад сетевых протоколов RFC. Используйте стрелки для навигации, Enter для выбора, Escape для сброса."></canvas>
+
+        <div class="toolbar" role="toolbar" data-i18n-attr="aria-label:e.toolbar.aria" aria-label="Фильтры и поиск протоколов">
+            <div class="search-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+                <input type="text" class="search-box" id="searchBox"
+                       data-i18n-attr="placeholder:e.search.placeholder|aria-label:e.search.aria"
+                       placeholder="Поиск: TCP, 793, security…  (/)" autocomplete="off" aria-label="Поиск протоколов">
+            </div>
+            <button class="chip" data-status="all" data-i18n="e.status.all" data-i18n-attr="aria-label:e.chip.all.aria" aria-label="Показать все протоколы">Все</button>
+            <button class="chip" data-status="active" data-i18n="e.status.active" data-i18n-attr="aria-label:e.chip.active.aria" aria-label="Показать активные протоколы">Активные</button>
+            <button class="chip" data-status="changed" data-i18n="e.status.changed" data-i18n-attr="aria-label:e.chip.changed.aria" aria-label="Показать изменённые протоколы">Изменённые</button>
+            <button class="chip" data-status="legacy" data-i18n="e.status.legacy" data-i18n-attr="aria-label:e.chip.legacy.aria" aria-label="Показать устаревшие протоколы">Устаревшие</button>
+            <span style="opacity:.3" aria-hidden="true">|</span>
+            <button class="chip active" data-layer="all" data-i18n="e.layer.all" data-i18n-attr="aria-label:e.chip.layerall.aria" aria-label="Показать все уровни">Все уровни</button>
+            <button class="chip" data-layer="application" data-i18n="layer.app" data-i18n-attr="aria-label:e.chip.layer.app.aria" aria-label="Показать прикладной уровень">Application</button>
+            <button class="chip" data-layer="presentation" data-i18n="layer.presentation" data-i18n-attr="aria-label:e.chip.layer.pr.aria" aria-label="Показать уровень шифрования">Presentation</button>
+            <button class="chip" data-layer="session" data-i18n="layer.session" data-i18n-attr="aria-label:e.chip.layer.se.aria" aria-label="Показать сеансовый уровень">Session</button>
+            <button class="chip" data-layer="transport" data-i18n="layer.transport" data-i18n-attr="aria-label:e.chip.layer.tr.aria" aria-label="Показать транспортный уровень">Transport</button>
+            <button class="chip" data-layer="network" data-i18n="layer.network" data-i18n-attr="aria-label:e.chip.layer.nw.aria" aria-label="Показать сетевой уровень">Network</button>
+            <button class="chip" data-layer="link" data-i18n="layer.link" data-i18n-attr="aria-label:e.chip.layer.li.aria" aria-label="Показать канальный уровень">Link</button>
+            <button class="chip" data-layer="physical" data-i18n="layer.physical" data-i18n-attr="aria-label:e.chip.layer.ph.aria" aria-label="Показать физический уровень">Physical</button>
+            <select class="cat-select" id="catSelect" data-i18n-attr="aria-label:e.catselect.aria" aria-label="Фильтр по назначению"></select>
+            <span class="shown-counter" id="shownCounter" aria-live="polite"></span>
+            <button class="btn btn-secondary btn-sm" id="tourBtn"
+                    data-i18n-attr="title:e.tour.title|aria-label:e.tour.aria"
+                    title="Авто-тур по саду" aria-label="Запустить авто-тур"><span data-icon="tour"></span> <span data-i18n="e.tour.lbl">Тур</span></button>
+            <button class="btn btn-secondary btn-sm" id="examBtn"
+                    data-i18n-attr="title:e.exam.title|aria-label:e.exam.aria"
+                    title="Режим экзамена: скрыть названия" aria-label="Режим экзамена"><span data-icon="exam"></span></button>
+            <button class="btn btn-secondary btn-sm" id="favBtn"
+                    data-i18n-attr="title:e.fav.title|aria-label:e.fav.aria"
+                    title="Показать избранное" aria-label="Показать избранное"><span data-icon="favOff"></span></button>
+            <button class="btn btn-secondary btn-sm" id="recentBtn"
+                    data-i18n-attr="title:e.recent.title|aria-label:e.recent.aria"
+                    title="Недавно открытые" aria-label="Недавно открытые"><span data-icon="recent"></span></button>
+            <button class="btn btn-secondary btn-sm" id="soundBtn"
+                    data-i18n-attr="title:e.sound.title|aria-label:e.sound.aria"
+                    title="Звук" aria-label="Переключить звук"><span data-icon="soundOn"></span></button>
+            <button class="btn btn-secondary btn-sm" id="exportSetBtn"
+                    data-i18n-attr="title:e.exportSet.title|aria-label:e.exportSet.aria"
+                    title="Скачать видимые протоколы как JSON" aria-label="Скачать набор JSON"><span data-icon="export"></span></button>
+            <button class="btn btn-secondary btn-sm" id="importSetBtn"
+                    data-i18n-attr="title:e.importSet.title|aria-label:e.importSet.aria"
+                    title="Загрузить свой набор JSON" aria-label="Загрузить набор JSON"><span data-icon="import"></span></button>
+            <button class="btn btn-secondary btn-sm" id="resetView"
+                    style="margin-left:auto;" data-i18n-attr="title:e.reset.title|aria-label:e.reset.aria"
+                    title="Сбросить камеру (двойной клик по полю)"
+                    aria-label="Сбросить положение камеры"><span data-icon="reset"></span></button>
+            <button class="btn btn-secondary btn-sm" id="exportPng"
+                    data-i18n-attr="title:e.png.title|aria-label:e.png.aria"
+                    title="Экспорт в PNG" aria-label="Скачать изображение сада">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <button class="btn btn-secondary btn-sm" id="shareLink"
+                    data-i18n-attr="title:e.share.title|aria-label:e.share.aria"
+                    title="Поделиться ссылкой" aria-label="Скопировать ссылку на текущий вид">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+        </div>
+
+        <div class="legend" data-i18n-attr="aria-label:e.legend.aria" aria-label="Легенда: цвета уровней сетевого стека. Клик фильтрует сад.">
+            <span data-layer="application" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.app" title="Показать прикладной уровень"><i style="background:#a78bfa" aria-hidden="true"></i> <span data-i18n="layer.app">Application</span></span>
+            <span data-layer="presentation" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.pr" title="Показать уровень шифрования"><i style="background:#f59e0b" aria-hidden="true"></i> Security / Sync</span>
+            <span data-layer="session" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.se" title="Показать сеансовый уровень"><i style="background:#f472b6" aria-hidden="true"></i> <span data-i18n="layer.session">Session</span></span>
+            <span data-layer="transport" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.tr" title="Показать транспортный уровень"><i style="background:#22d3ee" aria-hidden="true"></i> <span data-i18n="layer.transport">Transport</span></span>
+            <span data-layer="network" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.nw" title="Показать сетевой уровень"><i style="background:#4ade80" aria-hidden="true"></i> <span data-i18n="layer.network">Network</span></span>
+            <span data-layer="link" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.li" title="Показать канальный уровень"><i style="background:#a3e635" aria-hidden="true"></i> <span data-i18n="layer.link">Link</span></span>
+            <span data-layer="physical" role="button" tabindex="0" data-i18n-attr="title:e.legend.title.ph" title="Показать физический уровень"><i style="background:#fb9235" aria-hidden="true"></i> <span data-i18n="layer.physical">Physical</span></span>
+            <span style="margin-left:8px;opacity:.6;" data-i18n="e.legend.hint">колёсико — зум · тянуть — панорама · клик — карточка · Esc — сброс</span>
+        </div>
+
+        <div class="proto-card hidden" id="protoCard" role="dialog" data-i18n-attr="aria-label:e.pc.aria" aria-label="Информация о протоколе" aria-modal="false" aria-live="polite">
+            <button class="pc-close" id="pcClose" data-i18n-attr="aria-label:e.pc.close.aria" aria-label="Закрыть карточку"><span data-icon="close"></span></button>
+            <div class="pc-num" id="pcNum"></div>
+            <div class="pc-title" id="pcTitle"></div>
+            <div class="pc-fullname" id="pcFullname"></div>
+            <div class="pc-badges" id="pcBadges"></div>
+            <div class="pc-desc" id="pcDesc"></div>
+            <div class="pc-where" id="pcWhere"></div>
+            <div class="pc-fact" id="pcFact"></div>
+            <div id="pcRelations"></div>
+            <div class="pc-actions">
+                <button class="btn btn-secondary btn-sm" id="pcFav" aria-label="В избранное">☆ В избранное</button>
+                <button class="btn btn-secondary btn-sm" id="pcCompare" data-i18n="e.compare">Сравнить</button>
+                <button class="btn btn-secondary btn-sm" id="pcPath" data-i18n="e.path">Путь пакета</button>
+                <button class="btn btn-secondary btn-sm" id="pcProfile" data-i18n="e.profile">Паспорт</button>
+                <button class="btn btn-secondary btn-sm hidden" id="pcReveal" data-i18n="e.reveal">Показать ответ</button>
+            </div>
+            <a class="pc-link" id="pcLink" target="_blank" rel="noopener noreferrer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M21 3l-9 9M10 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-4"/></svg>
+                <span data-i18n="e.link" id="pcLinkText">Читать оригинальный RFC</span>
+            </a>
+        </div>
+
+        <div class="hint" data-i18n="e.hint">кликните растение, чтобы изучить протокол</div>
+
+        <div class="compare-card hidden" id="compareCard" role="dialog" data-i18n-attr="aria-label:e.cmp.aria" aria-label="Сравнение протоколов" aria-live="polite">
+            <button class="pc-close" id="cmpClose" data-i18n-attr="aria-label:e.cmp.close.aria" aria-label="Закрыть сравнение"><span data-icon="close"></span></button>
+            <div class="pc-num" data-i18n="e.cmp.title">Сравнение</div>
+            <div class="cmp-cols" id="cmpCols"></div>
+        </div>
+
+        <canvas id="minimap" width="180" height="120" role="img" data-i18n-attr="aria-label:e.minimap.aria" aria-label="Мини-карта сада. Клик перемещает камеру."></canvas>
+        <div class="tour-caption hidden" id="tourCaption" aria-live="polite"></div>
+        <div class="recent-panel hidden" id="recentPanel" role="dialog" data-i18n-attr="aria-label:e.recent.aria" aria-label="Недавно открытые протоколы"></div>
+        <div class="toast hidden" id="toast" aria-live="polite"></div>
+        <input type="file" id="fileImport" accept="application/json,.json" class="hidden" aria-label="Загрузить набор протоколов JSON">
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/garden.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/explore.js"></script>
+</body>
+</html>

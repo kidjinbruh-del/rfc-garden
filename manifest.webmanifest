@@ -1,0 +1,12 @@
+{
+  "name": "RFC Garden — сад сетевых протоколов",
+  "short_name": "RFC Garden",
+  "description": "Интерактивная визуализация 50 RFC-протоколов в виде живого сада: поиск, квиз, экзамен, таймлайн.",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "lang": "ru",
+  "icons": []
+}

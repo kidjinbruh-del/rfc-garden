@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.timeline">Таймлайн — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="timeline.html" class="active" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main style="max-width:900px;">
+        <h1 class="sec-title" style="margin-top:40px;" data-i18n="timeline.h1">История в растениях</h1>
+        <p class="sec-sub" data-i18n="timeline.sub">Пятьдесят лет эволюции интернета — от простого RFC до QUIC.
+        Кликните запись, чтобы увидеть растение в саду.</p>
+        <div class="timeline" id="timeline"></div>
+    </main>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        (function () {
+            var box = document.getElementById('timeline');
+            var items = protocolsData.protocols.slice()
+                .sort(function (a, b) { return a.year - b.year; });
+            for (var i = 0; i < items.length; i++) {
+                var p = items[i];
+                var div = document.createElement('div');
+                div.className = 'tl-item';
+                div.style.setProperty('--dot', p.color);
+                div.setAttribute('data-id', p.id);
+                div.tabIndex = 0;
+                div.setAttribute('role', 'button');
+                div.setAttribute('aria-label', p.name + ' — RFC ' + p.number + ', ' + p.year);
+                div.addEventListener('click', function () {
+                    location.href = 'explore.html#' + this.getAttribute('data-id');
+                });
+                div.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') location.href = 'explore.html#' + this.getAttribute('data-id');
+                });
+                var RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
+                lang: "языки", ai: "ИИ" };
+                var st = I18N.t('status.' + p.status, { active: 'активен', updated: 'обновлён',
+                             legacy: 'устарел' }[p.status] || p.status);
+                var tag = p.number ? 'RFC ' + p.number
+                    : I18N.t('cat.' + p.category, RUCAT[p.category] || p.category);
+                div.innerHTML =
+                    '<div class="tl-year">' + p.year + ' · ' + st + '</div>' +
+                    '<div class="tl-name">' + p.name +
+                    '<span>' + tag + '</span></div>' +
+                    '<div class="tl-desc">' + p.description + '</div>';
+                box.appendChild(div);
+            }
+        })();
+    </script>
+</body>
+</html>

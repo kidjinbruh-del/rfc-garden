@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.cheatsheet">Шпаргалка — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        table.sheet { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; }
+        table.sheet th, table.sheet td { border: 1px solid var(--line-strong);
+            padding: 7px 10px; text-align: left; vertical-align: top; }
+        table.sheet th { background: var(--bg-elevated); font-size: 11px;
+            text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+        table.sheet td.mono { font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+        @media print {
+            .navbar, .no-print { display: none !important; }
+            body { background: #fff; color: #000; }
+            main { max-width: 100%; }
+            table.sheet th, table.sheet td { border-color: #999; }
+            table.sheet { font-size: 11px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main style="max-width:1000px;">
+        <h1 class="sec-title" style="margin-top:40px;" data-i18n="cs.h1">Шпаргалка</h1>
+        <p class="sec-sub no-print" data-i18n="cs.sub">Все объекты сада одной таблицей. Распечатай перед парой.</p>
+        <div class="no-print" style="margin-bottom:10px;">
+            <button class="btn btn-primary" onclick="window.print()"><span data-icon="print"></span><span data-i18n="cs.print">Печать</span></button>
+        </div>
+        <table class="sheet" id="sheetTable" aria-label="Все протоколы сада таблицей"></table>
+        <div style="margin:30px 0 60px;" class="no-print">
+            <a href="explore.html" class="btn btn-secondary" data-i18n="cs.back">← Вернуться в сад</a>
+        </div>
+    </main>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        (function () {
+            "use strict";
+            const t = document.getElementById("sheetTable");
+            const T = (k, fb) => I18N.t(k, fb);
+            const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
+                lang: "языки", ai: "ИИ" };
+            const typeName = (p) => p.number ? T("kind.protocol", "Протокол")
+                : T("cat." + p.category, RUCAT[p.category] || p.category);
+            const st = {
+                active: T("status.active", "активен"),
+                updated: T("status.updated", "обновлён"),
+                legacy: T("status.legacy", "устарел"),
+            };
+            let html = "<tr><th>" + T("table.protocol", "Протокол") + "</th><th>RFC</th><th>" +
+                T("table.year", "Год") + "</th><th>" + T("table.layer", "Слой") + "</th><th>" +
+                T("table.status", "Статус") + "</th><th>" + T("table.kind", "Тип") + "</th><th>" +
+                T("cs.what", "Что это") + "</th></tr>";
+            protocolsData.protocols.slice()
+                .sort((a, b) => a.year - b.year || (a.number || 0) - (b.number || 0))
+                .forEach((p) => {
+                    html += `<tr><td><strong>${p.name}</strong></td>` +
+                        `<td class="mono">${p.number || "—"}</td><td class="mono">${p.year}</td>` +
+                        `<td>${T("layer." + p.layer, p.layer)}</td><td>${st[p.status] || p.status}</td>` +
+                        `<td>${typeName(p)}</td>` +
+                        `<td>${p.description}</td></tr>`;
+                });
+            t.innerHTML = html;
+        })();
+    </script>
+</body>
+</html>

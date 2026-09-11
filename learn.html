@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.learn">Обучение — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" class="active" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main class="article" style="padding-top:48px;">
+        <h1 style="font-size:38px;font-weight:800;letter-spacing:-.03em;margin-bottom:6px;" data-i18n="learn.h1">
+            Как читать сад</h1>
+        <p class="sec-sub" data-i18n="learn.sub">Пять минут — и язык сетевых протоколов перестанет быть магией.</p>
+
+        <h3 data-i18n="learn.rfc.t">Что такое RFC</h3>
+        <p data-i18n-html="learn.rfc.p"><strong>RFC (Request for Comments)</strong> — рабочие документы, в которых
+        описаны все стандарты интернета. Первый вышел в <strong>1969 году</strong>.
+        TCP, IP, HTTP, DNS — всё, по чему ходит ваш трафик, однажды было чьим-то RFC.
+        Документы бесплатны и открыты: их пишет сообщество IETF.</p>
+
+        <h3 data-i18n="learn.plants.t">Почему растения</h3>
+        <p data-i18n-html="learn.plants.p">Протоколы не живут отдельно — они <strong>прорастают друг из друга</strong>.
+        HTTP невозможен без TCP, TCP без IP. Поэтому сад: деревья — фундамент
+        (IPv4, TLS), лианы — то, что обвивает фундамент (TCP, SSH),
+        цветы — то, что распускается для человека (HTTP, DNS).</p>
+
+        <h3 data-i18n="learn.legend.t">Легенда сада</h3>
+        <p data-i18n-html="learn.legend.p"><strong>Размер растения</strong> — количество связей с другими протоколами.
+        Чем важнее узел, тем крупнее крона.<br>
+        <strong>Цвет линий</strong> — градиент между цветами двух связанных протоколов;
+        пунктир означает «зависит от».<br>
+        <strong>Частицы</strong> — путь данных: от прикладного уровня вниз к сети.</p>
+
+        <h3 data-i18n="learn.status.t">Статусы растений</h3>
+        <p data-i18n-html="learn.status.p"><span class="badge st-active">активен</span>&nbsp; — стандарт живой, используйте смело.&nbsp;
+        <span class="badge st-updated">обновлён</span>&nbsp; — работает, но есть более новая версия.&nbsp;
+        <span class="badge st-legacy">устарел</span>&nbsp; — музейный экспонат: FTP всё ещё где-то растёт.</p>
+
+        <h3 data-i18n="learn.example.t">Пример: что происходит, когда вы открываете сайт</h3>
+        <div class="code-block" data-i18n-html="learn.example.code">вы вводите google.com
+  → DNS (RFC 1035) превращает имя в IP-адрес
+    → браузер открывает TCP-соединение (RFC 793)
+      → оборачивает его в TLS-шифрование (RFC 8446)
+        → отправляет HTTP/2-запрос (RFC 7540)
+          → всё это бегает по IPv4 или IPv6 (RFC 791 / 8200)</div>
+        <p data-i18n="learn.example.p">В саду этот путь виден глазами частиц, бегущих по линиям зависимостей:
+        HTTP → TCP → IPv4 → ARP.</p>
+
+        <div style="margin-top:44px; display:flex; gap:14px; flex-wrap:wrap;">
+            <a href="explore.html" class="btn btn-primary"><span data-icon="sprout"></span><span data-i18n="learn.cta1">Открыть сад и найти эти растения</span></a>
+            <a href="guide.html" class="btn btn-secondary" data-i18n="learn.cta2">Гайд за 5 минут</a>
+        </div>
+    </main>
+
+    <footer>
+        <div><h4>RFC Garden</h4><p data-i18n="foot.open">Open Source · данные из публичных RFC IETF</p></div>
+    </footer>
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>
