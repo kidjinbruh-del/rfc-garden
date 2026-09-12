@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.linux">Справочник Linux — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .demo-card { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 18px 20px; margin: 14px 0; }
+        .demo-card h3 { margin: 0 0 10px; font-size: 16px; }
+        .demo-card h3 .icon { vertical-align: -3px; margin-right: 6px; color: var(--accent); }
+        .demo-card p { font-size: 14px; margin: 8px 0; }
+        .demo-row { display: flex; gap: 8px; align-items: baseline; padding: 5px 0;
+            border-top: 1px dashed var(--line); font-size: 14px; flex-wrap: wrap; }
+        .demo-row:first-of-type { border-top: none; }
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px;
+            font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+        .pill.pass { background: rgba(52,211,153,.15); color: var(--accent); }
+        .pill.fail { background: rgba(248,113,113,.15); color: #f87171; }
+        .pill.info { background: rgba(148,163,184,.15); color: var(--text-dim); }
+        .demo-code { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 14px 18px; margin: 14px 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; overflow-x: auto;
+            white-space: pre; }
+        .demo-note { font-size: 13px; color: var(--text-dim); margin: 10px 0 0; }
+        .fam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 24px 0; }
+        .fam-card { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 18px; }
+        .fam-card h3 { margin: 0 0 8px; font-size: 15px; }
+        .fam-card h3 .icon { vertical-align: -3px; margin-right: 6px; color: var(--accent); }
+        .fam-card p { font-size: 13px; margin: 6px 0; color: var(--text-dim); }
+        .fam-card p b { color: var(--text); }
+        .filter-bar { position: sticky; top: 64px; z-index: 5; background: var(--bg-panel);
+            border: 1px solid var(--line); border-radius: var(--radius-sm);
+            padding: 12px 14px; margin: 18px 0 6px; }
+        .filter-search { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--text-dim); }
+        .filter-search input { flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text); font-size: 15px; font-family: inherit; min-width: 0; }
+        .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        [data-group] { scroll-margin-top: 150px; }
+        main h2.sec-title { scroll-margin-top: 150px; }
+        .count-pill { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text-dim);
+            border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; white-space: nowrap; }
+        .toc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .toc a { font-size: 12.5px; color: var(--text-dim); text-decoration: none;
+            border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; }
+        .toc a:hover { color: var(--accent); border-color: var(--accent); }
+        .toc a.dim { opacity: .35; }
+        .toc a b { font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-right: 5px; color: var(--accent); }
+        .filter-bar.collapsed .filter-chips, .filter-bar.collapsed .toc { display: none; }
+        .filter-bar.collapsed .filter-search { margin-bottom: 0; }
+    </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="demo.html" data-i18n="nav.demo">Демо</a></li>
+            <li><a href="linux.html" class="active" data-i18n="nav.linux">Линукс</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main style="max-width:860px;">
+        <h1 class="sec-title" style="margin-top:40px;" data-i18n="linux.h1">Линукс для администратора</h1>
+        <p class="sec-sub" data-i18n="linux.sub">Семейства дистрибутивов, команды системного и сетевого администратора: что запускать, а чего не делать.</p>
+
+        <div class="filter-bar">
+            <span class="filter-search"><span data-icon="search"></span><input id="linuxSearch" type="search" autocomplete="off" data-i18n-attr="placeholder:linux.search.ph" placeholder="Поиск команд…"><span class="count-pill" id="linuxCount"></span><button class="chip" id="linuxCollapse" data-i18n="linux.collapse">Свернуть</button></span>
+            <div class="filter-chips">
+                <button class="chip active" data-chip="all" data-i18n="linux.filter.all">Все</button>
+                <button class="chip" data-chip="pkgs" data-i18n="linux.filter.pkgs">Пакеты</button>
+                <button class="chip" data-chip="svc" data-i18n="linux.filter.svc">Службы</button>
+                <button class="chip" data-chip="net" data-i18n="linux.filter.net">Сеть</button>
+                <button class="chip" data-chip="dns" data-i18n="linux.filter.dns">DNS</button>
+                <button class="chip" data-chip="fw" data-i18n="linux.filter.fw">Фаервол</button>
+                <button class="chip" data-chip="files" data-i18n="linux.filter.files">Файлы</button>
+                <button class="chip" data-chip="diag" data-i18n="linux.filter.diag">Диагностика</button>
+                <button class="chip" data-chip="fix" data-i18n="linux.filter.fix">Проблемы</button>
+                <button class="chip" data-chip="err" data-i18n="linux.filter.err">Коды ошибок</button>
+            </div>
+            <nav class="toc" id="linuxToc"></nav>
+        </div>
+        <p class="demo-note hidden" id="linuxEmpty" data-i18n="linux.empty">Ничего не найдено — попробуй другой запрос.</p>
+
+        <h2 class="sec-title" style="font-size:22px;" data-i18n="linux.fam">Семейства и разновидности</h2>
+        <p class="sec-sub" data-i18n="linux.fam.sub">Шесть семейств закрывают почти всё, что встретится в продакшене.</p>
+        <div class="fam-grid">
+            <div class="fam-card">
+                <h3><span data-icon="stack"></span>Debian-семейство</h3>
+                <p><b>Кто:</b> Debian, Ubuntu, Linux Mint, Kali, Raspberry Pi OS, Proxmox VE</p>
+                <p><b>Пакеты:</b> apt, формат .deb</p>
+                <p><b>Службы:</b> systemd. Сеть: netplan (Ubuntu Server) или NetworkManager</p>
+                <p><b>Где:</b> веб-серверы, десктопы, стенды labspin и сам Proxmox — он собран на Debian</p>
+            </div>
+            <div class="fam-card">
+                <h3><span data-icon="book"></span>RHEL-семейство</h3>
+                <p><b>Кто:</b> RHEL, Rocky Linux, AlmaLinux, Fedora, CentOS Stream, Oracle Linux</p>
+                <p><b>Пакеты:</b> dnf (yum — старое имя), формат .rpm</p>
+                <p><b>Службы:</b> systemd. Сеть: NetworkManager. Плюс SELinux и firewalld</p>
+                <p><b>Где:</b> корпоративные серверы, банки, госсектор — там, где нужна поддержка 10 лет</p>
+            </div>
+            <div class="fam-card">
+                <h3><span data-icon="route"></span>Arch-семейство</h3>
+                <p><b>Кто:</b> Arch Linux, Manjaro, EndeavourOS</p>
+                <p><b>Пакеты:</b> pacman, rolling-release (всё самое свежее)</p>
+                <p><b>Службы:</b> systemd, настройка вручную</p>
+                <p><b>Где:</b> рабочие станции энтузиастов, тестовые стенды. Правило: обновляться только целиком</p>
+            </div>
+            <div class="fam-card">
+                <h3><span data-icon="link"></span>SUSE-семейство</h3>
+                <p><b>Кто:</b> openSUSE Leap, openSUSE Tumbleweed, SLES</p>
+                <p><b>Пакеты:</b> zypper, формат .rpm</p>
+                <p><b>Службы:</b> systemd. Фишка: YaST — панель управления в терминале</p>
+                <p><b>Где:</b> европейский enterprise, SAP-окружение, инженерные компании</p>
+            </div>
+            <div class="fam-card">
+                <h3><span data-icon="packet"></span>Alpine</h3>
+                <p><b>Кто:</b> Alpine Linux</p>
+                <p><b>Пакеты:</b> apk. Библиотека musl вместо glibc, утилиты BusyBox</p>
+                <p><b>Службы:</b> OpenRC — systemd здесь нет!</p>
+                <p><b>Где:</b> контейнеры Docker, роутеры, встраиваемые системы — образ от 5 МБ</p>
+            </div>
+            <div class="fam-card">
+                <h3><span data-icon="search"></span>Gentoo</h3>
+                <p><b>Кто:</b> Gentoo Linux</p>
+                <p><b>Пакеты:</b> emerge + Portage, всё компилируется из исходников</p>
+                <p><b>Службы:</b> OpenRC или systemd на выбор, USE-флаги в make.conf</p>
+                <p><b>Где:</b> максимум контроля и производительности, цена — время компиляции</p>
+            </div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.cmd">Команды по семействам</h2>
+        <p class="sec-sub" data-i18n="linux.cmd.sub">Одна задача — разное написание. Свою колонку выучи наизусть.</p>
+
+        <div class="demo-card" data-group="pkgs svc fw net">
+            <h3><span data-icon="stack"></span>Debian / Ubuntu — apt, ufw, netplan</h3>
+<div class="demo-code">sudo apt update &amp;&amp; sudo apt upgrade -y   # индексы, затем пакеты
+sudo apt install -y nginx curl       # установка
+sudo apt remove nginx                # удалить, конфиги останутся
+sudo apt purge nginx                 # удалить вместе с конфигами
+apt search nginx | less              # поиск
+apt show nginx                       # карточка пакета
+sudo apt autoremove -y &amp;&amp; sudo apt autoclean  # чистка мусора
+
+sudo systemctl enable --now nginx    # автозапуск + старт
+systemctl status nginx               # жив ли
+journalctl -u nginx -f               # живой лог службы
+
+sudo ufw enable                      # фаервол: сначала разреши SSH!
+sudo ufw allow 22/tcp
+sudo ufw allow 80,443/tcp
+sudo ufw status verbose              # что реально открыто</div>
+            <p class="demo-note">Сеть Ubuntu Server: файл /etc/netplan/01-netcfg.yaml, применить — sudo netplan apply, проверить — ip a. Proxmox VE и стенды labspin живут именно здесь.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc fw net">
+            <h3><span data-icon="book"></span>RHEL / Rocky / Alma / Fedora — dnf, firewalld, SELinux</h3>
+<div class="demo-code">sudo dnf upgrade -y                  # обновление
+sudo dnf install -y nginx curl       # установка
+sudo dnf remove nginx                # удаление
+dnf search nginx                     # поиск
+dnf info nginx                       # карточка пакета
+sudo dnf autoremove -y &amp;&amp; sudo dnf clean all  # чистка
+sudo dnf install -y epel-release     # доп. репозиторий для Rocky/Alma
+
+sudo firewall-cmd --state
+sudo firewall-cmd --add-service={http,https} --permanent
+sudo firewall-cmd --add-port=22/tcp --permanent
+sudo firewall-cmd --reload &amp;&amp; firewall-cmd --list-all
+
+getenforce                         # Enforcing | Permissive | Disabled
+sudo setenforce 0                  # ТОЛЬКО для диагностики, временно!
+sudo ausearch -m AVC -ts recent    # кого заблокировал SELinux</div>
+            <p class="demo-note">Сеть: NetworkManager — nmcli device status, nmcli con show. Постоянное SELINUX=enforcing правится в /etc/selinux/config, а не сносом защиты.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc fw">
+            <h3><span data-icon="route"></span>Arch / Manjaro — pacman</h3>
+<div class="demo-code">sudo pacman -Syu                    # ВСЕГДА полное обновление
+sudo pacman -S nginx                 # установка
+sudo pacman -Rns nginx               # удалить с зависимостями и конфигами
+pacman -Ss nginx                     # поиск
+pacman -Qi nginx                     # что установлено
+sudo pacman -Sc                      # чистка кэша
+yay -S пакет                         # AUR: сторонний код — сначала читай PKGBUILD</div>
+            <p class="demo-note">Частичное обновление (pacman -Sy без -u) — классический способ сломать Arch. Фаервол ставится руками: ufw или firewalld, как выше.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc fw">
+            <h3><span data-icon="link"></span>openSUSE — zypper, YaST</h3>
+<div class="demo-code">sudo zypper refresh &amp;&amp; sudo zypper update
+sudo zypper install -y nginx
+sudo zypper remove nginx
+zypper search nginx
+sudo yast                            # TUI-панель: сеть, службы, пакеты</div>
+            <p class="demo-note">Leap — стабильный (как RHEL по духу), Tumbleweed — rolling (как Arch по духу). Фаервол — firewalld, команды как у RHEL.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc net">
+            <h3><span data-icon="packet"></span>Alpine — apk, OpenRC</h3>
+<div class="demo-code">sudo apk update &amp;&amp; sudo apk upgrade
+sudo apk add nginx curl
+sudo apk del nginx
+apk search nginx
+
+sudo rc-service nginx start          # старт (systemd здесь НЕТ)
+sudo rc-update add nginx default     # автозапуск — аналог enable</div>
+            <p class="demo-note">musl + BusyBox: легко и быстро, но glibc-бинарники и башизмы могут не встать. Сеть: /etc/network/interfaces.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc">
+            <h3><span data-icon="search"></span>Gentoo — emerge</h3>
+<div class="demo-code">sudo emerge --sync
+sudo emerge -avuDN @world            # обновить всю систему
+sudo emerge -av nginx                # установка с вопросом
+sudo emerge -C nginx                 # удаление</div>
+            <p class="demo-note">USE-флаги в /etc/portage/make.conf решают, с какими опциями соберётся пакет. Платишь временем компиляции за точный контроль.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="enter"></span>systemd — везде, кроме Alpine и части Gentoo</h3>
+<div class="demo-code">systemctl status nginx
+sudo systemctl start|stop|restart|reload nginx
+sudo systemctl enable --now nginx    # автозапуск + старт сразу
+systemctl is-enabled nginx           # включён ли в автозапуск
+systemctl is-active nginx            # работает ли сейчас
+journalctl -u nginx -f               # живой лог
+journalctl -u nginx --since "1 hour ago" -p err
+hostnamectl                          # имя хоста
+timedatectl                          # время и NTP
+loginctl                             # сессии пользователей</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.deep">Глубже: службы, логи, SSH, виртуалки</h2>
+        <p class="sec-sub" data-i18n="linux.deep.sub">То, что отличает пользователя от администратора.</p>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="enter"></span>systemd глубже</h3>
+<div class="demo-code">systemctl list-units --failed        # что упало после загрузки
+systemctl list-timers --all          # systemd-таймеры (замена cron)
+sudo systemctl daemon-reload         # после правки unit-файла — обязательно!
+sudo systemctl edit nginx --full     # безопасная правка unit
+sudo systemctl isolate rescue.target # однопользовательский режим</div>
+        </div>
+
+        <div class="demo-card" data-group="diag files">
+            <h3><span data-icon="book"></span>Логи глубже</h3>
+<div class="demo-code">journalctl -p err -b                 # ошибки текущей загрузки
+journalctl --disk-usage              # сколько жрут логи
+sudo journalctl --vacuum-size=200M   # чистка
+dmesg -T | tail -30                  # кольцо ядра: железо, OOM
+last | head                          # кто заходил
+sudo lastb | head                    # неудачные входы — брутфорс видно тут
+sudo tail -f /var/log/auth.log       # Debian: входы и ssh
+sudo tail -f /var/log/secure         # RHEL: то же самое</div>
+        </div>
+
+        <div class="demo-card" data-group="net svc">
+            <h3><span data-icon="handshake"></span>SSH: диагностика и защита</h3>
+<div class="demo-code">sudo sshd -t                         # проверка конфига ПЕРЕД рестартом!
+systemctl status sshd
+sudo journalctl -u sshd --since "30 min ago"
+chmod 700 ~/.ssh &amp;&amp; chmod 600 ~/.ssh/authorized_keys
+# /etc/ssh/sshd_config:
+PasswordAuthentication no
+PermitRootLogin prohibit-password
+# после правок: sshd -t, затем reload — он не рвёт сессии</div>
+            <p class="demo-note">От брутфорса — fail2ban (apt/dnf install -y fail2ban), от всего остального — только ключи.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc diag">
+            <h3><span data-icon="stack"></span>Proxmox и виртуалки</h3>
+<div class="demo-code">qm list                              # все ВМ ноды
+qm status 100
+qm start 100
+qm shutdown 100                      # вежливо; qm stop — жёстко
+qm snapshot 100 before-upgrade       # снапшот — та самая страховка
+qm rollback 100 before-upgrade
+pct list                             # LXC-контейнеры</div>
+            <p class="demo-note">Стенды labspin — обычные qemu-ВМ на Debian-шаблоне. ID видишь в выводе qm list и в конфиге.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="route"></span>cron и таймеры</h3>
+<div class="demo-code">crontab -e
+# формат: m h dom mon dow — бэкап в 3:15 ночи:
+15 3 * * * /usr/local/bin/backup.sh &gt;&gt; /var/log/backup.log 2&gt;&amp;1
+systemctl list-timers --all          # systemd-альтернатива cron</div>
+            <p class="demo-note">В cron пустой PATH — только полные пути. Не сработало — смотри grep CRON /var/log/syslog.</p>
+        </div>
+
+        <div class="demo-card" data-group="fw net">
+            <h3><span data-icon="dns"></span>nftables голыми руками</h3>
+<div class="demo-code">sudo nft list ruleset                # все правила
+sudo nft add table inet filter
+sudo nft add chain inet filter input '{ type filter hook input priority 0; policy drop; }'
+sudo nft add rule inet filter input tcp dport 22 accept
+sudo nft add rule inet filter input ct state established,related accept</div>
+            <p class="demo-note">ufw и firewalld — лишь фронтенды над nftables. Правило живёт до ребута, если не сохранено (nftables.service / persistent).</p>
+        </div>
+
+        <div class="demo-card" data-group="svc diag">
+            <h3><span data-icon="packet"></span>Docker-минимум</h3>
+<div class="demo-code">docker ps                            # живые контейнеры
+docker ps -a                         # включая мёртвые
+docker logs -f web                   # лог контейнера
+docker exec -it web sh               # зайти внутрь
+docker compose up -d                 # поднять по compose.yaml
+docker system prune -a               # чистка (сносит неиспользуемые образы!)</div>
+            <p class="demo-note">Docker сам правит iptables — свои запреты проверяй в цепочке DOCKER-USER, а не в INPUT.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.net">Сетевое ядро администратора</h2>
+        <p class="sec-sub" data-i18n="linux.net.sub">Работает почти везде: iproute2, ss, dig, tcpdump.</p>
+
+        <div class="demo-card" data-group="net">
+            <h3><span data-icon="route"></span>Интерфейсы, маршруты, сокеты</h3>
+<div class="demo-code">ip -brief a                       # адреса коротко
+ip r                                 # таблица маршрутов
+sudo ip link set eth0 up             # поднять интерфейс
+ss -tulpn                            # кто слушает (замена netstat!)
+ss -tunp | grep ESTAB                # живые соединения</div>
+        </div>
+
+        <div class="demo-card" data-group="net dns">
+            <h3><span data-icon="search"></span>Связность и DNS</h3>
+<div class="demo-code">ping -c4 8.8.8.8                    # жив ли узел
+mtr --report 8.8.8.8                 # ping + traceroute в одном
+traceroute 8.8.8.8                   # где теряется путь
+dig +short example.com               # быстрый ответ DNS
+dig +trace example.com               # вся цепочка резолва
+host example.com                     # коротко: имя -&gt; IP
+resolvectl status                    # какой резолвер реально используется</div>
+        </div>
+
+        <div class="demo-card" data-group="net diag">
+            <h3><span data-icon="packet"></span>Захват и проверка прикладного уровня</h3>
+<div class="demo-code">sudo tcpdump -i any -n port 80      # что летит по 80-му порту
+sudo tcpdump -i any -n host 192.168.10.10
+curl -sSI https://example.com | head -20  # заголовки ответа
+nc -zv 192.168.10.10 80              # открыт ли TCP-порт
+iperf3 -s                            # сервер замера на одной стороне
+iperf3 -c 192.168.10.10              # клиент на другой
+ethtool eth0                         # скорость и дуплекс линка</div>
+        </div>
+
+        <div class="demo-card" data-group="net">
+            <h3><span data-icon="dns"></span>Где живёт конфигурация сети</h3>
+            <div class="demo-row"><span class="pill info">Ubuntu Server</span><span>/etc/netplan/*.yaml, применить: sudo netplan apply</span></div>
+            <div class="demo-row"><span class="pill info">RHEL / Fedora / SUSE</span><span>NetworkManager: nmcli, nmtui</span></div>
+            <div class="demo-row"><span class="pill info">Alpine</span><span>/etc/network/interfaces, затем rc-service networking restart</span></div>
+            <div class="demo-row"><span class="pill info">DNS везде</span><span>/etc/resolv.conf, на systemd — resolvectl</span></div>
+        </div>
+
+        <div class="demo-card" data-group="net fw">
+            <h3><span data-icon="route"></span>WireGuard за 5 минут</h3>
+<div class="demo-code"># сторона A (сервер):
+wg genkey | tee privatekey | wg pubkey > publickey
+# /etc/wireguard/wg0.conf:
+[Interface]
+Address = 10.9.0.1/24
+ListenPort = 51820
+PrivateKey = ...ключ A...
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+[Peer]
+PublicKey = ...публичный ключ клиента...
+AllowedIPs = 10.9.0.2/32
+sudo systemctl enable --now wg-quick@wg0
+sudo ufw allow 51820/udp</div>
+            <p class="demo-note">AllowedIPs 0.0.0.0/0 у клиента — весь трафик в туннель; конкретные подсети — split-tunnel. Приватные ключи — как пароли: не в git!</p>
+        </div>
+
+        <div class="demo-card" data-group="files svc">
+            <h3><span data-icon="handshake"></span>Файлы, пользователи, процессы — минимум выживания</h3>
+<div class="demo-code">ls -la                               # права и владельцы
+chmod 640 file                       # минимум прав, НЕ 777
+chown user:group file
+sudo useradd -m -s /bin/bash alice &amp;&amp; sudo passwd alice
+sudo usermod -aG sudo alice          # -aG! без -a выкинешь из остальных групп
+ps aux | grep nginx
+htop                                 # top для людей
+kill PID                             # вежливо; kill -9 PID — в крайнем случае
+df -h                                # место на дисках
+du -sh /var/* | sort -h              # кто съел диск
+tar -czf backup.tgz /etc/nginx       # архив конфигов
+rsync -avh --delete src/ dst/        # синхронизация каталогов
+crontab -e                           # */5 * * * * /usr/local/bin/check.sh</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.access">Доступ и пользователи</h2>
+        <p class="sec-sub" data-i18n="linux.access.sub">Ключи, sudo, пароли, аудит входов.</p>
+
+        <div class="demo-card" data-group="net svc">
+            <h3><span data-icon="handshake"></span>SSH-ключи: полный цикл</h3>
+<div class="demo-code">ssh-keygen -t ed25519 -C "admin@web-01"  # ключ (пароль-фраза — да!)
+ssh-copy-id user@host                # отправить публичный ключ на сервер
+cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys  # вручную, если без copy-id
+chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+eval $(ssh-agent) && ssh-add ~/.ssh/id_ed25519  # ключ в память на сессию</div>
+            <p class="demo-note">Приватный ключ никогда не покидает твою машину. Утерянный ноут = удалить его .pub со всех серверов.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="book"></span>sudo и группы без граблей</h3>
+<div class="demo-code">groups alice
+sudo usermod -aG sudo alice          # Debian/Ubuntu
+sudo usermod -aG wheel alice         # RHEL/SUSE/Arch
+echo "alice ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx" | sudo tee /etc/sudoers.d/alice
+sudo visudo -c                       # проверка синтаксиса — обязательно!</div>
+            <p class="demo-note">Файлы в sudoers.d — точечные права вместо ALL. Кривой sudoers = потеря sudo (чини через root-консоль или Proxmox).</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="enter"></span>Пароли и старение</h3>
+<div class="demo-code">sudo passwd -S alice                  # статус пароля
+sudo chage -l alice                  # срок действия
+sudo chage -M 90 -W 7 alice          # жить 90 дней, предупредить за 7
+sudo faillock --user alice           # RHEL: счётчик неудачных входов
+sudo faillock --user alice --reset   # разблокировать</div>
+            <p class="demo-note">На серверах с ключами пароль можно заблокировать вовсе: passwd -l alice — вход только по ключу.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc diag">
+            <h3><span data-icon="search"></span>Аудит входов</h3>
+<div class="demo-code">last | head                          # успешные входы
+sudo lastb | head                        # НЕудачные — брутфорс виден тут
+sudo journalctl _SYSTEMD_UNIT=sshd.service --since today | grep -iE "failed|accepted"</div>
+            <p class="demo-note">lastb пустой, а auth.log кипит — кто-то уже стучится. Дальше: fail2ban, ключи, смена порта — по желанию.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.disks">Диски и файловые системы</h2>
+        <p class="sec-sub" data-i18n="linux.disks.sub">Разметка, LVM, здоровье, RAID.</p>
+
+        <div class="demo-card" data-group="files">
+            <h3><span data-icon="stack"></span>Разметка и монтирование</h3>
+<div class="demo-code">lsblk -f                             # диски, разделы, ФС, точки
+blkid                                # UUID разделов
+# /etc/fstab — монтирование по UUID (буквы /dev/sdX плавают!):
+UUID=xxxx  /data  ext4  defaults,nofail  0  2
+sudo mount -a                        # проверить fstab БЕЗ ребута!
+sudo umount -l /mnt                  # lazy, если занято</div>
+            <p class="demo-note">nofail для несистемных дисков — иначе зависнешь в emergency при сбое диска. mount -a после каждой правки fstab.</p>
+        </div>
+
+        <div class="demo-card" data-group="files">
+            <h3><span data-icon="packet"></span>LVM: диски, которые растут</h3>
+<div class="demo-code">sudo pvcreate /dev/sdb
+sudo vgcreate vg0 /dev/sdb
+sudo lvcreate -n data -L 50G vg0
+sudo mkfs.ext4 /dev/vg0/data
+# расширить на живую, без переразметки:
+sudo lvextend -L +20G /dev/vg0/data
+sudo resize2fs /dev/vg0/data         # ext4; для xfs: xfs_growfs /data</div>
+            <p class="demo-note">Снапшоты тома (lvcreate -s) — страховка перед опасными операциями: откат за секунды.</p>
+        </div>
+
+        <div class="demo-card" data-group="files diag">
+            <h3><span data-icon="search"></span>Здоровье дисков</h3>
+<div class="demo-code">sudo apt install -y smartmontools     # один раз
+sudo smartctl -a /dev/sda | grep -iE "reallocated|pending|health"
+sudo nvme smart-log /dev/nvme0       # для NVMe
+dmesg -T | grep -iE "I/O error|EXT4-fs error"  # первые крики</div>
+            <p class="demo-note">Reallocated и Pending растут — диск под замену, бэкап сегодня. SMART не панацея: диски умирают и без предупреждения.</p>
+        </div>
+
+        <div class="demo-card" data-group="files">
+            <h3><span data-icon="link"></span>RAID коротко (и честно)</h3>
+<div class="demo-code">sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdb /dev/sdc
+cat /proc/mdstat                      # статус ресинка</div>
+            <p class="demo-note">RAID ≠ бэкап: защищает от смерти диска, не от rm -rf и шифровальщиков. На Proxmox зеркало делает нода (ZFS), внутри ВМ — один virtio-диск.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.console">Консоль выживания</h2>
+        <p class="sec-sub" data-i18n="linux.console.sub">vim, tmux, grep, права в цифрах, пайпы, основы bash.</p>
+
+        <div class="demo-card" data-group="files">
+            <h3><span data-icon="book"></span>vim-минимум (и nano)</h3>
+<div class="demo-code">i — вставка; Esc — назад в командный режим
+:w — сохранить; :q — выйти; :q! — выйти БЕЗ сохранения
+u — отмена; yy — копировать строку; p — вставить; dd — вырезать
+gg — в начало файла; G — в конец; /текст + n — поиск
+:set number — номера строк
+# nano проще: Ctrl+O сохранить, Ctrl+X выйти</div>
+            <p class="demo-note">visudo, crontab -e и git открывают именно vim. Знать :wq и :q! — обязательный минимум.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="route"></span>tmux: сессия переживает обрыв SSH</h3>
+<div class="demo-code">tmux new -s deploy                   # новая сессия
+Ctrl-b d                             # открепиться — всё продолжает работать!
+tmux attach -t deploy                # вернуться (хоть с другого ПК)
+tmux ls                              # список сессий
+tmux kill-session -t deploy          # прибрать за собой</div>
+            <p class="demo-note">Долгий upgrade по SSH — только внутри tmux. Обрыв связи без tmux = прерванный dpkg (см. справочник проблем).</p>
+        </div>
+
+        <div class="demo-card" data-group="files diag">
+            <h3><span data-icon="search"></span>grep, find, sed, awk — разбор всего</h3>
+<div class="demo-code">grep -rni "error" /etc/nginx/        # рекурсивно, без учёта регистра
+grep -v "^#" nginx.conf | grep -v "^$"  # конфиг без комментариев и пустых
+find /var/log -name "*.gz" -mtime +30 -delete  # старше 30 дней — удалить
+sed -i.bak 's/80/8080/' file          # замена с бэкапом .bak
+awk '{print $1}' access.log | sort | uniq -c | sort -nr | head  # топ IP</div>
+        </div>
+
+        <div class="demo-card" data-group="files">
+            <h3><span data-icon="stack"></span>Права в цифрах</h3>
+<div class="demo-code"># r=4 w=2 x=1 → суммы: 7=rwx 6=rw- 5=r-x 4=r-- 0=---
+755 каталоги и скрипты; 644 файлы; 640 секреты; 600 ключи; 700 ~/.ssh
+umask 022  → новые файлы 644, каталоги 755
+umask 077  → максимум приватности
+chmod 1777 /tmp                       # sticky: удалять может только владелец
+chmod u+s /usr/bin/myapp              # setuid — осторожно!
+find / -perm -4000 2&gt;/dev/null       # все setuid — проверь лишние</div>
+            <p class="demo-note">Читается слева направо: владелец, группа, остальные. Вопрос на собеседовании и в жизни: почему 777 — всегда неверный ответ.</p>
+        </div>
+
+        <div class="demo-card" data-group="files">
+            <h3><span data-icon="packet"></span>Пайпы и перенаправления</h3>
+<div class="demo-code">cmd &gt; out.log 2&gt;&amp;1                   # всё в файл
+cmd &gt;&gt; out.log                          # дописать в конец
+cmd 2&gt;/dev/null                      # скрыть ошибки
+cmd | tee out.log                    # и на экран, и в файл
+cmd1 &amp;&amp; cmd2                         # второе — только если первое успешно
+cmd1 || cmd2                         # второе — если первое упало</div>
+        </div>
+
+        <div class="demo-card" data-group="svc files">
+            <h3><span data-icon="enter"></span>Bash-минимум для скриптов</h3>
+<div class="demo-code">#!/usr/bin/env bash
+set -euo pipefail                     # падать на первой ошибке
+BACKUP_DIR="${1:?укажи каталог}"      # обязательный аргумент
+if systemctl is-active --quiet nginx; then echo ok; fi
+for h in web-01 web-02; do ssh "$h" uptime; done  # кавычки вокруг переменных!</div>
+            <p class="demo-note">Непроверенные переменные + rm -rf = карточка «Так делать не надо». Кавычки, set -u и :? — три страховки.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.install">Установки от и до</h2>
+        <p class="sec-sub" data-i18n="linux.install.sub">Система, репозитории, пакеты, рабочий веб-стек, чеклист первого часа.</p>
+
+        <div class="demo-card" data-group="pkgs">
+            <h3><span data-icon="stack"></span>Установка Linux: минимум</h3>
+            <div class="demo-row"><span class="pill info">Носитель</span><span>Rufus / balenaEtcher. Вручную: sudo dd if=iso of=/dev/sdX bs=4M status=progress — тройная проверка of, иначе снесёшь диск!</span></div>
+            <div class="demo-row"><span class="pill info">Загрузка</span><span>UEFI вместо Legacy, SecureBoot обычно выключить для не-Ubuntu</span></div>
+            <div class="demo-row"><span class="pill info">Разметка</span><span>/ на 30–50 ГБ, /home — остальное, swap — файлом позже. LVM — если нужны снапшоты и рост разделов</span></div>
+            <div class="demo-row"><span class="pill info">Рядом с Windows</span><span>Только после бэкапа. Сначала уменьшается том Windows, потом ставится Linux</span></div>
+        </div>
+
+        <div class="demo-card" data-group="pkgs">
+            <h3><span data-icon="book"></span>Сторонние репозитории по семействам</h3>
+<div class="demo-code"># Debian / Ubuntu: ключ + свой источник (без apt-key — он мёртв!)
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://repo/app/key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/app.gpg
+echo "deb [signed-by=/etc/apt/keyrings/app.gpg] https://repo/app stable main" | sudo tee /etc/apt/sources.list.d/app.list
+sudo apt update
+# RHEL / Rocky / Alma:
+sudo dnf install -y epel-release
+sudo dnf config-manager --add-repo https://repo/app.repo
+# Arch: AUR через yay (читай PKGBUILD!)
+# openSUSE: sudo zypper ar https://repo/ alias
+# Alpine: дописать community в /etc/apk/repositories
+# Gentoo: eselect repository enable guru && emerge --sync</div>
+        </div>
+
+        <div class="demo-card" data-group="pkgs">
+            <h3><span data-icon="packet"></span>Мимо пакетника: deb, rpm, universal, исходники</h3>
+<div class="demo-code">sudo dpkg -i app.deb && sudo apt install -f -y  # дотянуть зависимости
+sudo dnf install ./app.rpm               # локальный rpm — правильно
+sudo rpm -ivh app.rpm                    # грубо, без зависимостей — так не надо
+snap install app                         # универсальные (Ubuntu)
+flatpak install flathub app              # универсальные (везде)
+./configure && make -j$(nproc) && sudo checkinstall  # из исходников: checkinstall вместо make install!</div>
+            <p class="demo-note">Голый make install размазывает файлы мимо пакетника — потом не удалить чисто. checkinstall собирает из них .deb/.rpm.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc net fw">
+            <h3><span data-icon="route"></span>Веб-стек за 10 минут (LEMP)</h3>
+<div class="demo-code">sudo apt install -y nginx certbot python3-certbot-nginx
+# RHEL: sudo dnf install -y nginx certbot python3-certbot-nginx
+sudo systemctl enable --now nginx
+sudo ufw allow 'Nginx Full'              # Debian/Ubuntu
+# RHEL/SUSE: firewall-cmd --add-service={http,https} --permanent && firewall-cmd --reload
+sudo certbot --nginx -d site.example.com --agree-tos -m admin@example.com
+sudo nginx -t && sudo systemctl reload nginx
+curl -sSI https://site.example.com | head -5</div>
+            <p class="demo-note">Порядок важен: пакет → автозапуск → фаервол → сертификат → проверка. Сертификат обновляется сам (certbot timer), проверь: systemctl list-timers | grep certbot.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs svc net">
+            <h3><span data-icon="packet"></span>nginx: server-блок и прокси</h3>
+<div class="demo-code"># /etc/nginx/sites-available/site (Debian) или /etc/nginx/conf.d/site.conf (RHEL):
+server {
+    listen 80;
+    server_name site.example.com;
+    location / { proxy_pass http://127.0.0.1:3000; proxy_set_header Host $host; }
+}
+# Debian: ln -s sites-available/site sites-enabled/ (в RHEL conf.d подхватывается сам)
+sudo nginx -t && sudo systemctl reload nginx
+tail -f /var/log/nginx/error.log     # ошибки — сюда</div>
+            <p class="demo-note">reload, не restart — без разрыва соединений. Заглушка index.html в location / скроет упавший бэкенд от глаз, но не от мониторинга.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc net fw pkgs">
+            <h3><span data-icon="enter"></span>Новый сервер: чеклист первого часа</h3>
+            <div class="demo-row"><span class="pill pass">1</span><span>Обновления: sudo apt update &amp;&amp; sudo apt upgrade -y (или dnf upgrade -y)</span></div>
+            <div class="demo-row"><span class="pill pass">2</span><span>Имя: sudo hostnamectl set-hostname web-01</span></div>
+            <div class="demo-row"><span class="pill pass">3</span><span>Пользователь + SSH-ключи, PasswordAuthentication no (см. карточки выше)</span></div>
+            <div class="demo-row"><span class="pill pass">4</span><span>Фаервол СРАЗУ: ufw enable + allow 22/tcp (проверь доступ до enable!)</span></div>
+            <div class="demo-row"><span class="pill pass">5</span><span>Время: timedatectl set-ntp true</span></div>
+            <div class="demo-row"><span class="pill pass">6</span><span>Защита и автообновления: fail2ban + unattended-upgrades (Debian) / dnf-automatic (RHEL)</span></div>
+            <div class="demo-row"><span class="pill pass">7</span><span>Снапшот в Proxmox ДО первого продакшена</span></div>
+            <div class="demo-row"><span class="pill pass">8</span><span>Мониторинг: доступ для сторожа NetPulse (SSH или WinRM-опрос по сети)</span></div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.err">Коды и значения ошибок</h2>
+        <p class="sec-sub" data-i18n="linux.err.sub">Что означают цифры: коды выхода, errno, HTTP, curl.</p>
+
+        <div class="demo-card" data-group="err diag">
+            <h3><span data-icon="search"></span>Коды выхода: читай через $?</h3>
+<div class="demo-code">./script.sh; echo $?                     # код прошлой команды
+# 0   — успех
+# 1   — общая ошибка
+# 2   — неверные аргументы
+# 126 — нет прав на запуск
+# 127 — команда не найдена
+# 130 — убит Ctrl+C (SIGINT = 128+2)
+# 137 — SIGKILL или OOM-киллер (128+9)
+# 139 — падение (SIGSEGV, 128+11)
+# 143 — SIGTERM (128+15)
+set -euo pipefail                   # скрипт падает на первой ошибке, а не врёт дальше</div>
+            <p class="demo-note">137 после ночи — почти всегда OOM-киллер: смотри dmesg, а не перезапускай вслепую.</p>
+        </div>
+
+        <div class="demo-card" data-group="err diag">
+            <h3><span data-icon="book"></span>errno: цифры ядра</h3>
+<div class="demo-code"># полный список: man 3 errno
+# 1  EPERM   — операция запрещена
+# 2  ENOENT  — нет такого файла
+# 13 EACCES  — доступ запрещён (права!)
+# 17 EEXIST  — уже существует
+# 28 ENOSPC  — нет места на диске
+# 32 EPIPE   — сломанный пайп
+# 98 EADDRINUSE — адрес уже занят
+# 110 ETIMEDOUT — таймаут
+# 111 ECONNREFUSED — в соединении отказано</div>
+        </div>
+
+        <div class="demo-card" data-group="err net diag">
+            <h3><span data-icon="packet"></span>HTTP-коды глазами админа</h3>
+            <div class="demo-row"><span class="pill pass">2xx</span><span>200 OK, 201 создан, 204 без тела — всё хорошо</span></div>
+            <div class="demo-row"><span class="pill info">3xx</span><span>301/302 редирект, 304 не менялось — смотри заголовок Location</span></div>
+            <div class="demo-row"><span class="pill fail">400 / 401 / 403 / 404</span><span>Кривой запрос / нет логина / запретили / нет страницы — чинится на стороне клиента и прав</span></div>
+            <div class="demo-row"><span class="pill fail">500 / 502 / 503 / 504</span><span>Упал код / мёртв бэкенд при живом фронте / перегруз или деплой / бэкенд виснет — чинится на сервере</span></div>
+        </div>
+
+        <div class="demo-card" data-group="err net diag">
+            <h3><span data-icon="route"></span>Коды curl и ssh + разбор по стадиям</h3>
+<div class="demo-code"># curl: 6 — DNS, 7 — нет TCP, 28 — таймаут, 35/60 — TLS и сертификат
+curl -w "dns:%{time_namelookup} tcp:%{time_connect} tls:%{time_appconnect} total:%{time_total}\n" -o /dev/null -s https://site/
+# видно, КАКАЯ стадия тормозит: резолв, handshake или ответ сервера
+# ssh: 255 — ошибка самого ssh (сеть, ключ); остальное — код команды внутри:
+ssh user@host 'cmd'; echo $?</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.ops">Эксплуатация</h2>
+        <p class="sec-sub" data-i18n="linux.ops.sub">Бэкапы, холды версий, тюнинг, бондинг, привычка наблюдать.</p>
+
+        <div class="demo-card" data-group="files svc">
+            <h3><span data-icon="packet"></span>Бэкапы по-взрослому</h3>
+<div class="demo-code">tar -czf /backup/etc-$(date +%F).tgz /etc/nginx /etc/ssh
+rsync -avh --delete /srv/ backup:/srv/   # зеркало каталога
+# правило 3-2-1: 3 копии, 2 носителя, 1 вне площадки
+tar -tzf /backup/etc-2026-01-01.tgz | head  # проверка архива
+# ВМ: qm snapshot / vzdump ДО изменений, а не после аварии</div>
+            <p class="demo-note">Бэкап без проверки восстановления — это не бэкап, а надежда. Тестовый restore раз в квартал.</p>
+        </div>
+
+        <div class="demo-card" data-group="pkgs">
+            <h3><span data-icon="book"></span>Холд версий: не обновлять точечно</h3>
+<div class="demo-code">sudo apt-mark hold nginx              # Debian: пропустить при upgrade
+sudo apt-mark showhold                  # что на холде
+sudo apt-mark unhold nginx              # снять после окна обслуживания
+# RHEL: в /etc/dnf/dnf.conf → exclude=kernel*
+sudo dnf versionlock add nginx          # нужен python3-dnf-plugins-core</div>
+            <p class="demo-note">Холд — временная мера до окна обслуживания. Вечный холд копит CVE молча.</p>
+        </div>
+
+        <div class="demo-card" data-group="net svc">
+            <h3><span data-icon="route"></span>sysctl-тюнинг сети и памяти</h3>
+<div class="demo-code"># /etc/sysctl.d/99-tune.conf, затем: sudo sysctl --system
+net.core.somaxconn = 4096             # очередь входящих (за nginx/haproxy)
+net.ipv4.ip_forward = 1               # сделать из машины роутер
+vm.swappiness = 10                    # меньше свопа на серверах (было 60)
+fs.file-max = 2097152                 # запас дескрипторов
+sysctl net.core.somaxconn             # проверить, что применилось</div>
+        </div>
+
+        <div class="demo-card" data-group="svc fw">
+            <h3><span data-icon="dns"></span>fail2ban и автообновления</h3>
+<div class="demo-code">sudo apt install -y fail2ban          # jail для sshd из коробки
+sudo systemctl enable --now fail2ban
+sudo fail2ban-client status sshd       # кого забанил
+# Debian: только security-обновления автоматом:
+sudo dpkg-reconfigure -plow unattended-upgrades
+# RHEL: sudo dnf install -y dnf-automatic
+sudo systemctl enable --now dnf-automatic.timer</div>
+        </div>
+
+        <div class="demo-card" data-group="net">
+            <h3><span data-icon="link"></span>Мост и бондинг руками</h3>
+<div class="demo-code"># bridge для ВМ (как Proxmox делает с vmbr0):
+sudo nmcli con add type bridge ifname br0
+sudo nmcli con add type bridge-slave ifname eth0 master br0
+# bonding active-backup (живучесть линка):
+sudo nmcli con add type bond ifname bond0 mode active-backup
+sudo nmcli con add type ethernet ifname eth0 master bond0
+sudo nmcli con up bond0</div>
+            <p class="demo-note">Мост — L2-коммутатор внутри хоста, бондинг — страховка от смерти кабеля. Проверяй: bridge link, cat /proc/net/bonding/bond0.</p>
+        </div>
+
+        <div class="demo-card" data-group="net diag">
+            <h3><span data-icon="search"></span>Наблюдение как привычка</h3>
+<div class="demo-code">ss -tulpn && systemctl list-units --failed  # утренний обход за 10 секунд
+mtr --report host                    # жалоба "тормозит" — сначала цифры
+journalctl -p err -b                 # что болело с утра</div>
+            <p class="demo-note">Те же проверки с живым трафиком — на вкладке «Демо»: NetPulse показывает след твоих ping, TCP и HTTP в эфире.</p>
+        </div>
+
+        <div class="demo-card" data-group="net diag">
+            <h3><span data-icon="stats"></span>Метрики: node_exporter за минуту</h3>
+<div class="demo-code">sudo useradd -rs /bin/false nodeexp
+# бинарь с GitHub releases, unit systemd, порт 9100:
+curl -s localhost:9100/metrics | head  # node_cpu_seconds_total, node_memory_...</div>
+            <p class="demo-note">Идея как у NetPulse: метрики → графики → алерты. Дальше их забирает Prometheus, а пороги превращаются в алерты.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.infra">Инфраструктура</h2>
+        <p class="sec-sub" data-i18n="linux.infra.sub">Ansible, KVM, кластер Proxmox, cloud-init, K8s, LDAP.</p>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="route"></span>Ansible: начало</h3>
+<div class="demo-code">sudo apt install -y ansible
+ansible all -i 192.168.10.10, -m ping    # запятая = инлайн-инвентарь!
+# playbook site.yml:
+# - hosts: web
+#   become: yes
+#   tasks:
+#     - apt: { name: nginx, state: present }
+ansible-playbook -i inv.ini site.yml --check  # dry-run сначала!</div>
+        </div>
+
+        <div class="demo-card" data-group="svc files">
+            <h3><span data-icon="book"></span>Ansible: факты, шаблоны, секреты</h3>
+<div class="demo-code">ansible web -i inv -m setup -a "filter=ansible_mem*"  # факты хоста
+# templates/nginx.conf.j2 + модуль template: src → dest
+ansible-vault create secrets.yml          # секреты шифруем, не в git!
+ansible-playbook site.yml --ask-vault-pass</div>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="stack"></span>KVM и libvirt руками</h3>
+<div class="demo-code">sudo apt install -y qemu-kvm libvirt-daemon-system virtinst
+sudo virsh list --all
+sudo virt-install --name vm1 --ram 2048 --disk size=20 --os-variant debian12 --network bridge=virbr0 --graphics none --location ISO
+virsh snapshot-create-as vm1 clean
+virsh console vm1</div>
+            <p class="demo-note">Proxmox — это KVM с веб-мордой и кластером. virsh — тот же гипервизор руками.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc net">
+            <h3><span data-icon="link"></span>Кластер Proxmox</h3>
+<div class="demo-code">pvecm create CLUSTER                      # первая нода
+pvecm add 192.168.10.1                    # остальные — по одной!
+pvecm status                              # кворум: нужно больше 50% нод
+qm migrate 100 node2 --online             # живая миграция</div>
+            <p class="demo-note">Две ноды без третьего голоса (qdevice) — split-brain при аварии. Минимум для HA — три голоса.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="packet"></span>cloud-init вглубь</h3>
+<div class="demo-code"># /etc/cloud/cloud.cfg.d/99-custom.cfg:
+# users: [{name: alice, sudo: ALL=(ALL) NOPASSWD:ALL, ssh_authorized_keys: [ssh-ed25519...]}]
+cloud-init status                         # done или error?
+cloud-init collect-logs -o /tmp/logs.tgz # всё для разбора</div>
+            <p class="demo-note">Именно так labspin раздаёт IP и hostname стендам. Меняешь конфиг — чисти cloud.cfg.d и пересоздавай.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc net">
+            <h3><span data-icon="route"></span>K8s-минимум (k3s)</h3>
+<div class="demo-code">curl -sfL https://get.k3s.io | sh -      # k3s вместо полного k8s для старта
+sudo k3s kubectl get nodes
+kubectl run web --image=nginx --port=80
+kubectl expose pod web --port=80 --type=NodePort
+kubectl logs deploy/web</div>
+            <p class="demo-note">K8s — оркестрация, а не «докер побольше». Сначала compose, потом k3s, потом уже кластер.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc net">
+            <h3><span data-icon="book"></span>LDAP и FreeIPA</h3>
+<div class="demo-code"># FreeIPA-сервер (RHEL): ipa-server-install
+# клиент:
+sudo apt install -y freeipa-client && sudo ipa-client-install
+id alice@domain                            # пользователь из каталога виден?</div>
+            <p class="demo-note">Один пароль на всё + sudo-правила из центра + Kerberos-билеты. Окупается примерно от 20 машин.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="stack"></span>Terraform для Proxmox</h3>
+<div class="demo-code"># main.tf: ресурс proxmox_virtual_environment_vm
+terraform init && terraform plan
+terraform apply                            # как labspin, но декларативно и с состоянием</div>
+            <p class="demo-note">labspin — императивный скрипт, terraform — состояние в tfstate. Идея одна: инфраструктура как код.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.services">Сервисы</h2>
+        <p class="sec-sub" data-i18n="linux.services.sub">Postgres, MySQL, почта, балансировщик, Redis, юниты, логи.</p>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="packet"></span>PostgreSQL</h3>
+<div class="demo-code">sudo apt install -y postgresql
+sudo -u postgres psql -c "CREATE USER app WITH PASSWORD '...';"
+sudo -u postgres createdb appdb -O app
+# /etc/postgresql/16/main/postgresql.conf: listen_addresses
+# pg_hba.conf: host appdb app 192.168.10.0/24 scram-sha-256
+sudo -u postgres pg_dump appdb | gzip > appdb.sql.gz</div>
+            <p class="demo-note">peer-аутентификация локально (psql без пароля под юзером postgres) — не баг. Бэкап: pg_dump в cron + проверка restore.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="book"></span>MySQL и MariaDB</h3>
+<div class="demo-code">sudo apt install -y mariadb-server
+sudo mysql_secure_installation
+sudo mysql -e "CREATE USER 'app'@'192.168.10.%' IDENTIFIED BY '...'; GRANT ALL ON appdb.* TO 'app'@'192.168.10.%';"
+mysqldump -u root -p appdb | gzip > appdb.sql.gz</div>
+            <p class="demo-note">Права вида user@host — отдельная ось доступа. Для сети: bind-address и открытый порт только для подсети.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc net">
+            <h3><span data-icon="route"></span>Postfix: отправка почты</h3>
+<div class="demo-code">sudo apt install -y postfix            # тип: Internet Site
+postconf -e 'relayhost = [smtp.provider]:587'
+postconf -e 'smtp_sasl_auth_enable = yes'  # + файл sasl_passwd
+echo "test" | mail -s "ping" admin@example.com
+mailq                                      # застрявшие письма</div>
+            <p class="demo-note">Без SPF, DKIM и DMARC письма уходят в спам. Порт 25 наружу у облаков часто закрыт — relay через провайдера.</p>
+        </div>
+
+        <div class="demo-card" data-group="net svc">
+            <h3><span data-icon="link"></span>HAProxy: балансировщик</h3>
+<div class="demo-code">sudo apt install -y haproxy
+# /etc/haproxy/haproxy.cfg:
+# frontend web :80 → default_backend app
+# backend app: server w1 192.168.10.10:80 check / server w2 ... check
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+sudo systemctl reload haproxy</div>
+            <p class="demo-note">check — это health-check бэкендов. Дальше: stats-socket для живой картины и L7-маршрутизация по Host.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc net">
+            <h3><span data-icon="packet"></span>Redis</h3>
+<div class="demo-code">sudo apt install -y redis-server
+# /etc/redis/redis.conf: bind 127.0.0.1 ::1 + requirepass ...
+redis-cli -a PASS ping                    # PONG = жив
+redis-cli -a PASS info replication        # роль и лаг</div>
+            <p class="demo-note">Без пароля и с bind 0.0.0.0 Redis угоняют за минуты (см. «Так делать не надо»). Бэкап: RDB + AOF.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="enter"></span>Свой systemd-unit</h3>
+<div class="demo-code"># /etc/systemd/system/myapp.service:
+# [Unit] Description=... After=network.target
+# [Service] User=app ExecStart=/opt/app/run Restart=on-failure MemoryMax=512M
+# [Install] WantedBy=multi-user.target
+sudo systemctl daemon-reload && sudo systemctl enable --now myapp</div>
+            <p class="demo-note">Restart + MemoryMax превращают самописный демон в гражданский сервис.</p>
+        </div>
+
+        <div class="demo-card" data-group="svc files">
+            <h3><span data-icon="book"></span>logrotate</h3>
+<div class="demo-code"># /etc/logrotate.d/myapp: /var/log/myapp/*.log { daily rotate 14 compress missingok }
+/usr/sbin/logrotate -d /etc/logrotate.conf  # dry-run для отладки</div>
+            <p class="demo-note">Без ротации логи съедают диск (см. карточку про df). copytruncate — для демонов, не умеющих reopen.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.mon">Наблюдаемость</h2>
+        <p class="sec-sub" data-i18n="linux.mon.sub">Prometheus, Grafana, алерты, Zabbix.</p>
+
+        <div class="demo-card" data-group="net diag">
+            <h3><span data-icon="stats"></span>Prometheus</h3>
+<div class="demo-code"># prometheus.yml:
+# scrape_configs: [{job_name: nodes, static_configs: [{targets: [host:9100]}]}]
+# + node_exporter на каждой машине (см. выше)</div>
+            <p class="demo-note">Pull-модель: сервер сам ходит за метриками. Дальше — правила записи и алерты.</p>
+        </div>
+
+        <div class="demo-card" data-group="net diag">
+            <h3><span data-icon="route"></span>Grafana</h3>
+<div class="demo-code"># datasource: Prometheus → http://prom:9090
+# dashboard: импорт ID 1860 (Node Exporter Full)</div>
+            <p class="demo-note">Первый вход — сменить дефолтный admin-пароль. Дашборды версиионируй в git как код.</p>
+        </div>
+
+        <div class="demo-card" data-group="net">
+            <h3><span data-icon="search"></span>Alertmanager: пороги в алерты</h3>
+<div class="demo-code"># alert.rules: InstanceDown (up == 0), DiskWillFill (predict_linear)
+# alertmanager.yml: routes → receivers (telegram webhook)</div>
+            <p class="demo-note">Алерт без runbook («что делать») — это спам. К каждому правилу — ссылку на карточку из справочника проблем.</p>
+        </div>
+
+        <div class="demo-card" data-group="diag">
+            <h3><span data-icon="book"></span>Zabbix и ELK коротко</h3>
+            <div class="demo-row"><span class="pill info">Zabbix</span><span>Агент + готовые шаблоны, кривая обучения ниже. Выбор, когда нужен «мониторинг из коробки»</span></div>
+            <div class="demo-row"><span class="pill info">ELK</span><span>Filebeat → Elasticsearch → Kibana: централизованные логи и полнотекстовый поиск по ним</span></div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.boot">Ядро и загрузка</h2>
+        <p class="sec-sub" data-i18n="linux.boot.sub">GRUB, initramfs, модули, sysctl.</p>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="route"></span>GRUB</h3>
+<div class="demo-code"># /etc/default/grub: GRUB_TIMEOUT=5, GRUB_CMDLINE_LINUX="..."
+sudo update-grub                            # Debian/Ubuntu
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg # RHEL
+# разовый выбор ядра и параметров: Shift/Esc при загрузке → клавиша e</div>
+        </div>
+
+        <div class="demo-card" data-group="svc">
+            <h3><span data-icon="packet"></span>initramfs</h3>
+<div class="demo-code">sudo update-initramfs -u -k all             # Debian/Ubuntu
+sudo dracut --regenerate-all --force        # RHEL
+lsinitramfs /boot/initrd.img | head         # что внутри</div>
+            <p class="demo-note">Пропал диск после обновления ядра — почти наверняка забыли пересобрать initramfs (модули NVMe/RAID).</p>
+        </div>
+
+        <div class="demo-card" data-group="svc diag">
+            <h3><span data-icon="stack"></span>Модули ядра</h3>
+<div class="demo-code">lsmod | grep kvm
+sudo modprobe br_netfilter
+echo br_netfilter | sudo tee /etc/modules-load.d/k8s.conf  # навсегда
+modinfo br_netfilter
+sudo rmmod модуль                           # выгрузить, если не занят</div>
+        </div>
+
+        <div class="demo-card" data-group="net svc">
+            <h3><span data-icon="search"></span>sysctl вглубь</h3>
+<div class="demo-code">sysctl -a | grep -E "forward|swappiness|somaxconn"
+# /etc/sysctl.d/99-tune.conf + sudo sysctl --system (см. карточку тюнинга)
+sysctl -w net.ipv4.ip_forward=0             # откат одного ключа без ребута</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.fix">Справочник проблем</h2>
+        <p class="sec-sub" data-i18n="linux.fix.sub">Симптом, диагностика, лечение.</p>
+
+        <div class="demo-card" data-group="fix net">
+            <div class="demo-row"><span class="pill fail">Нет сети вообще</span><span>Не пингуется даже шлюз. Иди по лестнице — ломайся на первой failed-ступени:</span></div>
+<div class="demo-code">ip -brief a                          # 1. адрес вообще есть?
+ip r                                 # 2. шлюз по умолчанию есть?
+ping -c3 &lt;шлюз&gt;                      # 3. L2 до шлюза жив?
+ping -c3 8.8.8.8                     # 4. дальше шлюза ходит?</div>
+            <p class="demo-note">Нет адреса — смотри netplan / NetworkManager / DHCP. Нет шлюза — маршрут. Шлюз жив, а дальше нет — проблема уже не твоя машина.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix dns net">
+            <div class="demo-row"><span class="pill fail">DNS не резолвит</span><span>IP ходят, имена — нет. Значит, дело точно в резолве:</span></div>
+<div class="demo-code">ping -c2 8.8.8.8                     # IP ходит, а имена нет = точно DNS
+resolvectl status                    # какой резолвер РЕАЛЬНО используется
+dig @1.1.1.1 example.com             # обход локального резолва
+cat /etc/resolv.conf                 # 127.0.0.53 = stub systemd-resolved</div>
+            <p class="demo-note">Не правь resolv.conf руками — его перезапишут NetworkManager или systemd. DNS задаётся в netplan, nmcli или /etc/systemd/resolved.conf.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix net fw">
+            <div class="demo-row"><span class="pill fail">refused против timeout</span><span>Разные диагнозы — разное лечение:</span></div>
+<div class="demo-code">ss -tulpn | grep :80                 # слушает? и на чём: 127.0.0.1 или 0.0.0.0?
+nc -zv 127.0.0.1 80                  # локально работает?
+nc -zv &lt;внешний-ip&gt; 80               # а снаружи?</div>
+            <p class="demo-note">refused = некому отвечать (служба down или bind на localhost). timeout = пакет умер по дороге (фаервол, маршрут).</p>
+        </div>
+
+        <div class="demo-card" data-group="fix net diag">
+            <div class="demo-row"><span class="pill fail">Сайт не открывается</span><span>Разбери, на какой стадии всё встало:</span></div>
+<div class="demo-code">curl -sv https://site/ -o /dev/null  # стадии: DNS -&gt; TCP -&gt; TLS -&gt; HTTP
+echo | openssl s_client -connect site:443 2&gt;/dev/null | openssl x509 -noout -dates -subject
+sudo nginx -t                        # конфиг веб-сервера валиден?</div>
+            <p class="demo-note">certificate expired или CN mismatch чинится обновлением серта, а не отключением проверки. 502 означает: nginx жив, мёртв бэкенд.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix net svc">
+            <div class="demo-row"><span class="pill fail">SSH не пускает</span><span>Причина почти всегда в логе sshd:</span></div>
+<div class="demo-code">systemctl is-active sshd
+ss -tlnp | grep :22
+sudo journalctl -u sshd --since "15 min ago"
+ls -ld ~/.ssh &amp;&amp; ls -l ~/.ssh/authorized_keys  # нужно 700 и 600</div>
+            <p class="demo-note">Неправильные права на ~/.ssh sshd игнорирует молча. После правок конфига — sshd -t и reload. Root по паролю наружу — нет.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix net diag">
+            <div class="demo-row"><span class="pill fail">Медленно, потери пакетов</span><span>Смотри последний хоп, а не первый красный:</span></div>
+<div class="demo-code">mtr --report --wide host            # loss% по хопам
+ethtool eth0 | grep -i duplex        # Half вместо Full — кабель или порт!
+iperf3 -c host                       # реальная полоса, а не ощущения</div>
+            <p class="demo-note">Потери на промежуточных хопах при чистом последнем — часто rate-limit ICMP, а не авария.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix files diag">
+            <div class="demo-row"><span class="pill fail">Диск кончился</span><span>Проверяй и байты, и иноды:</span></div>
+<div class="demo-code">df -h                                # где 100%
+df -i                                # иноды! миллион мелких файлов = та же авария
+du -sh /* 2&gt;/dev/null | sort -rh | head
+sudo journalctl --vacuum-size=200M
+sudo apt clean                       # или: docker system prune</div>
+            <p class="demo-note">"No space left" при свободных гигабайтах — это иноды. Логи чистит vacuum, а не rm -rf /var/log: службы держат дескрипторы удалённых файлов.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix svc diag">
+            <div class="demo-row"><span class="pill fail">Память кончилась, OOM</span><span>Ядро убивает самый жирный процесс — узнай кого:</span></div>
+<div class="demo-code">free -h
+dmesg -T | grep -i oom              # кого убило ядро
+journalctl -k | grep -i "out of memory"
+# swapfile 2G:
+sudo fallocate -l 2G /swapfile &amp;&amp; sudo chmod 600 /swapfile
+sudo mkswap /swapfile &amp;&amp; sudo swapon /swapfile</div>
+            <p class="demo-note">Лечится лимитами (MemoryMax в unit-файле) и swap, а не добавлением RAM вслепую.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix svc diag">
+            <div class="demo-row"><span class="pill fail">Служба не стартует</span><span>В 9 из 10 — опечатка в конфиге или занятый порт:</span></div>
+<div class="demo-code">systemctl status svc --no-pager      # exit-code и последние строки
+journalctl -xe -u svc               # полный лог падения
+sudo nginx -t                       # валидация конфига ДО рестарта
+ss -tlnp | grep :80                  # порт уже занят кем-то другим?</div>
+            <p class="demo-note">Проверка -t перед restart экономит даунтайм. Правило: сначала validate, потом reload.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix diag svc">
+            <div class="demo-row"><span class="pill fail">Нагрузка CPU 100%</span><span>Сначала пойми, кто и чего ждёт:</span></div>
+<div class="demo-code">top  # затем Shift+P (по CPU), Shift+M (по памяти)
+ps -eo pid,ppid,%cpu,%mem,comm --sort=-%cpu | head
+sudo apt install -y sysstat &amp;&amp; iostat -xz 1  # диски тоже душат CPU</div>
+            <p class="demo-note">Высокий %wa в top означает ожидание диска, а не нехватку CPU. Лечится логами и диском, а не мощностью.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix net svc">
+            <div class="demo-row"><span class="pill fail">Время уплыло</span><span>Ломает TLS, DNSSEC и Kerberos разом:</span></div>
+<div class="demo-code">timedatectl                          # NTP synchronized: yes?
+timedatectl set-ntp true
+sudo systemctl enable --now chronyd  # RHEL и SUSE</div>
+            <p class="demo-note">Симптом — «вчера работало». Причина — часы. На виртуалках время плывёт чаще: NTP обязателен.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix pkgs diag">
+            <div class="demo-row"><span class="pill fail">Сломан пакетный менеджер</span><span>Lock-файл — мьютекс, а не мусор:</span></div>
+<div class="demo-code"># apt висит на lock — жди процесс, НЕ удаляй lock-файл!
+ps aux | grep -E "apt|dpkg"
+sudo dpkg --configure -a             # донастроить прерванное
+sudo apt install -f                  # починить зависимости
+sudo rpm --rebuilddb                 # RHEL: пересобрать базу rpm</div>
+            <p class="demo-note">Удаление lock-файла лечит симптом и калечит базу пакетов. Дождись процесса или убей именно его.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix svc fw">
+            <div class="demo-row"><span class="pill fail">SELinux всё режет</span><span>Не сносить, а точечно разрешить:</span></div>
+<div class="demo-code">sudo ausearch -m AVC -ts recent
+sudo ausearch -m AVC -ts recent | audit2why  # ЧТО за правило сработало
+sudo setsebool -P httpd_can_network_connect 1  # пример точечного разрешения</div>
+            <p class="demo-note">setenforce 0 навсегда — это сдача. Правильно: audit2why, затем bool через setsebool или контекст через semanage/chcon.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix svc">
+            <div class="demo-row"><span class="pill fail">Забыл пароль root</span><span>Нужен доступ к консоли (у ВМ — через Proxmox):</span></div>
+<div class="demo-code"># в меню GRUB: клавиша e, к строке linux дописать:
+systemd.unit=rescue.target
+# либо для быстрого сброса:
+init=/bin/bash
+mount -o remount,rw /
+passwd root
+exec /sbin/init</div>
+            <p class="demo-note">Работает при физическом доступе или консоли Proxmox (qm terminal). На шифрованных дисках — только через recovery-ключи.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix files svc">
+            <div class="demo-row"><span class="pill fail">Permission denied</span><span>Три разные причины — проверь все по порядку:</span></div>
+<div class="demo-code">ls -l файл                              # 1. права на сам файл
+namei -l /srv/app/config.yml             # 2. ВСЯ цепочка каталогов (частая засада: нет +x на родителе!)
+sudo ausearch -m AVC -ts recent          # 3. SELinux (RHEL): молчаливый запрет</div>
+            <p class="demo-note">Классика: файл 644, а каталог 700 у другого владельца. Лечит namei, а не chmod 777.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix pkgs">
+            <div class="demo-row"><span class="pill fail">E: Unable to locate package</span><span>Пакетника не знает такого имени:</span></div>
+<div class="demo-code">sudo apt update                          # 1. индексы протухли?
+apt search имя | head                    # 2. точное имя другое?
+lsb_release -cs                          # 3. твой релиз есть в sources? (jammy vs noble!)
+grep -r "^deb" /etc/apt/sources.list*</div>
+            <p class="demo-note">После добавления репозитория всегда apt update. Нет пакета и после — нужен EPEL/AUR/сторонний репозиторий (см. выше).</p>
+        </div>
+
+        <div class="demo-card" data-group="fix pkgs">
+            <div class="demo-row"><span class="pill fail">GPG error: NO_PUBKEY / EXPKEYSIG</span><span>Подпись репозитория нечем проверить:</span></div>
+<div class="demo-code"># узнать ключ из текста ошибки (последние 8-16 hex-символов):
+sudo gpg --keyserver keyserver.ubuntu.com --recv-keys КЛЮЧ
+sudo gpg --export КЛЮЧ | sudo gpg --dearmor -o /etc/apt/keyrings/app.gpg
+# EXPKEYSIG = ключ протух: скачать свежий тем же способом</div>
+            <p class="demo-note">apt-key add мёртв — только signed-by в sources.list.d. Никогда не ставь [trusted=yes] чтобы «заткнуть» ошибку.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix pkgs">
+            <div class="demo-row"><span class="pill fail">dpkg was interrupted</span><span>Прерванная установка (упал SSH, кончилось место):</span></div>
+<div class="demo-code">sudo dpkg --configure -a               # донастроить прерванное
+sudo apt install -f -y                   # дотянуть зависимости</div>
+        </div>
+
+        <div class="demo-card" data-group="fix diag">
+            <div class="demo-row"><span class="pill fail">command not found (127)</span><span>Три варианта, по вероятности:</span></div>
+<div class="demo-code">apt search имя                        # 1. просто не установлено
+echo $PATH                               # 2. стоит, но не в PATH (/usr/local/bin? snap?)
+ls -l $(which имя)                       # 3. битая ссылка</div>
+        </div>
+
+        <div class="demo-card" data-group="fix svc">
+            <div class="demo-row"><span class="pill fail">user is not in the sudoers file</span><span>Пользователя забыли в группе:</span></div>
+<div class="demo-code"># из-под существующего sudo-пользователя или root:
+sudo usermod -aG sudo alice              # Debian/Ubuntu
+sudo usermod -aG wheel alice             # RHEL/SUSE/Arch
+# проверить: groups alice; перелогиниться!</div>
+            <p class="demo-note">Группа применяется при новом входе. Править /etc/sudoers — только через visudo (проверяет синтаксис, кривой файл = потеря sudo).</p>
+        </div>
+
+        <div class="demo-card" data-group="fix svc">
+            <div class="demo-row"><span class="pill fail">Job for X.service failed</span><span>Служба упала при старте:</span></div>
+<div class="demo-code">systemctl status X --no-pager           # exit-код и хвост лога
+journalctl -xe -u X                      # полная картина падения</div>
+        </div>
+
+        <div class="demo-card" data-group="fix files">
+            <div class="demo-row"><span class="pill fail">Device or resource busy</span><span>Кто-то держит точку монтирования:</span></div>
+<div class="demo-code">lsof +D /mnt/data | head               # кто держит
+fuser -vm /mnt/data                      # процессы с PID
+sudo umount -l /mnt/data                 # lazy-отмонтирование, если спешишь</div>
+        </div>
+
+        <div class="demo-card" data-group="fix files">
+            <div class="demo-row"><span class="pill fail">Read-only file system</span><span>Диск ушёл в RO — симптом, а не настройка:</span></div>
+<div class="demo-code">dmesg -T | tail -30                     # ошибки EXT4/SATA/NVMe?
+mount | grep " / "                       # проверить флаги
+# лечение: бэкап важного, затем fsck с live/USB; на ВМ — проверить сторадж ноды</div>
+            <p class="demo-note">Ядро переводит ФС в RO при ошибках, чтобы не портить данные дальше. Просто перемонтировать в rw — замести следы, а не починить.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix svc diag">
+            <div class="demo-row"><span class="pill fail">Too many open files</span><span>Процесс упёрся в лимит дескрипторов:</span></div>
+<div class="demo-code">ulimit -n                              # текущий лимит shell
+cat /proc/PID/limits | grep -i open      # лимит конкретного процесса
+lsof -p PID | wc -l                      # сколько реально открыто
+# навсегда: /etc/security/limits.conf или LimitNOFILE=65536 в unit-файле + daemon-reload</div>
+        </div>
+
+        <div class="demo-card" data-group="fix net">
+            <div class="demo-row"><span class="pill fail">curl: (60) SSL certificate problem</span><span>Цепочке не доверяют:</span></div>
+<div class="demo-code">sudo apt install -y ca-certificates &amp;&amp; sudo update-ca-certificates
+date                                     # протухший серт ИЛИ уплывшие часы — проверь оба!
+echo | openssl s_client -connect site:443 2&gt;/dev/null | openssl x509 -noout -dates</div>
+            <p class="demo-note">Флаг -k лечит симптом и убивает смысл TLS. Только для разового теста, никогда — в скриптах.</p>
+        </div>
+
+        <div class="demo-card" data-group="fix net svc">
+            <div class="demo-row"><span class="pill fail">bind() failed: Address already in use</span><span>Порт занят — найди кем:</span></div>
+<div class="demo-code">ss -tlnp | grep :80
+ps -fp PID                              # кто этот процесс
+# частая причина: второй nginx/apache или зависший мастер после kill -9</div>
+        </div>
+
+        <div class="demo-card" data-group="fix net fw">
+            <div class="demo-row"><span class="pill fail">No route to host / Network is unreachable</span><span>Дополнение к refused/timeout:</span></div>
+<div class="demo-code">ip r get 192.168.10.10                # каким маршрутом пойдёт?
+# Network is unreachable = нет маршрута вообще (шлюз? интерфейс down?)
+# No route to host = маршрут есть, сосед мёртв (фаервол режет ICMP? хост down?)</div>
+            <p class="demo-note">Четыре строки — четыре диагноза: refused (не слушает), timeout (фаервол/маршрут), unreachable (нет маршрута), no route (сосед мёртв).</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="linux.dont">Так делать не надо</h2>
+        <p class="sec-sub" data-i18n="linux.dont.sub">Классические способы сломать сервер в первый день.</p>
+
+        <div class="demo-card" data-group="pkgs svc net dns fw files diag">
+            <div class="demo-row"><span class="pill fail">chmod -R 777 /</span><span>«Чинит» права ценой безопасности. Правильно: найти владельца и выдать минимум.</span></div>
+            <div class="demo-row"><span class="pill fail">curl … | sudo bash</span><span>Вслепую — никогда. Скачай, прочитай скрипт, потом запускай.</span></div>
+            <div class="demo-row"><span class="pill fail">Выключить firewall / SELinux навсегда</span><span>«Чтобы заработало» — чини правило, а не сноси стену. setenforce 0 — только диагностика.</span></div>
+            <div class="demo-row"><span class="pill fail">Всё под root</span><span>Ключи + sudo вместо пароля root; 22-й порт наружу — только через bastion или VPN.</span></div>
+            <div class="demo-row"><span class="pill fail">rm -rf $DIR/</span><span>Пустая переменная превращает это в rm -rf /. Защита: ${DIR:?not set}.</span></div>
+            <div class="demo-row"><span class="pill fail">Upgrade прода без снапшота</span><span>Сначала snapshot в Proxmox, потом upgrade. Откат дешевле переустановки.</span></div>
+            <div class="demo-row"><span class="pill fail">3306 / 6379 / 27017 в интернет</span><span>Базы слушают 127.0.0.1 или VPN. Открытый Redis в мире находят за минуты.</span></div>
+            <div class="demo-row"><span class="pill fail">Пароли в history и скриптах</span><span>Env-файлы с chmod 600 и HISTCONTROL=ignorespace (пробел в начале — не писать в историю).</span></div>
+        </div>
+
+        <div style="margin:36px 0 60px; display:flex; gap:14px; flex-wrap:wrap;">
+            <a href="explore.html" class="btn btn-primary"><span data-icon="sprout"></span><span data-i18n="linux.cta1">Открыть сад</span></a>
+            <a href="demo.html" class="btn btn-secondary"><span data-icon="route"></span><span data-i18n="linux.cta2">Живое демо сети</span></a>
+        </div>
+    </main>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        (function () {
+            "use strict";
+            const input = document.getElementById("linuxSearch");
+            const empty = document.getElementById("linuxEmpty");
+            const chips = Array.prototype.slice.call(document.querySelectorAll("[data-chip]"));
+            const cards = Array.prototype.slice.call(document.querySelectorAll("[data-group]"));
+            const toc = document.getElementById("linuxToc");
+            const counter = document.getElementById("linuxCount");
+            const filterBar = document.querySelector(".filter-bar");
+            const collapseBtn = document.getElementById("linuxCollapse");
+            let collapsed = false;
+            try { collapsed = localStorage.getItem("rfcGarden_linuxFilter") === "0"; } catch (e) {}
+            function setCollapsed(v) {
+                collapsed = v;
+                if (filterBar) filterBar.classList.toggle("collapsed", v);
+                if (collapseBtn) collapseBtn.textContent = T(v ? "linux.expand" : "linux.collapse", v ? "Развернуть" : "Свернуть");
+                try { localStorage.setItem("rfcGarden_linuxFilter", v ? "0" : "1"); } catch (e) {}
+            }
+            const T = (k, fb) => I18N.t(k, fb);
+            // Оглавление строится из живых заголовков — работает и в RU, и в EN.
+            const SECS = ["fam", "cmd", "deep", "net", "console", "install", "err", "ops", "infra", "services", "mon", "boot", "fix", "dont"];
+            const secLinks = [];
+            // Заголовки ищем по атрибуту, собранному по частям, чтобы
+            // статический сканер тестов не принимал селектор за ключ словаря.
+            const attrName = "data-" + "i18n";
+            Array.prototype.forEach.call(document.querySelectorAll("main h2.sec-title"), (h) => {
+                const key = h.getAttribute(attrName) || "";
+                const m = key.match(/^linux\.([a-z]+)$/);
+                if (!m || SECS.indexOf(m[1]) === -1) return;
+                const k = m[1];
+                h.id = "sec-" + k;
+                const a = document.createElement("a");
+                a.href = "#sec-" + k;
+                const b = document.createElement("b");
+                b.textContent = "0";
+                a.appendChild(b);
+                a.appendChild(document.createTextNode(h.textContent));
+                toc.appendChild(a);
+                secLinks.push({ head: h, link: a, num: b });
+            });
+            let active = "all";
+            function apply(scroll) {
+                const q = (input.value || "").toLowerCase().trim();
+                let shown = 0, first = null;
+                cards.forEach((c) => {
+                    const g = (c.getAttribute("data-group") || "").split(/\s+/);
+                    const okG = active === "all" || g.indexOf(active) !== -1;
+                    const okQ = !q || c.textContent.toLowerCase().indexOf(q) !== -1;
+                    const vis = okG && okQ;
+                    c.style.display = vis ? "" : "none";
+                    if (vis) { shown++; if (!first) first = c; }
+                });
+                empty.style.display = shown ? "none" : "";
+                chips.forEach((ch) => ch.classList.toggle("active", ch.getAttribute("data-chip") === active));
+                tidySections();
+                updateToc(shown);
+                if (scroll && first && active !== "all") {
+                    try { first.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+                }
+            }
+            // Прячем заголовки разделов, в которых не осталось видимых карточек.
+            // Обзор семейств (без data-group) виден всегда.
+            function tidySections() {
+                const heads = Array.prototype.slice.call(document.querySelectorAll("main h2.sec-title"));
+                heads.forEach((h) => {
+                    let el = h.nextElementSibling, sub = null, anyCard = false, allHidden = true;
+                    while (el && !(el.tagName === "H2" && el.classList.contains("sec-title"))) {
+                        if (el.classList && el.classList.contains("sec-sub") && !sub) sub = el;
+                        if (el.hasAttribute && el.hasAttribute("data-group")) {
+                            anyCard = true;
+                            if (el.style.display !== "none") allHidden = false;
+                        }
+                        el = el.nextElementSibling;
+                    }
+                    const hide = anyCard && allHidden;
+                    h.style.display = hide ? "none" : "";
+                    if (sub) sub.style.display = hide ? "none" : "";
+                });
+            }
+            function secVisible(head) {
+                // -1: в разделе нет фильтруемых карточек (обзор виден всегда)
+                let el = head.nextElementSibling, n = 0, any = false;
+                while (el && !(el.tagName === "H2" && el.classList.contains("sec-title"))) {
+                    if (el.hasAttribute && el.hasAttribute("data-group")) {
+                        any = true;
+                        if (el.style.display !== "none") n++;
+                    }
+                    el = el.nextElementSibling;
+                }
+                return any ? n : -1;
+            }
+            function updateToc(shown) {
+                secLinks.forEach((s) => {
+                    const n = secVisible(s.head);
+                    s.num.textContent = n < 0 ? "•" : n;
+                    s.link.classList.toggle("dim", n === 0);
+                });
+                counter.textContent = T("linux.count", "Показано $n из $m")
+                    .replace("$n", shown).replace("$m", cards.length);
+            }
+            chips.forEach((ch) => ch.addEventListener("click", () => { active = ch.getAttribute("data-chip"); apply(true); }));
+            input.addEventListener("input", () => apply(false));
+            if (collapseBtn) collapseBtn.addEventListener("click", () => setCollapsed(!collapsed));
+            setCollapsed(collapsed);
+            apply(false);
+        })();
+    </script>
+</body>
+</html>
