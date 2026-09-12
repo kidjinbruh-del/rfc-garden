@@ -1,0 +1,89 @@
+{
+  "netpulse": {
+    "home": "NetPulse",
+    "core_available": true,
+    "mode": "netpulse-core",
+    "psutil": true,
+    "error": ""
+  },
+  "host_traffic": {
+    "before": {
+      "bytes_sent": 171522209,
+      "bytes_recv": 239853814,
+      "packets_sent": 1381206,
+      "packets_recv": 214003
+    },
+    "after": {
+      "bytes_sent": 171526245,
+      "bytes_recv": 239854514,
+      "packets_sent": 1381226,
+      "packets_recv": 214015
+    },
+    "delta": {
+      "bytes_sent": 4036,
+      "bytes_recv": 700,
+      "packets_sent": 20,
+      "packets_recv": 12
+    }
+  },
+  "stands": [
+    {
+      "stand": "stand-local",
+      "name": "stand-local",
+      "ip": "127.0.0.1",
+      "elapsed_ms": 2025.7,
+      "ping": {
+        "passed": true,
+        "rtt_ms": 17.4,
+        "detail": "echo-request -> echo-reply"
+      },
+      "ports": [
+        {
+          "port": 9,
+          "passed": false,
+          "connect_ms": 2008.3,
+          "detail": "handshake failed: timed out"
+        }
+      ],
+      "http": [],
+      "dns": {
+        "passed": true,
+        "answer": "127.0.0.1",
+        "ms": 0.0,
+        "detail": "IP задан напрямую, DNS не нужен"
+      },
+      "trace": {
+        "ran": false,
+        "hops": [],
+        "reason": "tracer off (включи --trace)"
+      }
+    }
+  ],
+  "edu": [
+    {
+      "check": "ping (ICMP)",
+      "osi": "L3 — сетевой",
+      "wire": "ARP находит MAC соседа -> ICMP Echo-Request -> Echo-Reply. Каждый ответ — живое доказательство, что L1/L2/L3 между хостами в порядке."
+    },
+    {
+      "check": "TCP-порт",
+      "osi": "L4 — транспортный",
+      "wire": "Трёхэтапное рукопожатие: SYN -> SYN-ACK -> ACK. Если порт закрыт — придёт RST или тишина (timeout). connect_ms показывает время handshake."
+    },
+    {
+      "check": "HTTP",
+      "osi": "L7 — прикладной (поверх TCP)",
+      "wire": "DNS (если имя) -> TCP-handshake -> HTTP GET -> статус + тело. Статус 200 и байты доказывают, что сервис отдал контент."
+    },
+    {
+      "check": "DNS",
+      "osi": "L7 (служба имён)",
+      "wire": "Запрос A-записи возвращает IP. Без ответа резолвера браузер не знает, куда слать SYN."
+    },
+    {
+      "check": "Трафик хоста",
+      "osi": "L1–L4 в цифрах",
+      "wire": "Счётчики интерфейсов растут на каждый пакет проверок. Дельта до и после — твой след в эфире."
+    }
+  ]
+}

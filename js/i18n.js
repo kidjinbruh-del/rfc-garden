@@ -23,6 +23,7 @@ var D = {
     "nav.guide": "Guide",
     "nav.learn": "Learn",
     "nav.contribute": "Contribute",
+    "nav.demo": "Demo",
     "theme.aria": "Toggle theme",
     "lang.aria.en": "Switch to Russian",
     "lang.aria.ru": "Switch to English",
@@ -498,7 +499,26 @@ var D = {
     "table.year": "Year",
     "table.layer": "Layer",
     "table.status": "Status",
-    "table.kind": "Kind"
+    "table.kind": "Kind",
+
+    // ---- demo.html ----
+    "title.demo": "Live demo — RFC Garden",
+    "demo.h1": "Live demo",
+    "demo.sub": "How the network really works: live NetPulse observations over labspin stands.",
+    "demo.mode": "Mode",
+    "demo.traffic": "Host traffic during observation",
+    "demo.sent": "sent",
+    "demo.recv": "received",
+    "demo.packets": "packets",
+    "demo.stands": "Stands under observation",
+    "demo.edu": "On the wire",
+    "demo.how": "Repeat it yourself and update the live site",
+    "demo.step1": "1. Run observation on the labspin side — no Proxmox needed for the demo config:",
+    "demo.step2": "2. Drop the fresh file into the site root:",
+    "demo.step3": "3. Commit and push — the live site picks the numbers up automatically:",
+    "demo.note": "Numbers above are a real localhost run. This page shows a built-in sample first, then tries to load netpulse_evidence.json next to itself.",
+    "demo.cta1": "Open the garden",
+    "demo.cta2": "Read the passport"
 };
 
 function t(key, fallback) {
