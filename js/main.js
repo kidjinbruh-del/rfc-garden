@@ -3,9 +3,31 @@
 "use strict";
 
 if (document.getElementById('gardenCanvas') && typeof ProtocolGarden !== 'undefined') {
-    window.rfcGarden = new ProtocolGarden('gardenCanvas');
-    window.rfcGarden.loadProtocols(protocolsData);
-    window.rfcGarden.start();
+    const garden = new ProtocolGarden('gardenCanvas');
+    window.rfcGarden = garden;
+    garden.loadProtocols(protocolsData);
+
+    // ручной тир качества: ?perf=low|med|high (для слабых устройств и тестов)
+    try {
+        const perf = new URLSearchParams(location.search).get("perf");
+        if (perf && garden.setQuality) garden.setQuality(perf, true);
+    } catch (e) {}
+
+    garden.start();
+
+    // при сворачивании/прокрутке страницы останавливаем hero-сад, чтобы не тратить CPU
+    if (typeof IntersectionObserver !== "undefined") {
+        const hero = document.getElementById('gardenCanvas');
+        if (hero) {
+            const io = new IntersectionObserver((entries) => {
+                const visible = entries.some((e) => e.isIntersecting);
+                if (visible && !garden.animationId) garden.start();
+                else if (!visible && garden.animationId) garden.stop();
+            }, { rootMargin: "200px" });
+            io.observe(hero);
+            garden._io = io;
+        }
+    }
 }
 
 function animateValue(el, end, duration) {

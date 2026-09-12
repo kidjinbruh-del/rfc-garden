@@ -34,7 +34,7 @@ var D = {
     "title.index": "RFC Garden — Garden of Network Protocols",
     "hero.canvas.aria": "Animated garden of RFC network protocols",
     "hero.h1": "Garden of network<br>protocols.",
-    "hero.p": "Every internet RFC is a living plant. The connections between them are roots and branches. Explore forty years of engineering history as an ecosystem.",
+    "hero.p": "Every internet RFC is a living plant. The connections between them are roots and branches. Explore 72 objects of engineering history as an ecosystem.",
     "hero.sub": "No sign-up. No server. Opens instantly.",
     "hero.enter": "Enter the garden",
     "hero.read": "How to read it",
@@ -258,7 +258,7 @@ var D = {
     "art.shortNote": "The full article is being written — meanwhile here is everything the garden knows. Want to add?",
     "art.write": "Write the article →",
     "timeline.h1": "History in plants",
-    "timeline.sub": "Fifty years of internet evolution — from a simple RFC to QUIC. Click an entry to see the plant in the garden.",
+    "timeline.sub": "72 objects of internet evolution — from a simple RFC to QUIC. Click an entry to see the plant in the garden.",
 
     // ---- guide.html ----
     "title.guide": "Student Guide — RFC Garden",

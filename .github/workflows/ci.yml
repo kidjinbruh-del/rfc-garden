@@ -1,0 +1,23 @@
+name: RFC Garden CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies (none, vanilla project)
+        run: echo "No npm install needed — vanilla JS project"
+      - name: Run test suite
+        run: node tests/run-all.js
+      - name: Verify Pages deploy path
+        run: |
+          test -f docs/.nojekyll || test -f .nojekyll || echo "::warning::No .nojekyll found"

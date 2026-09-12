@@ -672,7 +672,7 @@ function drawMinimap() {
     if (!mm || !garden.canvas) return;
     const ctx = mm.getContext("2d");
     if (!ctx) return;
-    const cw = garden.canvas.width || 1, ch = garden.canvas.height || 1;
+    const cw = garden.w || garden.canvas.width || 1, ch = garden.h || garden.canvas.height || 1;
     const kx = MIN_W / cw, ky = MIN_H / ch;
     const isDark = document.body.getAttribute("data-theme") === "dark";
     ctx.clearRect(0, 0, MIN_W, MIN_H);
@@ -695,9 +695,9 @@ setInterval(drawMinimap, 500);
 if ($("minimap")) $("minimap").addEventListener("click", (e) => {
     const r = $("minimap").getBoundingClientRect();
     const mx = e.clientX - r.left, my = e.clientY - r.top;
-    const cw = garden.canvas.width || 1, ch = garden.canvas.height || 1;
+    const cw = garden.w || garden.canvas.width || 1, ch = garden.h || garden.canvas.height || 1;
     const wx = (mx / MIN_W) * cw, wy = (my / MIN_H) * ch;
-    const w = garden.canvas.width, h = garden.canvas.height;
+    const w = cw, h = ch;
     garden._viewTarget = { x: w / 2 - wx * garden.view.s, y: h / 2 - wy * garden.view.s };
 });
 
@@ -779,6 +779,11 @@ resetAll();
     }
     const q = urlParams.get("q");
     if (q) $("searchBox").value = q;
+    // ручной тир качества: ?perf=low|med|high (для слабых устройств и тестов)
+    const perf = urlParams.get("perf");
+    if (perf && garden.setQuality) garden.setQuality(perf, true);
+    // на узких экранах стартуем с общим планом (если нет сохранённого вида/хеша)
+    if (!location.hash && !urlParams.get("view") && garden.w && garden.w < 700) garden.fitView();
     if (st || layerFromUrl || cat || q) { syncChips(); apply(); }
     const v = urlParams.get("view");
     if (v) {

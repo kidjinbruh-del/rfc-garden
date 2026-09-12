@@ -27,6 +27,22 @@ class ProtocolGarden {
         this.hideLabels = false;
         this.compareIds = [];
 
+        // кэш рёбер (пары объектов) — пересчитывается при смене состава,
+        // а не каждый кадр
+        this._edges = [];
+
+        // логический размер (CSS-px) и плотность пикселей отдельно:
+        // раскладка и хит-тест живут в CSS-px, бэкстор — в device-px
+        this.w = 0;
+        this.h = 0;
+        this.dpr = 1;
+
+        // тиры качества: high — всё, med — без тяжёлых теней,
+        // low — плюс плоская аура и минимум частиц
+        this.q = { shadow: 1, auraGrad: true, maxP: 34, dprCap: 2 };
+        this._fps = { last: 0, ema: 60, n: 0, cool: 0 };
+        this._resizeT = null;
+
         this._pointers = new Map();
 
         const mm = (typeof window !== "undefined" && window.matchMedia)
@@ -34,8 +50,12 @@ class ProtocolGarden {
         this.reducedMotion = mm ? mm("(prefers-reduced-motion: reduce)").matches : false;
         this.coarsePointer = mm ? mm("(pointer: coarse)").matches : false;
 
+        this.setQuality(this._autoQuality(), true);
         this.resize();
-        window.addEventListener("resize", () => this.resize());
+        window.addEventListener("resize", () => {
+            if (this._resizeT) clearTimeout(this._resizeT);
+            this._resizeT = setTimeout(() => this.resize(), 150);
+        });
 
         this.canvas.addEventListener("mousemove", (e) => this._onMouseMove(e));
         this.canvas.addEventListener("mousedown", (e) => this._onMouseDown(e));
@@ -65,9 +85,80 @@ class ProtocolGarden {
         if (this.onSelect) this.onSelect(null);
     }
 
+    // ---------- качество ----------
+    _autoQuality() {
+        try {
+            const nav = (typeof navigator !== "undefined") ? navigator : {};
+            const smallScreen = (typeof window !== "undefined" &&
+                Math.min(window.innerWidth || 1e9, window.innerHeight || 1e9)) < 500;
+            if (this.coarsePointer && (smallScreen || (nav.hardwareConcurrency || 8) <= 4)) return "low";
+            if (this.coarsePointer || (nav.deviceMemory || 8) <= 4) return "med";
+        } catch (e) {}
+        return "high";
+    }
+    setQuality(q, silent) {
+        if (q !== "high" && q !== "med" && q !== "low") return this.qName || "high";
+        this.qName = q;
+        this.q = q === "high" ? { shadow: 1, auraGrad: true, maxP: 34, dprCap: 2 }
+            : q === "med" ? { shadow: 0, auraGrad: true, maxP: 16, dprCap: 1.5 }
+            : { shadow: 0, auraGrad: false, maxP: 0, dprCap: 1 };
+        if (!silent) this.resize();
+        return q;
+    }
+    _tuneFps(now) {
+        const f = this._fps;
+        if (f.last) {
+            const dt = now - f.last;
+            if (dt > 0 && dt < 1000) f.ema = f.ema * .95 + (1000 / dt) * .05;
+        }
+        f.last = now;
+        if (++f.n < 180) return;
+        f.n = 0;
+        if (f.cool > 0) { f.cool--; return; }
+        if (f.ema < 30) {
+            if (this.qName === "high") { this.setQuality("med", true); f.cool = 1; }
+            else if (this.qName === "med") { this.setQuality("low", true); f.cool = 1; }
+        }
+    }
+
+    // вписать весь видимый сад в экран (стартовое кадрирование на узких экранах)
+    fitView(pad) {
+        const list = this.protocols.filter((p) => this._visible(p) && p.x != null);
+        if (!list.length || !this.w || !this.h) return;
+        pad = pad == null ? 70 : pad;
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const p of list) {
+            const r = (p.size || 24) + 26;
+            if (p.x - r < x0) x0 = p.x - r;
+            if (p.y - r < y0) y0 = p.y - r;
+            if (p.x + r > x1) x1 = p.x + r;
+            if (p.y + r > y1) y1 = p.y + r;
+        }
+        const s = Math.max(.2, Math.min(1.15,
+            Math.min((this.w - pad) / Math.max(1, x1 - x0), (this.h - pad) / Math.max(1, y1 - y0))));
+        this.view.s = s;
+        this._viewTarget = null;
+        this.view.x = (this.w - (x0 + x1) * s) / 2;
+        this.view.y = (this.h - (y0 + y1) * s) / 2;
+    }
+
+    // пересобрать кэш рёбер из текущего состава
+    _relink() {
+        const byId = new Map(this.protocols.map((p) => [p.id, p]));
+        const edges = [];
+        for (const p of this.protocols) {
+            if (!p.dependsOn) continue;
+            for (const depId of p.dependsOn) {
+                const dep = byId.get(depId);
+                if (dep) edges.push({ a: p, b: dep });
+            }
+        }
+        this._edges = edges;
+    }
+
     centerOn(p) {
         if (!p) return;
-        const w = this.canvas.width, h = this.canvas.height;
+        const w = this.w || this.canvas.width, h = this.h || this.canvas.height;
         this._viewTarget = { x: w / 2 - p.x * this.view.s, y: h / 2 - p.y * this.view.s };
         this.focusId = p.id;
     }
@@ -75,13 +166,17 @@ class ProtocolGarden {
     resize() {
         if (!this.canvas) return;
         const rect = this.canvas.getBoundingClientRect();
-        this.canvas.width = rect.width || window.innerWidth;
-        this.canvas.height = rect.height || window.innerHeight;
+        this.w = rect.width || (typeof window !== "undefined" && window.innerWidth) || 800;
+        this.h = rect.height || (typeof window !== "undefined" && window.innerHeight) || 600;
+        const rawDpr = (typeof window !== "undefined" && window.devicePixelRatio) || 1;
+        this.dpr = Math.min(rawDpr, this.q.dprCap);
+        this.canvas.width = Math.max(1, Math.round(this.w * this.dpr));
+        this.canvas.height = Math.max(1, Math.round(this.h * this.dpr));
         if (this.protocols.length) this.positionProtocols();
     }
 
     positionProtocols() {
-        const W = this.canvas.width, H = this.canvas.height;
+        const W = this.w || this.canvas.width, H = this.h || this.canvas.height;
         // Слои сверху вниз (метафора стека), у каждого — своя полоса.
         // Внутри полосы растения раскладываются сеткой с гарантированным
         // шагом, чтобы подписи не налезали друг на друга.
@@ -140,6 +235,7 @@ class ProtocolGarden {
         this.allProtocols = this.protocols.slice();
         this.pathIds = null;
         this.positionProtocols();
+        this._relink();
     }
 
     calculateSize(p) {
@@ -155,6 +251,7 @@ class ProtocolGarden {
         const now = Date.now();
         this.protocols.forEach((p) => { if (!prev.has(p.id) || !p.born) p.born = now; });
         if (this.canvas) this.positionProtocols();
+        this._relink();
     }
 
     _visible(p) { return !this.visibleIds || this.visibleIds.has(p.id); }
@@ -193,9 +290,14 @@ class ProtocolGarden {
     draw() {
         const ctx = this.ctx;
         if (!ctx || !this.canvas) return;
-        const w = this.canvas.width, h = this.canvas.height;
+        const w = this.w || this.canvas.width, h = this.h || this.canvas.height;
+        this._sh = this.q.shadow;
 
-        ctx.clearRect(0, 0, w, h);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.setTransform(this.dpr || 1, 0, 0, this.dpr || 1, 0, 0);
+
+        try { this._tuneFps(Date.now()); } catch (e) {}
 
         if (this._viewTarget) {
             this.view.x += (this._viewTarget.x - this.view.x) * .12;
@@ -231,6 +333,8 @@ class ProtocolGarden {
         }
         ctx.restore();
 
+        ctx.font = `${Math.min(13, 11 * this.view.s)}px Inter`;
+        ctx.textAlign = "center";
         this.protocols.forEach((p, idx) => {
             if (this.hideLabels || !this._visible(p)) return;
             // чёт/нечет — врозь на few px: соседние подписи не сливаются
@@ -238,8 +342,6 @@ class ProtocolGarden {
             const sy = p.y * this.view.s + this.view.y + p.size * this.view.s + 16;
             if (sx < -60 || sx > w + 60 || sy < -30 || sy > h + 30) return;
             const dim = this.focusId && p.id !== this.focusId;
-            ctx.font = `${Math.min(13, 11 * this.view.s)}px Inter`;
-            ctx.textAlign = "center";
             ctx.fillStyle = dim
                 ? (isDark ? "rgba(140,150,160,.25)" : "rgba(90,100,110,.3)")
                 : isDark ? "#c8d4de" : "#33414b";
@@ -251,60 +353,50 @@ class ProtocolGarden {
 
     drawConnections(ctx) {
         const path = this.pathIds;
-        for (const protocol of this.protocols) {
-            if (!protocol.dependsOn || !this._visible(protocol)) continue;
-            const focused = this.focusId && (protocol.id === this.focusId || protocol.dependsOn.includes(this.focusId));
-            if (this.focusId && !focused) continue;
+        for (const e of this._edges) {
+            const protocol = e.a, dep = e.b;
+            const onPath = path && path.has(protocol.id) && path.has(dep.id);
+            if (path && !onPath) continue;
+            if (this.focusId && !(protocol.id === this.focusId ||
+                (protocol.dependsOn || []).includes(this.focusId))) continue;
 
-            for (const depId of protocol.dependsOn) {
-                const dep = this.protocols.find((p) => p.id === depId);
-                if (!dep || !this._visible(dep)) continue;
-                const onPath = path && path.has(protocol.id) && path.has(depId);
-                if (path && !onPath) continue;
-
-                const dx = dep.x - protocol.x, dy = dep.y - protocol.y;
-                const len = Math.hypot(dx, dy) || 1;
-                // дуга вместо прямой: пересечения читаются легче, веер от хабов
-                // не превращается в кашу; длинные связи дополнительно приглушены
-                const bend = Math.min(52, len * .1);
-                const cx = (protocol.x + dep.x) / 2 - (dy / len) * bend;
-                const cy = (protocol.y + dep.y) / 2 + (dx / len) * bend;
-                const baseAlpha = (this.focusId || onPath) ? "cc" : (len > 420 ? "2e" : "38");
-                const gradient = ctx.createLinearGradient(protocol.x, protocol.y, dep.x, dep.y);
-                gradient.addColorStop(0, protocol.color + baseAlpha);
-                gradient.addColorStop(1, dep.color + baseAlpha);
-                // внешний свечение кабеля
-                ctx.strokeStyle = gradient;
-                ctx.lineWidth = onPath ? 5 : this.focusId ? 4 : 2;
-                ctx.shadowBlur = onPath ? 12 : this.focusId ? 10 : 4;
-                ctx.shadowColor = protocol.color;
-                if (!this.focusId && !onPath) ctx.setLineDash([5, 6]);
-                ctx.beginPath();
-                ctx.moveTo(protocol.x, protocol.y);
-                ctx.quadraticCurveTo(cx, cy, dep.x, dep.y);
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-                if (!this.focusId && !onPath) ctx.setLineDash([]);
-            }
+            const dx = dep.x - protocol.x, dy = dep.y - protocol.y;
+            const len = Math.hypot(dx, dy) || 1;
+            // дуга вместо прямой: пересечения читаются легче, веер от хабов
+            // не превращается в кашу; длинные связи дополнительно приглушены
+            const bend = Math.min(52, len * .1);
+            const cx = (protocol.x + dep.x) / 2 - (dy / len) * bend;
+            const cy = (protocol.y + dep.y) / 2 + (dx / len) * bend;
+            const baseAlpha = (this.focusId || onPath) ? "cc" : (len > 420 ? "2e" : "38");
+            const gradient = ctx.createLinearGradient(protocol.x, protocol.y, dep.x, dep.y);
+            gradient.addColorStop(0, protocol.color + baseAlpha);
+            gradient.addColorStop(1, dep.color + baseAlpha);
+            // внешний свечение кабеля
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = onPath ? 5 : this.focusId ? 4 : 2;
+            ctx.shadowBlur = (onPath ? 12 : this.focusId ? 10 : 4) * this._sh;
+            ctx.shadowColor = protocol.color;
+            if (!this.focusId && !onPath) ctx.setLineDash([5, 6]);
+            ctx.beginPath();
+            ctx.moveTo(protocol.x, protocol.y);
+            ctx.quadraticCurveTo(cx, cy, dep.x, dep.y);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            if (!this.focusId && !onPath) ctx.setLineDash([]);
         }
     }
 
     drawParticles(ctx) {
-        const maxP = (this.protocols.length > 40 || this.coarsePointer) ? 18 : 34;
-        if (!this.reducedMotion && this.particles.length < maxP && Math.random() < .32) {
-            const pool = this.protocols.filter((p) => this._visible(p));
-            const protocol = pool[Math.floor(Math.random() * pool.length)];
-            if (protocol?.dependsOn?.length) {
-                const depId = protocol.dependsOn[Math.floor(Math.random() * protocol.dependsOn.length)];
-                const dep = this.protocols.find((p) => p.id === depId);
-                if (dep) this.particles.push({
-                    x: protocol.x, y: protocol.y,
-                    tx: dep.x, ty: dep.y,
-                    progress: 0, speed: .006 + Math.random() * .01,
-                    color: protocol.color,
-                    trail: [],
-                });
-            }
+        const maxP = this.coarsePointer ? Math.min(this.q.maxP, 18) : this.q.maxP;
+        if (!this.reducedMotion && this._edges.length && this.particles.length < maxP && Math.random() < .32) {
+            const e = this._edges[(Math.random() * this._edges.length) | 0];
+            if (e) this.particles.push({
+                x: e.a.x, y: e.a.y,
+                tx: e.b.x, ty: e.b.y,
+                progress: 0, speed: .006 + Math.random() * .01,
+                color: e.a.color,
+                trail: [],
+            });
         }
         this.particles = this.particles.filter((p) => {
             p.progress += p.speed;
@@ -323,7 +415,7 @@ class ProtocolGarden {
                 ctx.fill();
             }
             // ядро — яркая точка
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 8 * this._sh;
             ctx.shadowColor = p.color;
             ctx.fillStyle = p.color + "cc";
             ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
@@ -365,12 +457,16 @@ class ProtocolGarden {
         // наследуют globalAlpha выше)
         this.drawRoots(ctx, x, y, size, color, protocol.pulse);
 
-        // биолюминесцентная аура
+        // биолюминесцентная аура (на слабых устройствах — плоский круг без градиента)
         const glowSize = (size * .6 + Math.sin(protocol.pulse + t * .003) * size * .08) * grow;
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(glowSize, .1));
-        glow.addColorStop(0, color + "18");
-        glow.addColorStop(1, color + "00");
-        ctx.fillStyle = glow;
+        if (this.q.auraGrad) {
+            const glow = ctx.createRadialGradient(x, y, 0, x, y, Math.max(glowSize, .1));
+            glow.addColorStop(0, color + "18");
+            glow.addColorStop(1, color + "00");
+            ctx.fillStyle = glow;
+        } else {
+            ctx.fillStyle = color + "10";
+        }
         ctx.beginPath();
         ctx.arc(x, y, Math.max(glowSize, .1), 0, Math.PI * 2);
         ctx.fill();
@@ -447,7 +543,7 @@ class ProtocolGarden {
             const fx = Math.cos(ang) * size * .42;
             const fy = -size * .3 + Math.sin(ang) * size * .3;
             const r = size * .038 * (.75 + .25 * Math.sin(protocol.pulse * 2.2 + i * 2.1));
-            ctx.shadowBlur = size * .25;
+            ctx.shadowBlur = size * .25 * this._sh;
             ctx.shadowColor = color;
             ctx.fillStyle = color + "33";
             ctx.beginPath(); ctx.arc(fx, fy, r * 2.2, 0, Math.PI * 2); ctx.fill();
@@ -487,7 +583,7 @@ class ProtocolGarden {
             ctx.stroke();
         }
         // узлы-диоды (свечение)
-        ctx.shadowBlur = size * .25;
+        ctx.shadowBlur = size * .25 * this._sh;
         ctx.shadowColor = color;
         const nodes = [[0, -.55], [-.15, -.35], [.15, -.35], [-.4, -.75], [.4, -.75], [0, -.15]];
         for (const [nx, ny] of nodes) {
@@ -527,7 +623,7 @@ class ProtocolGarden {
         // внутреннее свечение кабеля
         ctx.strokeStyle = color;
         ctx.lineWidth = 1.5;
-        ctx.shadowBlur = size * .2;
+        ctx.shadowBlur = size * .2 * this._sh;
         ctx.shadowColor = color;
         ctx.beginPath();
         ctx.moveTo(x, y + size * .5);
@@ -570,7 +666,7 @@ class ProtocolGarden {
         ctx.lineTo(x, y - size * .2);
         ctx.stroke();
         // кристаллические лепестки (шестиугольники)
-        ctx.shadowBlur = size * .2;
+        ctx.shadowBlur = size * .2 * this._sh;
         ctx.shadowColor = color;
         for (let i = 0; i < 6; i++) {
             const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
@@ -591,7 +687,7 @@ class ProtocolGarden {
         }
         // центральный нод — ядро пульсирует
         ctx.fillStyle = "#fff";
-        ctx.shadowBlur = size * .3;
+        ctx.shadowBlur = size * .3 * this._sh;
         ctx.beginPath();
         ctx.arc(x, y - size * .25, size * .06 * (1 + .15 * Math.sin(pulse * 2)), 0, Math.PI * 2);
         ctx.fill();
@@ -614,7 +710,7 @@ class ProtocolGarden {
             ctx.stroke();
         }
         // купол — как pcb-платформа
-        ctx.shadowBlur = size * .25;
+        ctx.shadowBlur = size * .25 * this._sh;
         ctx.shadowColor = color;
         ctx.fillStyle = color;
         ctx.beginPath();
@@ -651,7 +747,7 @@ class ProtocolGarden {
         ctx.strokeStyle = color;
         ctx.lineWidth = 2;
         ctx.lineCap = "round";
-        ctx.shadowBlur = size * .15;
+        ctx.shadowBlur = size * .15 * this._sh;
         ctx.shadowColor = color;
         ctx.beginPath();
         ctx.moveTo(x, y + size * .35);
@@ -674,7 +770,7 @@ class ProtocolGarden {
         ctx.closePath();
         ctx.fill();
         // светодиод на вершине
-        ctx.shadowBlur = size * .25;
+        ctx.shadowBlur = size * .25 * this._sh;
         ctx.shadowColor = color;
         ctx.fillStyle = "#fff";
         ctx.beginPath();

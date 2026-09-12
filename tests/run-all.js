@@ -11,6 +11,7 @@ const tests = [
   "check-encyclopedia.js",
   "run-explore.js",
   "run-main-timeline.js",
+  "perf-smoke.js",
 ];
 let failed = 0;
 for (const t of tests) {

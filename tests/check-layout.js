@@ -10,9 +10,7 @@ const load = (f) => fs.readFileSync(path.join(dir, f), "utf8");
 let failures = 0;
 const ok = (c, n) => { console.log((c ? "PASS " : "FAIL ") + n); if (!c) failures++; };
 
-function layout(W, H) {
-  const src = load("js/garden.js") + "\n;globalThis.__PG = ProtocolGarden;";
-  const dataSrc = load("js/data.js") + "\n;globalThis.__PD = protocolsData;";
+function makeContext(W, H) {
   const canvas = {
     width: 0, height: 0, style: {},
     addEventListener() {},
@@ -33,8 +31,13 @@ function layout(W, H) {
   };
   sb.window = sb; sb.globalThis = sb;
   vm.createContext(sb);
-  vm.runInContext(dataSrc, sb, { filename: "data.js" });
-  vm.runInContext(src, sb, { filename: "garden.js" });
+  vm.runInContext(load("js/data.js") + "\n;globalThis.__PD = protocolsData;", sb, { filename: "data.js" });
+  vm.runInContext(load("js/garden.js") + "\n;globalThis.__PG = ProtocolGarden;", sb, { filename: "garden.js" });
+  return { sb, canvas };
+}
+
+function layout(W, H) {
+  const { sb } = makeContext(W, H);
   const g = new sb.__PG("gardenCanvas");
   g.loadProtocols(sb.__PD);
   return g.protocols.map((p) => ({
@@ -56,7 +59,7 @@ function stats(ps) {
 try {
   const desktop = layout(1536, 900);
   const N = desktop.length;
-  ok(N > 50, "layout: entities added beyond 50 protocols (got " + N + ")");
+  ok(N > 70, "layout: entities count >= 72 (got " + N + ")");
   const st = stats(desktop);
   console.log("  1536x900: minDist=" + st.min.toFixed(1) + " (" + st.pair + "), bodyOverlap=" + st.overlap);
   ok(st.overlap === 0, "layout 1536x900: no overlapping plant bodies");
@@ -82,6 +85,15 @@ try {
   // вьюпорт: почти всё внутри экрана
   const inside = desktop.filter((p) => p.x > 0 && p.x < 1536 && p.y > 0 && p.y < 900).length;
   ok(inside === N, "layout 1536x900: all plants inside viewport (got " + inside + ")");
+
+  // fitView: не падает и возвращает валидный масштаб (0.2..1.15) на узком экране
+  const { sb } = makeContext(420, 700);
+  const g = new sb.__PG("gardenCanvas");
+  g.loadProtocols(sb.__PD);
+  g.setQuality("low", true);
+  g.fitView();
+  ok(g.view.s > 0 && g.view.s <= 1.15, "layout: fitView scale in range (got " + g.view.s.toFixed(3) + ")");
+  ok(Number.isFinite(g.view.x) && Number.isFinite(g.view.y), "layout: fitView produces finite view.x/y");
 } catch (e) {
   console.log("FAIL check-layout threw: " + (e && e.stack || e));
   failures++;
