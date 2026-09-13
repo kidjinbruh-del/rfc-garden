@@ -72,6 +72,7 @@ function buildSandbox(extra) {
     vm.runInContext(load("js/data.js"), sb, { filename: "data.js" });
     vm.runInContext(load("js/garden.js"), sb, { filename: "garden.js" });
     vm.runInContext(load("js/theme.js"), sb, { filename: "theme.js" });
+    vm.runInContext(load("js/intro.js"), sb, { filename: "intro.js" });
     vm.runInContext(load("js/main.js"), sb, { filename: "main.js" });
     const N = vm.runInContext("protocolsData.protocols.length", sb);
     ok(!!sb.rfcGarden && sb.rfcGarden.protocols.length === N, "main: hero garden loads " + N + " objects");

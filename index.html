@@ -5,13 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b1220">
     <link rel="manifest" href="manifest.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
     <meta name="description" content="RFC Garden — интерактивная карта сетевых протоколов в виде живого сада. 72 объекта, связи, история от 1969 года.">
     <meta name="author" content="Трофимов Петр">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z'/><path d='M12 22c4 0 7-3 7-7h-7z'/></svg>">
     <title data-i18n="title.index">RFC Garden — Сад сетевых протоколов</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260913">
     <style>
         .hero-content { pointer-events: auto; }
+        /* ---- entrance: появление при первой загрузке ---- */
+        @keyframes heroRise {
+            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            to { opacity: 1; transform: none; filter: blur(0); }
+        }
+        @keyframes heroFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes orbDrift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -30px) scale(1.12); }
+        }
+        /* ворота: hero-текст скрыт, пока нет Inter (иначе FOUT-вспышка).
+           Показывает main.js классом html.ready. Сад и навбар видны сразу. */
+        html.js .hero-content > * { opacity: 0; }
+        .navbar { animation: heroFade .7s ease both; }
+        #gardenCanvas { animation: heroFade 1.2s ease both; }
+        html.ready .hero-content > * { animation: heroRise .85s cubic-bezier(.16,1,.3,1) both; }
+        html.ready .hero-content > *:nth-child(1) { animation-delay: .10s; }
+        html.ready .hero-content > *:nth-child(2) { animation-delay: .24s; }
+        html.ready .hero-content > *:nth-child(3) { animation-delay: .36s; }
+        html.ready .hero-content > *:nth-child(4) { animation-delay: .48s; }
+        html.ready .hero-content > *:nth-child(5) { animation-delay: .62s; }
+        /* подзаголовок: межбуквенный интервал 8px → 0 поверх подъёма */
+        html.ready .hero-content > *:nth-child(3) {
+            animation: heroRise .85s cubic-bezier(.16,1,.3,1) both, subTrack 1.3s ease both;
+        }
+        @keyframes subTrack { from { letter-spacing: 8px; } to { letter-spacing: normal; } }
+        /* кнопки: подъём с bounce-отскоком */
+        html.ready .hero-content > *:nth-child(4) { animation: heroRiseBounce .95s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes heroRiseBounce {
+            0% { opacity: 0; transform: translateY(30px); }
+            60% { opacity: 1; transform: translateY(-5px); }
+            80% { transform: translateY(2px); }
+            100% { opacity: 1; transform: none; }
+        }
+        /* иконки карточек: каскад pop с шагом ~100мс */
+        .rv-stagger.in > *:nth-child(1) .card-icon, .rv-stagger.in > *:nth-child(1) span[data-icon] { animation: iconPop .45s .05s both; }
+        .rv-stagger.in > *:nth-child(2) .card-icon, .rv-stagger.in > *:nth-child(2) span[data-icon] { animation: iconPop .45s .15s both; }
+        .rv-stagger.in > *:nth-child(3) .card-icon, .rv-stagger.in > *:nth-child(3) span[data-icon] { animation: iconPop .45s .25s both; }
+        .rv-stagger.in > *:nth-child(4) .card-icon, .rv-stagger.in > *:nth-child(4) span[data-icon] { animation: iconPop .45s .35s both; }
+        .rv-stagger.in > *:nth-child(5) .card-icon, .rv-stagger.in > *:nth-child(5) span[data-icon] { animation: iconPop .45s .45s both; }
+        .rv-stagger.in > *:nth-child(6) .card-icon, .rv-stagger.in > *:nth-child(6) span[data-icon] { animation: iconPop .45s .55s both; }
+        @keyframes iconPop {
+            0% { opacity: 0; transform: scale(.4) rotate(-12deg); }
+            60% { opacity: 1; transform: scale(1.15) rotate(3deg); }
+            100% { opacity: 1; transform: none; }
+        }
+        .hero-orb {
+            position: absolute; left: 8%; top: 12%; width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(45,212,191,.14), rgba(139,92,246,.07) 55%, transparent 70%);
+            filter: blur(10px); pointer-events: none;
+            animation: orbDrift 9s ease-in-out infinite;
+        }
+        /* ---- появление блоков по скроллу — глобально в css/style.css ---- */
+        .btn { transition: transform .25s ease, box-shadow .25s ease, background .25s ease; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary:hover { box-shadow: 0 8px 28px rgba(45,212,191,.35); }
+        /* ---- главная: shimmer заголовка (полоса/курсор/зерно — глобально) ---- */
+        .hero h1 { background-size: 220% 220%; animation: h1Sheen 9s ease-in-out infinite; }
+        @keyframes h1Sheen {
+            0%, 100% { background-position: 0% 30%; }
+            50% { background-position: 100% 70%; }
+        }
+        .grid-cards, .layer-row { perspective: 900px; }
+        @media (prefers-reduced-motion: reduce) {
+            .navbar, #gardenCanvas, .hero-content > *,
+            html.ready .hero-content > * { animation: none; opacity: 1; }
+            html.js .hero-content > * { opacity: 1; }
+            .hero h1 { animation: none; }
+            .hero-orb { animation: none; }
+            .btn:hover { transform: none; }
+            .rv-stagger .card-icon, .rv-stagger span[data-icon] { animation: none; }
+        }
         .hero::after {
             content: ''; position: absolute; inset: 0;
             background: linear-gradient(90deg, var(--bg) 0%, transparent 55%),
@@ -39,6 +114,7 @@
     </style>
 </head>
 <body data-theme="dark">
+    <a class="skip-link" href="#mainContent" data-i18n="a11y.skip">Перейти к содержимому</a>
     <nav class="navbar">
         <div class="logo">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
@@ -50,6 +126,8 @@
             <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
             <li><a href="demo.html" data-i18n="nav.demo">Демо</a></li>
             <li><a href="linux.html" data-i18n="nav.linux">Линукс</a></li>
+            <li><a href="programming.html" data-i18n="nav.programming">Программирование</a></li>
+            <li><a href="virt.html" data-i18n="nav.virt">Виртуализация</a></li>
             <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
             <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
             <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
@@ -58,9 +136,14 @@
         <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
         <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
     </nav>
+    <div class="marquee marquee-top" aria-hidden="true"><div class="marquee-inner" id="mqInner"><div class="mq-group"><span>TCP</span><span class="mq-dot">·</span><span>UDP</span><span class="mq-dot">·</span><span>QUIC</span><span class="mq-dot">·</span><span>HTTP/3</span><span class="mq-dot">·</span><span>DNS</span><span class="mq-dot">·</span><span>TLS 1.3</span><span class="mq-dot">·</span><span>IPv6</span><span class="mq-dot">·</span><span>SSH</span><span class="mq-dot">·</span><span>BGP</span><span class="mq-dot">·</span><span>WebSocket</span><span class="mq-dot">·</span></div><div class="mq-group" aria-hidden="true"><span>TCP</span><span class="mq-dot">·</span><span>UDP</span><span class="mq-dot">·</span><span>QUIC</span><span class="mq-dot">·</span><span>HTTP/3</span><span class="mq-dot">·</span><span>DNS</span><span class="mq-dot">·</span><span>TLS 1.3</span><span class="mq-dot">·</span><span>IPv6</span><span class="mq-dot">·</span><span>SSH</span><span class="mq-dot">·</span><span>BGP</span><span class="mq-dot">·</span><span>WebSocket</span><span class="mq-dot">·</span></div></div></div>
+    <div id="cursorGlow" aria-hidden="true"></div>
+    <div id="scrollbar" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
 
     <section class="hero">
         <canvas id="gardenCanvas" role="img" data-i18n-attr="aria-label:hero.canvas.aria" aria-label="Анимированный сад сетевых протоколов RFC"></canvas>
+        <div class="hero-orb" aria-hidden="true"></div>
         <div class="hero-content">
             <h1 data-i18n-html="hero.h1">Сад сетевых<br>протоколов.</h1>
             <p data-i18n="hero.p">Каждый RFC интернета — живое растение. Связи между ними — корни и ветви.
@@ -81,11 +164,11 @@
         </div>
     </section>
 
-    <main>
-        <section class="features">
+    <main id="mainContent">
+        <section class="features rv">
             <h2 class="sec-title" data-i18n="feat.title">Что внутри</h2>
             <p class="sec-sub" data-i18n="feat.sub">Сад — это карта. Каждое растение рассказывает историю стандарта.</p>
-            <div class="grid-cards">
+            <div class="grid-cards rv-stagger">
                 <div class="card">
                     <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg></div>
                     <h3 data-i18n="feat.c1.title">Живые растения</h3>
@@ -109,10 +192,10 @@
             </div>
         </section>
 
-        <section class="layers-strip">
+        <section class="layers-strip rv">
             <h2 class="sec-title" data-i18n="layers.title">Уровни сада</h2>
             <p class="sec-sub" data-i18n="layers.sub">Протоколы организованы по слоям сетевого стека. Кликните — сад откроется на этом слое.</p>
-            <div class="layer-row">
+            <div class="layer-row rv-stagger">
                 <a class="layer-card" style="--lc:#a78bfa" href="explore.html?layer=application">
                     <span class="lc-count mono"></span>
                     <div class="lc-name">Application</div>
@@ -151,10 +234,10 @@
             </div>
         </section>
 
-        <section>
+        <section class="rv">
             <h2 class="sec-title" data-i18n="students.title">Студентам</h2>
             <p class="sec-sub" data-i18n="students.sub">От первого взгляда до зачёта: маршрут, проверка знаний и материалы.</p>
-<div class="grid-cards">
+<div class="grid-cards rv-stagger">
                 <a class="card" href="guide.html">
                     <div class="card-icon"><span data-icon="sprout"></span></div>
                     <h3 data-i18n="s1.title">Гайд за 5 минут</h3>
@@ -185,10 +268,15 @@
                     <h3 data-i18n="s6.title">Энциклопедия</h3>
                     <p data-i18n="s6.desc">Истории и практика каждого объекта — целиком на сайте.</p>
                 </a>
+                <a class="card" href="glossary.html">
+                    <div class="card-icon"><span data-icon="search"></span></div>
+                    <h3 data-i18n="s7.title">Глоссарий</h3>
+                    <p data-i18n="s7.desc">Термины сада одной строкой: латентность, порт, handshake.</p>
+                </a>
             </div>
         </section>
 
-        <section>
+        <section class="rv">
             <h2 class="sec-title" data-i18n="about.title">О проекте</h2>
             <p class="sec-sub" style="max-width:680px;" data-i18n="about.desc">RFC Garden — open-source визуализация мира сетевых стандартов:
             сухие технические документы превращены в живую экосистему. Для студентов,

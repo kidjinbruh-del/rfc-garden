@@ -203,7 +203,7 @@ li .icon { color: var(--accent); }
 .garden-page #gardenCanvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
 
 .toolbar {
-    position: fixed; top: 70px; left: 0; right: 0; z-index: 100;
+    position: fixed; top: 118px; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     padding: 12px 24px;
 }
@@ -242,8 +242,8 @@ li .icon { color: var(--accent); }
 
 /* Карточка протокола */
 .proto-card {
-    position: fixed; top: 80px; right: 24px; width: 380px;
-    max-height: calc(100vh - 110px); overflow-y: auto; z-index: 150;
+    position: fixed; top: 128px; right: 24px; width: 380px;
+    max-height: calc(100vh - 158px); overflow-y: auto; z-index: 150;
     background: var(--bg-panel); backdrop-filter: blur(24px) saturate(160%);
     border: 1px solid var(--line-strong); border-radius: var(--radius);
     padding: 24px; box-shadow: var(--shadow);
@@ -374,8 +374,8 @@ footer a:hover { color: var(--accent); }
 }
 
 .compare-card {
-    position: fixed; top: 130px; left: 24px; width: min(460px, calc(100vw - 48px));
-    max-height: calc(100vh - 160px); overflow-y: auto; z-index: 150;
+    position: fixed; top: 178px; left: 24px; width: min(460px, calc(100vw - 48px));
+    max-height: calc(100vh - 208px); overflow-y: auto; z-index: 150;
     background: var(--bg-panel); backdrop-filter: blur(24px) saturate(160%);
     border: 1px solid var(--line-strong); border-radius: var(--radius);
     padding: 24px; box-shadow: var(--shadow);
@@ -423,7 +423,7 @@ footer a:hover { color: var(--accent); }
 .recent-panel a:hover { border: 1px solid var(--accent); margin: -1px 5px 5px -1px; }
 
 .toast {
-    position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 178px; left: 50%; transform: translateX(-50%);
     z-index: 200; padding: 10px 22px; border-radius: 20px;
     background: var(--bg-panel); backdrop-filter: blur(16px);
     border: 1px solid var(--accent); font-size: 13px; white-space: nowrap;
@@ -434,6 +434,168 @@ footer a:hover { color: var(--accent); }
 .legend [data-layer]:hover { background: var(--accent-dim); color: var(--text); }
 .legend [data-layer]:focus-visible { outline: 2px solid var(--accent); }
 
+/* клик-ripple на кнопках (main.js / motion.js подкладывают .btn-ripple) */
+.btn { position: relative; }
+.btn-ripple {
+    position: absolute; border-radius: 50%; pointer-events: none; z-index: 1;
+    background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 70%);
+    transform: scale(0); animation: rippleOut .6s ease-out forwards;
+}
+@keyframes rippleOut { to { transform: scale(1); opacity: 0; } }
+
+/* lazy render длинных списков */
+.card, .tl-item, .demo-card, .step-card, table.sheet tbody tr {
+    content-visibility: auto; contain-intrinsic-size: auto 140px;
+}
+
+/* skip-link доступности */
+.skip-link {
+    position: absolute; left: 12px; top: -60px; z-index: 400;
+    background: var(--accent); color: #06281c; font-weight: 600;
+    padding: 8px 16px; border-radius: 8px; transition: top .2s;
+}
+.skip-link:focus { top: 12px; }
+
+/* тосты достижений */
+.ach-toasts {
+    position: fixed; bottom: 24px; right: 24px; z-index: 300;
+    display: flex; flex-direction: column; gap: 10px; max-width: min(340px, calc(100vw - 48px));
+}
+.ach-toast {
+    background: var(--bg-panel); backdrop-filter: blur(16px);
+    border: 1px solid var(--accent); border-radius: 12px; padding: 12px 18px;
+    box-shadow: var(--shadow); animation: achIn .4s cubic-bezier(.34,1.3,.64,1) both;
+}
+.ach-toast.out { opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .4s; }
+.ach-toast b { display: block; color: var(--accent); font-size: 14px; }
+.ach-toast span { font-size: 12.5px; color: var(--text-dim); }
+@keyframes achIn { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+
+/* виджет прогресса изучения */
+.stat-progress { margin: 6px 0 18px; }
+.stat-progress-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.stat-progress-top b { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--accent); }
+.stat-progress-top span { font-size: 13px; color: var(--text-dim); }
+
+/* печать: прячем интерактив на всех страницах */
+@media print {
+    .marquee, #scrollbar, #cursorGlow, .grain, .navbar, .skip-link, .ach-toasts { display: none !important; }
+}
+
+/* ============================================================
+   MOTION SYSTEM (js/motion.js, на главной — js/main.js)
+   Появление блоков, верхняя полоса, glow-курсор, зерно, варианты страниц.
+   ============================================================ */
+html.js .rv, html.js .rv-stagger > * {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .7s ease, transform .7s cubic-bezier(.16,1,.3,1);
+}
+html.js .rv.in, html.js .rv-stagger.in > * { opacity: 1; transform: none; }
+html.js .rv-stagger.in > *:nth-child(1) { transition-delay: 0s; }
+html.js .rv-stagger.in > *:nth-child(2) { transition-delay: .07s; }
+html.js .rv-stagger.in > *:nth-child(3) { transition-delay: .14s; }
+html.js .rv-stagger.in > *:nth-child(4) { transition-delay: .21s; }
+html.js .rv-stagger.in > *:nth-child(5) { transition-delay: .28s; }
+html.js .rv-stagger.in > *:nth-child(6) { transition-delay: .35s; }
+html.js .rv-stagger.in > *:nth-child(7) { transition-delay: .42s; }
+html.js .rv-stagger.in > *:nth-child(n+8) { transition-delay: .48s; }
+
+/* --- варианты страниц (body[data-motion]) --- */
+/* bloom (энциклопедия): раскрытие масштабом */
+html.js body[data-motion="bloom"] .rv-stagger > * { transform: scale(.9); }
+/* pop (квиз): упругое появление */
+html.js body[data-motion="pop"] .rv { transform: scale(.94); }
+html.js body[data-motion="pop"] .rv-stagger > * { transform: scale(.94); transition: opacity .5s ease, transform var(--tr); }
+/* reading (статья): медленный высокий подъём */
+html.js body[data-motion="reading"] .rv { transform: translateY(40px); transition-duration: .9s; }
+/* steps (гайд): ступени едут навстречу друг другу */
+html.js body[data-motion="steps"] .rv { transform: translateY(34px); transition-duration: .85s; }
+/* sheet (шпаргалка): только прозрачность, строки таблицы */
+html.js body[data-motion="sheet"] .rv-stagger > * { transform: none; transition: opacity .6s ease; }
+/* axis (таймлайн): влево/вправо через свойство translate —
+   не конфликтует с hover на transform */
+html.js body[data-motion="axis"] .rv-stagger > * {
+    transform: none; translate: -44px 0;
+    transition: opacity .7s ease, translate .7s cubic-bezier(.16,1,.3,1), transform var(--tr);
+}
+html.js body[data-motion="axis"] .rv-stagger > *:nth-child(even) { translate: 44px 0; }
+html.js body[data-motion="axis"] .rv-stagger.in > * { opacity: 1; translate: 0 0; }
+/* линия таймлайна рисуется сверху вниз */
+body[data-motion="axis"] .timeline::before {
+    transform-origin: top center; animation: tlDraw 1.8s ease both;
+}
+@keyframes tlDraw { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+/* bars (статистика): столбцы растут */
+html.js body[data-motion="bars"] .bar-track i {
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform 1.1s cubic-bezier(.16,1,.3,1);
+}
+html.js body[data-motion="bars"] .in .bar-track i { transform: none; }
+html.js body[data-motion="bars"] .in .bar-row:nth-child(2) i { transition-delay: .1s; }
+html.js body[data-motion="bars"] .in .bar-row:nth-child(3) i { transition-delay: .2s; }
+html.js body[data-motion="bars"] .in .bar-row:nth-child(4) i { transition-delay: .3s; }
+html.js body[data-motion="bars"] .in .bar-row:nth-child(5) i { transition-delay: .4s; }
+html.js body[data-motion="bars"] .in .bar-row:nth-child(6) i { transition-delay: .5s; }
+html.js body[data-motion="bars"] .in .bar-row:nth-child(n+7) i { transition-delay: .6s; }
+/* deck (сад): пульт съезжает сверху, холст проявляется */
+body[data-motion="deck"] .toolbar { animation: deckDrop .8s cubic-bezier(.16,1,.3,1) both; }
+body[data-motion="deck"] .toolbar > * { animation: deckPop .6s ease both; }
+body[data-motion="deck"] .toolbar > *:nth-child(1) { animation-delay: .05s; }
+body[data-motion="deck"] .toolbar > *:nth-child(2) { animation-delay: .12s; }
+body[data-motion="deck"] .toolbar > *:nth-child(3) { animation-delay: .19s; }
+body[data-motion="deck"] .toolbar > *:nth-child(4) { animation-delay: .26s; }
+body[data-motion="deck"] .toolbar > *:nth-child(5) { animation-delay: .33s; }
+body[data-motion="deck"] .toolbar > *:nth-child(6) { animation-delay: .40s; }
+body[data-motion="deck"] .toolbar > *:nth-child(7) { animation-delay: .47s; }
+body[data-motion="deck"] .toolbar > *:nth-child(n+8) { animation-delay: .54s; }
+body[data-motion="deck"] #gardenCanvas { animation: canvasIn 1.6s ease both; }
+@keyframes deckDrop { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: none; } }
+@keyframes deckPop { from { opacity: 0; transform: translateY(-10px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes canvasIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- верхняя полоса-бегушка --- */
+.marquee {
+    overflow: hidden; white-space: nowrap;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    margin: 0 0 90px;
+}
+.marquee-top { margin: 0; }
+.marquee-inner { display: flex; width: max-content; animation: mqMove 70s linear infinite; }
+.mq-group { display: flex; }
+.marquee-inner span { padding: 13px 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); }
+.marquee-inner .mq-dot { color: var(--accent); padding: 13px 0; }
+@keyframes mqMove { to { transform: translateX(-50%); } }
+.marquee:hover .marquee-inner { animation-play-state: paused; }
+
+/* --- glow-курсор, прогресс, зерно --- */
+#cursorGlow {
+    position: fixed; left: 0; top: 0; width: 340px; height: 340px;
+    margin: -170px 0 0 -170px; pointer-events: none; z-index: 3;
+    background: radial-gradient(circle, rgba(45,212,191,.10), rgba(139,92,246,.05) 45%, transparent 65%);
+    mix-blend-mode: screen;
+}
+#scrollbar {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 200;
+    background: linear-gradient(90deg, var(--accent), #22d3ee, #8b5cf6);
+}
+.grain {
+    position: fixed; inset: 0; z-index: 150; pointer-events: none; opacity: .05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.js .rv, html.js .rv-stagger > * {
+        opacity: 1 !important; transform: none !important; translate: none !important;
+        transition: none !important;
+    }
+    html.js body[data-motion="bars"] .bar-track i { transform: none !important; transition: none !important; }
+    .marquee-inner { animation: none !important; }
+    body[data-motion="deck"] .toolbar, body[data-motion="deck"] .toolbar > *,
+    body[data-motion="deck"] #gardenCanvas, body[data-motion="axis"] .timeline::before { animation: none !important; }
+    #cursorGlow, .grain { display: none; }
+    .btn-ripple { animation: none; opacity: 0; }
+}
+
 /* ---------- Адаптив ---------- */
 @media (min-width: 901px) {
     /* Сад на главной — стабильно справа от текста, текст его не перекрывает */
@@ -441,12 +603,14 @@ footer a:hover { color: var(--accent); }
 }
 @media (max-width: 900px) {
     .navbar { padding: 12px 16px; gap: 12px; }
-    .nav-menu { gap: 0; }
-    .nav-menu a { padding: 8px 10px; font-size: 12.5px; }
+    .logo { white-space: nowrap; flex-shrink: 0; }
+    .nav-menu { gap: 0; overflow-x: auto; scrollbar-width: none; flex: 1; }
+    .nav-menu::-webkit-scrollbar { display: none; }
+    .nav-menu a { padding: 8px 10px; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
     main { padding: 0 18px; }
     .proto-card { right: 12px; left: 12px; width: auto; top: auto; bottom: 12px;
                   max-height: 55vh; }
-    .toolbar { padding: 10px 14px; top: 62px; }
+    .toolbar { padding: 10px 14px; top: 132px; }
     .search-box { width: 100%; }
     .legend { display: none; }
     .hero-stats { gap: 24px; }

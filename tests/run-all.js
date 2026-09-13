@@ -11,6 +11,8 @@ const tests = [
   "check-encyclopedia.js",
   "run-explore.js",
   "run-main-timeline.js",
+  "run-intro.js",
+  "check-achievements.js",
   "perf-smoke.js",
 ];
 let failed = 0;

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.virt">Справочник виртуализации — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css?v=20260913">
+    <style>
+        .demo-card { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 18px 20px; margin: 14px 0; }
+        .demo-card h3 { margin: 0 0 10px; font-size: 16px; }
+        .demo-card h3 .icon { vertical-align: -3px; margin-right: 6px; color: var(--accent); }
+        .demo-card p { font-size: 14px; margin: 8px 0; }
+        .demo-row { display: flex; gap: 8px; align-items: baseline; padding: 5px 0;
+            border-top: 1px dashed var(--line); font-size: 14px; flex-wrap: wrap; }
+        .demo-row:first-of-type { border-top: none; }
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px;
+            font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+        .pill.pass { background: rgba(52,211,153,.15); color: var(--accent); }
+        .pill.fail { background: rgba(248,113,113,.15); color: #f87171; }
+        .pill.info { background: rgba(148,163,184,.15); color: var(--text-dim); }
+        .demo-code { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 14px 18px; margin: 14px 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; overflow-x: auto;
+            white-space: pre; }
+        .demo-note { font-size: 13px; color: var(--text-dim); margin: 10px 0 0; }
+        .filter-bar { position: sticky; top: 64px; z-index: 5; background: var(--bg-panel);
+            border: 1px solid var(--line); border-radius: var(--radius-sm);
+            padding: 12px 14px; margin: 18px 0 6px; }
+        .filter-search { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--text-dim); }
+        .filter-search input { flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text); font-size: 15px; font-family: inherit; min-width: 0; }
+        .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        [data-group] { scroll-margin-top: 150px; }
+        main h2.sec-title { scroll-margin-top: 150px; }
+        .count-pill { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text-dim);
+            border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; white-space: nowrap; }
+        .toc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .toc a { font-size: 12.5px; color: var(--text-dim); text-decoration: none;
+            border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; }
+        .toc a:hover { color: var(--accent); border-color: var(--accent); }
+        .toc a.dim { opacity: .35; }
+        .toc a b { font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-right: 5px; color: var(--accent); }
+        .filter-bar.collapsed .filter-chips, .filter-bar.collapsed .toc { display: none; }
+        .filter-bar.collapsed .filter-search { margin-bottom: 0; }
+    </style>
+</head>
+<body data-theme="dark">
+    <a class="skip-link" href="#mainContent" data-i18n="a11y.skip">Перейти к содержимому</a>
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="demo.html" data-i18n="nav.demo">Демо</a></li>
+            <li><a href="linux.html" data-i18n="nav.linux">Линукс</a></li>
+            <li><a href="programming.html" data-i18n="nav.programming">Программирование</a></li>
+            <li><a href="virt.html" class="active" data-i18n="nav.virt">Виртуализация</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main id="mainContent" style="max-width:860px;">
+        <h1 class="sec-title" style="margin-top:40px;" data-i18n="virt.h1">Виртуализация и контейнеры</h1>
+        <p class="sec-sub" data-i18n="virt.sub">Proxmox, KVM, LXC, Docker, Kubernetes, Terraform: от ВМ до кластера.</p>
+
+        <div class="filter-bar">
+            <span class="filter-search"><span data-icon="search"></span><input id="hbSearch" type="search" autocomplete="off" data-i18n-attr="placeholder:virt.search.ph" placeholder="Поиск команд…"><span class="count-pill" id="hbCount"></span><button class="chip" id="hbCollapse" data-i18n="hb.collapse">Свернуть</button></span>
+            <div class="filter-chips">
+                <button class="chip active" data-chip="all" data-i18n="virt.filter.all">Все</button>
+                <button class="chip" data-chip="proxmox" data-i18n="virt.filter.proxmox">Proxmox</button>
+                <button class="chip" data-chip="kvm" data-i18n="virt.filter.kvm">KVM</button>
+                <button class="chip" data-chip="lxc" data-i18n="virt.filter.lxc">LXC</button>
+                <button class="chip" data-chip="docker" data-i18n="virt.filter.docker">Docker</button>
+                <button class="chip" data-chip="k8s" data-i18n="virt.filter.k8s">K8s</button>
+                <button class="chip" data-chip="tf" data-i18n="virt.filter.tf">Terraform</button>
+            </div>
+            <nav class="toc" id="hbToc" data-prefix="virt."></nav>
+        </div>
+        <p class="demo-note hidden" id="hbEmpty" data-i18n="virt.empty">Ничего не найдено — попробуй другой запрос.</p>
+
+        <h2 class="sec-title" style="font-size:22px;" data-i18n="virt.proxmox">Proxmox вглубь</h2>
+        <p class="sec-sub" data-i18n="virt.proxmox.sub">Хранилища, бэкапы, шаблоны, фаервол, HA.</p>
+
+        <div class="demo-card" data-group="proxmox">
+            <h3><span data-icon="stack"></span>qm: жизнь виртуальной машины</h3>
+<div class="demo-code">qm list / qm status 100
+qm start 100 / qm shutdown 100 / qm stop 100 / qm reset 100
+qm snapshot 100 clean --description "до обновлений"
+qm rollback 100 clean
+qm clone 100 200 --name stand-3 --full   # full — независимая копия
+qm guest exec 100 -- ping -c2 8.8.8.8    # команда внутрь (нужен qemu-agent!)</div>
+            <p class="demo-note">Именно эти вызовы делает labspin через API. qemu-guest-agent в шаблоне обязателен — без него ни IP, ни exec.</p>
+        </div>
+
+        <div class="demo-card" data-group="proxmox">
+            <h3><span data-icon="packet"></span>Хранилища: типы и контент</h3>
+<div class="demo-code"># Datacenter → Storage → Add: dir / zfs / nfs / cephfs / lvm
+# У каждого типа — разрешённый контент: ISO, Images, Backup, Snippets
+pvesm status                             # что подключено и сколько свободно
+pvesm list local-zfs                     # что лежит внутри</div>
+            <p class="demo-note">ISO — только на file-хранилищах (dir/nfs). Диски ВМ — на блочных (zfs/lvm/ceph). Перепутал — получишь серую кнопку.</p>
+        </div>
+
+        <div class="demo-card" data-group="proxmox">
+            <h3><span data-icon="book"></span>Бэкапы vzdump</h3>
+<div class="demo-code"># Datacenter → Backup → Add: расписание, storage, retention
+vzdump 100 --storage backup --mode snapshot --compress zstd
+# retention: keep-last=3, keep-weekly=4, keep-monthly=6
+qmrestore backup/vzdump-qemu-100.vma.zst 200  # восстановить как новую ВМ</div>
+            <p class="demo-note">Snapshot-режим не останавливает ВМ. Проверяй restore раз в квартал — бэкап без проверки не считается.</p>
+        </div>
+
+        <div class="demo-card" data-group="proxmox">
+            <h3><span data-icon="route"></span>Шаблоны и cloud-init</h3>
+<div class="demo-code">qm template 9000                        # превратить настроенную ВМ в шаблон
+qm clone 9000 100 --name stand-1 --full
+qm set 100 --ciuser alice --sshkey ~/.ssh/id_ed25519.pub
+qm set 100 --ipconfig0 ip=192.168.10.10/24,gw=192.168.10.1
+qm cloudinit dump 100 user             # что реально уйдёт внутрь</div>
+            <p class="demo-note">Золотой образ: чистая ОС + qemu-agent + cloud-init, без ssh-ключей и history. Всё остальное — через cloud-init при клонировании.</p>
+        </div>
+
+        <div class="demo-card" data-group="proxmox">
+            <h3><span data-icon="dns"></span>Фаервол Proxmox</h3>
+<div class="demo-code"># Три уровня: Datacenter → Node → VM. Правила наследуются сверху вниз.
+# VM → Firewall → Add: Direction=in, Action=ACCEPT, Protocol=tcp, Dport=22
+pve-firewall status                      # работает ли на ноде</div>
+            <p class="demo-note">Включишь на Datacenter — закроешь всё, что не разрешено явно. Сначала правило для 8006 и SSH, потом — кнопку.</p>
+        </div>
+
+        <div class="demo-card" data-group="proxmox">
+            <h3><span data-icon="link"></span>HA и кворум</h3>
+<div class="demo-code">pvecm status                             # votes: нужно больше половины
+ha-manager add vm:100 --state started    # ВМ под охраной HA
+ha-manager status</div>
+            <p class="demo-note">Две ноды без qdevice — split-brain при потере связи. HA без shared storage (ceph/NFS) — перезапуск, а не миграция.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="virt.kvm">KVM и libvirt</h2>
+        <p class="sec-sub" data-i18n="virt.kvm.sub">Сети, пулы, снапшоты руками.</p>
+
+        <div class="demo-card" data-group="kvm">
+            <h3><span data-icon="stack"></span>virsh: Proxmox без морды</h3>
+<div class="demo-code">virsh list --all
+virsh net-list --all                     # сети (default = NAT virbr0)
+virsh pool-list --all                    # пулы дисков
+virsh snapshot-list vm1
+virsh snapshot-revert vm1 --snapshotname clean
+virsh console vm1                        # консоль (выход: Ctrl+])</div>
+        </div>
+
+        <div class="demo-card" data-group="kvm">
+            <h3><span data-icon="route"></span>Сеть libvirt</h3>
+<div class="demo-code">virsh net-dumpxml default                # что за NAT
+virsh net-start default / virsh net-autostart default
+# мост на хосте вместо NAT — как vmbr0 в Proxmox (см. карточку про мост)</div>
+        </div>
+
+        <div class="demo-card" data-group="kvm">
+            <h3><span data-icon="packet"></span>Диски qcow2</h3>
+<div class="demo-code">qemu-img info disk.qcow2
+qemu-img create -f qcow2 -o preallocation=metadata disk.qcow2 20G
+qemu-img convert -O qcow2 disk.raw disk.qcow2
+virsh vol-list default</div>
+            <p class="demo-note">qcow2 растёт по мере записи (thin). Снапшоты — только на qcow2, на raw их нет.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="virt.lxc">LXC-контейнеры</h2>
+        <p class="sec-sub" data-i18n="virt.lxc.sub">Лёгкая виртуализация в стиле Proxmox.</p>
+
+        <div class="demo-card" data-group="lxc">
+            <h3><span data-icon="packet"></span>pct: база</h3>
+<div class="demo-code">pct list
+pct create 200 local:vztmpl/debian-12.tar.zst --hostname lxc-1 --net0 name=eth0,bridge=vmbr0,ip=dhcp --cores 1 --memory 512 --storage local-zfs
+pct start 200 / pct stop 200
+pct enter 200                            # зайти внутрь
+pct exec 200 -- systemctl status nginx</div>
+        </div>
+
+        <div class="demo-card" data-group="lxc">
+            <h3><span data-icon="book"></span>Привилегии и nesting</h3>
+<div class="demo-code"># unprivileged (uid-map) — по умолчанию и правильно
+# для Docker внутри LXC: Options → Features → nesting=1
+pct push 200 /tmp/f.conf /etc/app/f.conf  # закинуть файл внутрь
+pct pull 200 /var/log/app.log /tmp/       # забрать наружу</div>
+            <p class="demo-note">Привилегированный контейнер с пробросом /dev — почти рут хоста. Не надо так.</p>
+        </div>
+
+        <div class="demo-card" data-group="lxc">
+            <h3><span data-icon="route"></span>LXC против Docker и ВМ</h3>
+            <div class="demo-row"><span class="pill info">LXC</span><span>Целая ОС, свой init, почти как ВМ — но без своего ядра. Идеален для сервисов labspin-стиля</span></div>
+            <div class="demo-row"><span class="pill info">Docker</span><span>Один процесс = один контейнер, образы из registry</span></div>
+            <div class="demo-row"><span class="pill info">VM</span><span>Своё ядро, любая ОС, максимальная изоляция — цена: гигабайты и минуты</span></div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="virt.docker">Docker вглубь</h2>
+        <p class="sec-sub" data-i18n="virt.docker.sub">Dockerfile, compose, сети, тома.</p>
+
+        <div class="demo-card" data-group="docker">
+            <h3><span data-icon="stack"></span>Dockerfile без граблей</h3>
+<div class="demo-code">FROM debian:12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends nginx \
+ && rm -rf /var/lib/apt/lists
+COPY nginx.conf /etc/nginx/nginx.conf
+USER www-data
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</div>
+            <p class="demo-note">Один RUN на установку (меньше слоёв), чистка apt в том же слое, не root внутри. .dockerignore обязателен.</p>
+        </div>
+
+        <div class="demo-card" data-group="docker">
+            <h3><span data-icon="book"></span>Compose: стек одним файлом</h3>
+<div class="demo-code"># compose.yaml:
+# services:
+#   web: { build: ., ports: ["8080:80"], restart: unless-stopped }
+#   db: { image: postgres:16, environment: { POSTGRES_PASSWORD_FILE: /run/secrets/pw } }
+docker compose up -d --build
+docker compose logs -f web
+docker compose down                         # стоп; down -v снесёт и тома!</div>
+        </div>
+
+        <div class="demo-card" data-group="docker">
+            <h3><span data-icon="route"></span>Сети Docker</h3>
+<div class="demo-code">docker network ls
+docker network create --driver bridge appnet
+docker run -d --network appnet --name web nginx  # имена резолвятся внутри сети
+docker network inspect appnet | grep -A3 IPv4</div>
+            <p class="demo-note">Внутри user-сети контейнеры видят друг друга по именам. Свои запреты — в DOCKER-USER, INPUT докер игнорирует.</p>
+        </div>
+
+        <div class="demo-card" data-group="docker">
+            <h3><span data-icon="packet"></span>Тома и данные</h3>
+<div class="demo-code">docker volume create appdata
+docker run -d -v appdata:/data nginx
+docker volume ls / docker volume inspect appdata
+# бэкап тома: docker run --rm -v appdata:/data -v $(pwd):/b alpine tar -czf /b/appdata.tgz /data</div>
+            <p class="demo-note">Данные в томах, не в слоях контейнера. Убил контейнер — том жив. down -v — единственная команда, о которой пожалеешь.</p>
+        </div>
+
+        <div class="demo-card" data-group="docker">
+            <h3><span data-icon="link"></span>Registry и образы</h3>
+<div class="demo-code">docker tag web:1.0 registry.local/web:1.0
+docker push registry.local/web:1.0
+docker images / docker rmi ID
+docker system df                           # кто съел диск
+docker system prune -a                     # чистка (спросит подтверждение!)</div>
+        </div>
+
+        <div class="demo-card" data-group="docker">
+            <h3><span data-icon="search"></span>Диагностика контейнеров</h3>
+<div class="demo-code">docker ps -a                            # включая мёртвые (там причины!)
+docker logs --tail 50 web
+docker exec -it web sh
+docker inspect web | grep -A5 State
+docker stats --no-stream                    # CPU/память живьём</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="virt.k8s">Kubernetes</h2>
+        <p class="sec-sub" data-i18n="virt.k8s.sub">Деплойменты, сервисы, ingress, Helm.</p>
+
+        <div class="demo-card" data-group="k8s">
+            <h3><span data-icon="stack"></span>k3s за 5 минут</h3>
+<div class="demo-code">curl -sfL https://get.k3s.io | sh -
+sudo k3s kubectl get nodes
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml  # для внешнего kubectl</div>
+            <p class="demo-note">k3s — полноценный K8s в одном бинарнике. Для учёбы и edge — то, что надо; дальше — полный дистрибутив.</p>
+        </div>
+
+        <div class="demo-card" data-group="k8s">
+            <h3><span data-icon="packet"></span>Deploy, Service, Ingress</h3>
+<div class="demo-code">kubectl create deploy web --image=nginx --replicas=2
+kubectl expose deploy web --port=80 --type=ClusterIP
+kubectl get pods -o wide
+kubectl logs deploy/web -f
+kubectl port-forward svc/web 8080:80       # быстрый доступ без ingress</div>
+        </div>
+
+        <div class="demo-card" data-group="k8s">
+            <h3><span data-icon="book"></span>Конфиги и секреты</h3>
+<div class="demo-code">kubectl create configmap app --from-file=nginx.conf
+kubectl create secret generic db --from-literal=password=...
+# в Pod: envFrom configMapRef/secretRef или volumeMounts
+kubectl get secrets                    # base64 — это кодировка, НЕ шифрование!</div>
+            <p class="demo-note">Секреты в git — только через sealed-secrets, vault или внешний менеджер. Base64 читает кто угодно.</p>
+        </div>
+
+        <div class="demo-card" data-group="k8s">
+            <h3><span data-icon="route"></span>Неймспейсы и контексты</h3>
+<div class="demo-code">kubectl create ns staging
+kubectl config set-context --current --namespace=staging  # работать в нём
+kubectl config get-contexts
+kubectl api-resources | head -30           # что вообще умеет кластер</div>
+        </div>
+
+        <div class="demo-card" data-group="k8s">
+            <h3><span data-icon="link"></span>Helm: пакетник для K8s</h3>
+<div class="demo-code">helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install web bitnami/nginx --set service.type=NodePort
+helm list -A
+helm rollback web 1                        # откат релиза</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="virt.tf">Terraform</h2>
+        <p class="sec-sub" data-i18n="virt.tf.sub">Состояние, импорт, окружения.</p>
+
+        <div class="demo-card" data-group="tf">
+            <h3><span data-icon="stack"></span>Цикл и состояние</h3>
+<div class="demo-code">terraform init
+terraform plan -out=tfplan                 # что изменится — читай внимательно!
+terraform apply tfplan
+terraform state list                       # чем управляет
+terraform output                           # выходные значения (IP стендов!)</div>
+            <p class="demo-note">tfstate — святое: в git не класть (там секреты), хранить в backend (S3/PG) с локом.</p>
+        </div>
+
+        <div class="demo-card" data-group="tf">
+            <h3><span data-icon="book"></span>Импорт живого и окружения</h3>
+<div class="demo-code">terraform import proxmox_vm.stand 100  # забрать существующую ВМ под управление
+terraform workspace new staging
+terraform workspace select prod
+terraform destroy -target=module.old       # точечный снос</div>
+        </div>
+
+        <div class="demo-card" data-group="tf">
+            <h3><span data-icon="route"></span>labspin против Terraform</h3>
+            <div class="demo-row"><span class="pill info">labspin</span><span>Императивный скрипт: поднял, проверил, отчитался. Идеален для учебных стендов</span></div>
+            <div class="demo-row"><span class="pill info">Terraform</span><span>Декларативное состояние: plan → apply → дрейф виден. Для долгоживущей инфры</span></div>
+        </div>
+
+        <div style="margin:36px 0 60px; display:flex; gap:14px; flex-wrap:wrap;">
+            <a href="explore.html" class="btn btn-primary"><span data-icon="sprout"></span><span data-i18n="virt.cta1">Открыть сад</span></a>
+            <a href="linux.html" class="btn btn-secondary"><span data-icon="book"></span><span data-i18n="virt.cta2">Справочник Linux</span></a>
+        </div>
+    </main>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/handbook.js"></script>
+    <script src="js/motion.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="manifest" href="manifest.webmanifest">
+    <title data-i18n="title.programming">Справочник программиста — RFC Garden</title>
+    <link rel="stylesheet" href="css/style.css?v=20260913">
+    <style>
+        .demo-card { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 18px 20px; margin: 14px 0; }
+        .demo-card h3 { margin: 0 0 10px; font-size: 16px; }
+        .demo-card h3 .icon { vertical-align: -3px; margin-right: 6px; color: var(--accent); }
+        .demo-card p { font-size: 14px; margin: 8px 0; }
+        .demo-row { display: flex; gap: 8px; align-items: baseline; padding: 5px 0;
+            border-top: 1px dashed var(--line); font-size: 14px; flex-wrap: wrap; }
+        .demo-row:first-of-type { border-top: none; }
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px;
+            font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+        .pill.pass { background: rgba(52,211,153,.15); color: var(--accent); }
+        .pill.fail { background: rgba(248,113,113,.15); color: #f87171; }
+        .pill.info { background: rgba(148,163,184,.15); color: var(--text-dim); }
+        .demo-code { background: var(--bg-panel); border: 1px solid var(--line);
+            border-radius: var(--radius-sm); padding: 14px 18px; margin: 14px 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; overflow-x: auto;
+            white-space: pre; }
+        .demo-note { font-size: 13px; color: var(--text-dim); margin: 10px 0 0; }
+        .filter-bar { position: sticky; top: 64px; z-index: 5; background: var(--bg-panel);
+            border: 1px solid var(--line); border-radius: var(--radius-sm);
+            padding: 12px 14px; margin: 18px 0 6px; }
+        .filter-search { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--text-dim); }
+        .filter-search input { flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text); font-size: 15px; font-family: inherit; min-width: 0; }
+        .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        [data-group] { scroll-margin-top: 150px; }
+        main h2.sec-title { scroll-margin-top: 150px; }
+        .count-pill { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text-dim);
+            border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; white-space: nowrap; }
+        .toc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .toc a { font-size: 12.5px; color: var(--text-dim); text-decoration: none;
+            border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; }
+        .toc a:hover { color: var(--accent); border-color: var(--accent); }
+        .toc a.dim { opacity: .35; }
+        .toc a b { font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-right: 5px; color: var(--accent); }
+        .filter-bar.collapsed .filter-chips, .filter-bar.collapsed .toc { display: none; }
+        .filter-bar.collapsed .filter-search { margin-bottom: 0; }
+    </style>
+</head>
+<body data-theme="dark">
+    <a class="skip-link" href="#mainContent" data-i18n="a11y.skip">Перейти к содержимому</a>
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="demo.html" data-i18n="nav.demo">Демо</a></li>
+            <li><a href="linux.html" data-i18n="nav.linux">Линукс</a></li>
+            <li><a href="programming.html" class="active" data-i18n="nav.programming">Программирование</a></li>
+            <li><a href="virt.html" data-i18n="nav.virt">Виртуализация</a></li>
+            <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
+            <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
+            <li><a href="contribute.html" data-i18n="nav.contribute">Вклад</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+
+    <main id="mainContent" style="max-width:860px;">
+        <h1 class="sec-title" style="margin-top:40px;" data-i18n="prog.h1">Программирование для админа</h1>
+        <p class="sec-sub" data-i18n="prog.sub">Git, Python, jq и API, редакторы: автоматизируй вместо кликанья.</p>
+
+        <div class="filter-bar">
+            <span class="filter-search"><span data-icon="search"></span><input id="hbSearch" type="search" autocomplete="off" data-i18n-attr="placeholder:prog.search.ph" placeholder="Поиск команд…"><span class="count-pill" id="hbCount"></span><button class="chip" id="hbCollapse" data-i18n="hb.collapse">Свернуть</button></span>
+            <div class="filter-chips">
+                <button class="chip active" data-chip="all" data-i18n="prog.filter.all">Все</button>
+                <button class="chip" data-chip="git" data-i18n="prog.filter.git">Git</button>
+                <button class="chip" data-chip="py" data-i18n="prog.filter.py">Python</button>
+                <button class="chip" data-chip="data" data-i18n="prog.filter.data">Данные</button>
+                <button class="chip" data-chip="edit" data-i18n="prog.filter.edit">Редакторы</button>
+            </div>
+            <nav class="toc" id="hbToc" data-prefix="prog."></nav>
+        </div>
+        <p class="demo-note hidden" id="hbEmpty" data-i18n="prog.empty">Ничего не найдено — попробуй другой запрос.</p>
+
+        <h2 class="sec-title" style="font-size:22px;" data-i18n="prog.git">Git для автоматизатора</h2>
+        <p class="sec-sub" data-i18n="prog.git.sub">Ветки, отмена без паники, удалённые репозитории.</p>
+
+        <div class="demo-card" data-group="git">
+            <h3><span data-icon="link"></span>База: настройка и ежедневный цикл</h3>
+<div class="demo-code">git config --global user.name "Admin"
+git config --global user.email admin@example.com
+git clone git@host:repo.git
+git status -s && git add -A
+git commit -m "feat: ..."
+git push
+git pull --rebase                      # без merge-мусора в истории</div>
+        </div>
+
+        <div class="demo-card" data-group="git">
+            <h3><span data-icon="route"></span>Ветки</h3>
+<div class="demo-code">git branch feature/x && git switch feature/x
+git switch -c hotfix/y                 # создать и перейти сразу
+git merge --no-ff feature/x            # слияние с узлом истории
+git branch -d feature/x                # удалить после мержа</div>
+            <p class="demo-note">Правило: main всегда зелёный. Работа — в ветках, вливание — через ревью.</p>
+        </div>
+
+        <div class="demo-card" data-group="git">
+            <h3><span data-icon="back"></span>Отмена без паники</h3>
+<div class="demo-code">git restore file                       # откатить файл (не в коммите)
+git revert HEAD                        # отмена коммитом — безопасно для запушенного
+git reset --soft HEAD~1                # передумал про коммит, изменения целы
+git reset --hard HEAD                  # СТЕРЕТЬ всё несохранённое — осторожно!
+git reflog                             # журнал ВСЕХ движений — спасение утопающих</div>
+        </div>
+
+        <div class="demo-card" data-group="git">
+            <h3><span data-icon="packet"></span>Stash: отложить грязное</h3>
+<div class="demo-code">git stash push -m "wip"                 # спрятать незакоммиченное
+git stash list
+git stash pop                          # вернуть
+git stash branch fix stash@{0}         # продолжить в отдельной ветке</div>
+        </div>
+
+        <div class="demo-card" data-group="git">
+            <h3><span data-icon="link"></span>Удалённые репозитории и PR</h3>
+<div class="demo-code">git remote -v
+git fetch origin
+git log HEAD..origin/main              # что приехало, до мержа
+git push -u origin feature/x           # дальше — Pull Request в веб-морде</div>
+            <p class="demo-note">В main напрямую не пушат: ветка → PR → ревью → мерж. Так живут labspin и NetPulse.</p>
+        </div>
+
+        <div class="demo-card" data-group="git">
+            <h3><span data-icon="search"></span>blame, bisect, ignore</h3>
+<div class="demo-code">git blame -L 10,20 file               # кто и когда правил строки
+git bisect start -- bad v1.0 good v0.9  # бинарный поиск коммита-виновника
+# .gitignore: *.log, .env, __pycache__/, *.pem — секреты и мусор не коммитят!
+git check-ignore -v file               # почему файл игнорируется</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="prog.py">Python для админа</h2>
+        <p class="sec-sub" data-i18n="prog.py.sub">Venv, безопасный subprocess, конфиги, логи.</p>
+
+        <div class="demo-card" data-group="py">
+            <h3><span data-icon="packet"></span>venv и зависимости</h3>
+<div class="demo-code">python3 -m venv .venv && source .venv/bin/activate
+pip install -U pip && pip install requests pyyaml
+pip freeze > requirements.txt
+deactivate</div>
+            <p class="demo-note">Системный pip — только через venv. Debian вообще запрещает установку мимо venv (externally-managed-environment).</p>
+        </div>
+
+        <div class="demo-card" data-group="py">
+            <h3><span data-icon="book"></span>Скелет скрипта</h3>
+<div class="demo-code">#!/usr/bin/env python3
+import argparse, logging, sys
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+def main(host: str) -> int:
+    logging.info("checking %s", host)
+    return 0
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("host")
+    sys.exit(main(ap.parse_args().host))</div>
+        </div>
+
+        <div class="demo-card" data-group="py">
+            <h3><span data-icon="route"></span>subprocess безопасно</h3>
+<div class="demo-code">import subprocess
+# правильно: список аргументов, без shell:
+subprocess.run(["ping", "-c", "2", host], check=True, capture_output=True, text=True)
+# shell=True + f-строка с вводом пользователя = инъекция команд</div>
+            <p class="demo-note">Так labspin запускает ping и ssh. check=True роняет скрипт при ненулевом коде — честное поведение.</p>
+        </div>
+
+        <div class="demo-card" data-group="py">
+            <h3><span data-icon="stack"></span>yaml и json</h3>
+<div class="demo-code">import json, yaml
+cfg = yaml.safe_load(open("config.yaml"))  # safe_load, не load!
+print(json.dumps(cfg, indent=2, ensure_ascii=False))</div>
+            <p class="demo-note">yaml.load без Loader выполняет произвольный код из файла. Всегда safe_load.</p>
+        </div>
+
+        <div class="demo-card" data-group="py">
+            <h3><span data-icon="search"></span>Логи и запуск</h3>
+<div class="demo-code"># logging в файл с ротацией:
+from logging.handlers import RotatingFileHandler
+h = RotatingFileHandler("app.log", maxBytes=2_000_000, backupCount=5)
+# долгоживущее — systemd unit с Restart=on-failure, а не cron</div>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="prog.data">jq, yq и API</h2>
+        <p class="sec-sub" data-i18n="prog.data.sub">Разбирать и дёргать HTTP как профи.</p>
+
+        <div class="demo-card" data-group="data">
+            <h3><span data-icon="search"></span>jq: SQL для JSON</h3>
+<div class="demo-code">curl -s API | jq .                          # pretty-print
+jq -r '.vms[] | "\(.name) \(.ip)"'         # строки без кавычек
+jq '.items | sort_by(.cpu) | reverse | .[0:3]'
+jq -e '.ok == true' > /dev/null && echo PASS  # проверка в скрипте</div>
+        </div>
+
+        <div class="demo-card" data-group="data">
+            <h3><span data-icon="link"></span>curl по API</h3>
+<div class="demo-code">curl -sS -X POST API -H "Content-Type: application/json" -H "X-Auth: $TOKEN" -d '{"a":1}'
+curl -sSI https://site/ | head -5
+curl --fail-with-body https://site/      # код не 2xx = ненулевой exit</div>
+            <p class="demo-note">-sS: тихо, но ошибки показывай. Так NetPulse ходит в Proxmox API.</p>
+        </div>
+
+        <div class="demo-card" data-group="data">
+            <h3><span data-icon="packet"></span>yq: то же для YAML</h3>
+<div class="demo-code">yq '.vm_configs.stand1.network.ip' config.yaml
+yq -i '.checks.timeout = 10' config.yaml  # правка на месте</div>
+        </div>
+
+        <div class="demo-card" data-group="data">
+            <h3><span data-icon="book"></span>Токены и секреты в скриптах</h3>
+<div class="demo-code"># токен — в env, не в историю: export TOKEN=...
+curl -sS -H "Authorization: Bearer $TOKEN" API
+# в Python: os.environ["TOKEN"] — KeyError лучше, чем тихий дефолт для секрета</div>
+            <p class="demo-note">Секреты не коммитят: .env + chmod 600 + .gitignore. Дальше — vault и DPAPI.</p>
+        </div>
+
+        <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="prog.edit">Редакторы вглубь</h2>
+        <p class="sec-sub" data-i18n="prog.edit.sub">Регистры и макросы vim, окна tmux, regex, современный тулкит.</p>
+
+        <div class="demo-card" data-group="edit">
+            <h3><span data-icon="book"></span>vim: регистры и макросы</h3>
+<div class="demo-code">"ayy — yank строки в регистр a; "ap — вставить из него
+qa ... q — записать макрос в регистр a; @a — выполнить; @@ — повторить
+:split и :vsplit, Ctrl-w w — hopping по окнам; :tabnew — вкладки
+~/.vimrc: set number relativenumber tabstop=4 expandtab hlsearch</div>
+        </div>
+
+        <div class="demo-card" data-group="edit">
+            <h3><span data-icon="route"></span>tmux: окна и автоматизация</h3>
+<div class="demo-code">Ctrl-b c — окно; Ctrl-b n/p — следующее/прошлое; Ctrl-b % и " — сплиты
+tmux new -s work \; split-window -h \; attach  # раскладка одной командой
+~/.tmux.conf: set -g mouse on</div>
+        </div>
+
+        <div class="demo-card" data-group="edit">
+            <h3><span data-icon="search"></span>regex на каждый день</h3>
+<div class="demo-code">^[0-9]{1,3}(\.[0-9]{1,3}){3}$      # IPv4 (грубо, но работает)
+grep -P "sshd\[\d+\]: Failed" /var/log/auth.log
+sed -E 's/^# ?//'                   # раскомментировать строку</div>
+        </div>
+
+        <div class="demo-card" data-group="edit">
+            <h3><span data-icon="packet"></span>Современный тулкит</h3>
+            <div class="demo-row"><span class="pill info">ripgrep</span><span>rg -n "TODO" — быстрее grep -r, уважает .gitignore</span></div>
+            <div class="demo-row"><span class="pill info">fzf</span><span>vim $(fzf) — нечёткий выбор файла</span></div>
+            <div class="demo-row"><span class="pill info">bat / eza / fd</span><span>Читаемые замены cat, ls, find — но не на проде по умолчанию</span></div>
+        </div>
+
+        <div style="margin:36px 0 60px; display:flex; gap:14px; flex-wrap:wrap;">
+            <a href="explore.html" class="btn btn-primary"><span data-icon="sprout"></span><span data-i18n="prog.cta1">Открыть сад</span></a>
+            <a href="linux.html" class="btn btn-secondary"><span data-icon="book"></span><span data-i18n="prog.cta2">Справочник Linux</span></a>
+        </div>
+    </main>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/handbook.js"></script>
+    <script src="js/motion.js"></script>
+</body>
+</html>

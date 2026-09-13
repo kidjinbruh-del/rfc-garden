@@ -26,6 +26,7 @@ var D = {
     "nav.demo": "Demo",
     "nav.linux": "Linux",
     "theme.aria": "Toggle theme",
+    "intro.skip": "Skip",
     "lang.aria.en": "Switch to Russian",
     "lang.aria.ru": "Switch to English",
     "status.active": "active",
@@ -581,7 +582,84 @@ var D = {
     "linux.boot.sub": "GRUB, initramfs, modules, sysctl.",
     "linux.count": "Showing $n of $m",
     "linux.collapse": "Collapse",
-    "linux.expand": "Expand"
+    "linux.expand": "Expand",
+    "hb.count": "Showing $n of $m",
+    "hb.collapse": "Collapse",
+    "hb.expand": "Expand",
+    "nav.programming": "Programming",
+    "nav.virt": "Virtualization",
+
+    // ---- programming.html ----
+    "title.programming": "Programming handbook — RFC Garden",
+    "prog.h1": "Programming for admins",
+    "prog.sub": "Git, Python, jq and APIs, editors: automate instead of clicking.",
+    "prog.git": "Git for automation",
+    "prog.git.sub": "Branches, undo without panic, remotes.",
+    "prog.py": "Python for admins",
+    "prog.py.sub": "Venv, safe subprocess, configs, logging.",
+    "prog.data": "jq, yq and APIs",
+    "prog.data.sub": "Parse and poke HTTP like a pro.",
+    "prog.edit": "Editors, deeper",
+    "prog.edit.sub": "vim registers and macros, tmux windows, regex, modern tools.",
+    "prog.filter.all": "All",
+    "prog.filter.git": "Git",
+    "prog.filter.py": "Python",
+    "prog.filter.data": "Data",
+    "prog.filter.edit": "Editors",
+    "prog.search.ph": "Search commands…",
+    "prog.empty": "Nothing found — try another query.",
+    "prog.cta1": "Open the garden",
+    "prog.cta2": "Linux handbook",
+
+    // ---- virt.html ----
+    "title.virt": "Virtualization handbook — RFC Garden",
+    "virt.h1": "Virtualization and containers",
+    "virt.sub": "Proxmox, KVM, LXC, Docker, Kubernetes, Terraform: from VM to cluster.",
+    "virt.proxmox": "Proxmox, deeper",
+    "virt.proxmox.sub": "Storage, backups, templates, firewall, HA.",
+    "virt.kvm": "KVM and libvirt",
+    "virt.kvm.sub": "Networks, pools, snapshots by hand.",
+    "virt.lxc": "LXC containers",
+    "virt.lxc.sub": "Lightweight virtualization, Proxmox style.",
+    "virt.docker": "Docker, deeper",
+    "virt.docker.sub": "Dockerfile, compose, networks, volumes.",
+    "virt.k8s": "Kubernetes",
+    "virt.k8s.sub": "Deployments, services, ingress, Helm.",
+    "virt.tf": "Terraform",
+    "virt.tf.sub": "State, import, workspaces.",
+    "virt.filter.all": "All",
+    "virt.filter.proxmox": "Proxmox",
+    "virt.filter.kvm": "KVM",
+    "virt.filter.lxc": "LXC",
+    "virt.filter.docker": "Docker",
+    "virt.filter.k8s": "K8s",
+    "virt.filter.tf": "Terraform",
+    "virt.search.ph": "Search commands…",
+    "virt.empty": "Nothing found — try another query.",
+    "virt.cta1": "Open the garden",
+    "virt.cta2": "Linux handbook",
+
+    // ---- quiz modes ----
+    "q.mode.guess": "Guess the protocol",
+    "q.mode.diag": "Diagnose the outage",
+
+    // ---- shared: a11y + progress ----
+    "a11y.skip": "Skip to content",
+    "st.studied": "Studied in the garden",
+
+    // ---- glossary.html ----
+    "title.glossary": "Glossary — RFC Garden",
+    "gl.h1": "Glossary",
+    "gl.sub": "Terms of the garden in one line — with links to profiles.",
+    "gl.search.ph": "Term: latency, port…",
+    "gl.search.aria": "Search glossary",
+    "gl.count": "{n} terms",
+    "gl.empty": "Nothing found — try another query.",
+    "gl.open": "Open →",
+
+    // ---- index students ----
+    "s7.title": "Glossary",
+    "s7.desc": "One-line terms of the garden: latency, port, handshake — with links."
 };
 
 function t(key, fallback) {

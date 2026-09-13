@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flora Lab — стенд дизайна растений</title>
+    <link rel="stylesheet" href="css/style.css?v=20260913">
+    <style>
+        body { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .lab-head h1 { margin: 0 0 6px; font-size: 26px; }
+        .lab-head p { color: var(--text-dim); max-width: 760px; font-size: 14px; }
+        .lab-ver { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); }
+        .lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+        .lab-card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+        .lab-card header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+        .lab-card header b { font-size: 14px; }
+        .lab-card canvas { display: block; width: 100%; height: 380px; }
+        .lab-controls { background: var(--bg-panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 20px; }
+        .sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 22px; }
+        .sl { display: grid; grid-template-columns: 90px 1fr 46px; align-items: center; gap: 10px; font-size: 13px; }
+        .sl output { font-family: 'JetBrains Mono', monospace; text-align: right; color: var(--accent); }
+        .lab-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        #labOut { width: 100%; min-height: 150px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+                  background: #060b12; color: #9fe8d8; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+        select.lab-color { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font-size: 12px; }
+    </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+            <a href="index.html">RFC Garden</a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="explore.html">Сад</a></li>
+            <li><a href="encyclopedia.html">Энциклопедия</a></li>
+            <li><a href="guide.html">Гайд</a></li>
+        </ul>
+        <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
+        <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
+    </nav>
+    <div class="lab-head">
+        <h1>Flora Lab <span class="lab-ver" id="labVer"></span></h1>
+        <p>Стенд дизайна техно-флоры. Крути ползунки — все пять типов перерисуются живьём.
+        Нашёл красоту — жми «Экспорт JSON» и присылай мне текст из поля ниже, я зашью значения в <code>js/garden.js</code> как дефолт.
+        Обнови страницу жёстко (Ctrl+F5), если превью не совпадает с садом.</p>
+    </div>
+
+    <div class="lab-controls">
+        <div class="sliders" id="sliders"></div>
+        <div class="lab-row">
+            <button class="btn btn-primary btn-sm" id="labExport">Экспорт JSON</button>
+            <button class="btn btn-secondary btn-sm" id="labReset">Сбросить</button>
+            <a class="btn btn-secondary btn-sm" href="explore.html">Открыть сад</a>
+        </div>
+        <textarea id="labOut" readonly placeholder="Сюда приедет JSON после экспорта…"></textarea>
+    </div>
+
+    <div class="lab-grid" id="labGrid"></div>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/garden.js"></script>
+    <script>
+    (function () {
+        document.getElementById("labVer").textContent = "flora " + (window.__FLORA_VERSION || "?");
+        var TYPES = [
+            { type: "tree", color: "#4CAF50", title: "Tree — дерево" },
+            { type: "vine", color: "#2196F3", title: "Vine — лиана" },
+            { type: "flower", color: "#E91E63", title: "Flower — цветок" },
+            { type: "mushroom", color: "#9C27B0", title: "Mushroom — гриб" },
+            { type: "sprout", color: "#CDDC39", title: "Sprout — росток" },
+        ];
+        var COLORS = ["#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#CDDC39", "#FF9800", "#00BCD4", "#FF5722"];
+        var grid = document.getElementById("labGrid");
+        var cards = TYPES.map(function (t, i) {
+            var card = document.createElement("div");
+            card.className = "lab-card";
+            var head = document.createElement("header");
+            var b = document.createElement("b");
+            b.textContent = t.title;
+            var sel = document.createElement("select");
+            sel.className = "lab-color";
+            COLORS.forEach(function (c) {
+                var o = document.createElement("option");
+                o.value = c; o.textContent = c;
+                if (c === t.color) o.selected = true;
+                sel.appendChild(o);
+            });
+            head.appendChild(b); head.appendChild(sel);
+            var cv = document.createElement("canvas");
+            cv.width = 300; cv.height = 380;
+            card.appendChild(head); card.appendChild(cv);
+            grid.appendChild(card);
+            var color = t.color;
+            sel.addEventListener("change", function () { color = sel.value; });
+            return {
+                type: t.type, cv: cv, ctx: cv.getContext("2d"),
+                color: function () { return color; },
+                proto: {
+                    id: "lab-" + t.type, name: "Demo", number: 1,
+                    x: 150, y: 205, size: 120, color: t.color, plant: t.type,
+                    pulse: 1 + i * 1.3, born: Date.now() - 5000,
+                    targetX: null, targetY: null,
+                    dependsOn: [], usedBy: ["a", "b", "c"], status: "active",
+                },
+            };
+        });
+
+        // один лёгкий инстанс движка только как контекст рисования
+        var ghost = document.createElement("canvas");
+        document.body.appendChild(ghost);
+        ghost.style.display = "none";
+        var g = new ProtocolGarden(ghost.id || (ghost.id = "labGhost"));
+        g._sh = 1;
+        g.focusId = null;
+        g.compareIds = [];
+
+        function frame() {
+            for (var i = 0; i < cards.length; i++) {
+                var c = cards[i], ctx = c.ctx;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, 300, 380);
+                g.ctx = ctx;
+                g._paintBackground(ctx, 300, 380, true);
+                c.proto.pulse += 0.02;
+                c.proto.color = c.color();
+                g.drawPlant(ctx, c.proto);
+            }
+            requestAnimationFrame(frame);
+        }
+        frame();
+
+        // ползунки → FLORA
+        var PARAMS = [
+            ["seed", 0, 9, 1, "вариант формы"],
+            ["petal", 0.5, 1.8, 0.05, "длина лепестков"],
+            ["crown", 0.2, 1.5, 0.05, "плотность короны"],
+            ["shard", 0.5, 2, 0.05, "размер кристаллов"],
+            ["tube", 0.5, 2.5, 0.05, "толщина стеблей"],
+            ["orb", 0.5, 2, 0.05, "размер орб"],
+            ["glow", 0, 2, 0.05, "сила свечения"],
+            ["aura", 0.5, 2, 0.05, "радиус ауры"],
+        ];
+        var slidersEl = document.getElementById("sliders");
+        var DEFAULTS = {};
+        PARAMS.forEach(function (p) {
+            var key = p[0];
+            DEFAULTS[key] = FLORA[key];
+            var wrap = document.createElement("label");
+            wrap.className = "sl";
+            var name = document.createElement("span");
+            name.textContent = p[4] + " · " + key;
+            var inp = document.createElement("input");
+            inp.type = "range"; inp.min = p[1]; inp.max = p[2]; inp.step = p[3]; inp.value = FLORA[key];
+            var out = document.createElement("output");
+            out.textContent = FLORA[key];
+            inp.addEventListener("input", function () {
+                var v = parseFloat(inp.value);
+                if (key === "seed") v = Math.round(v);
+                FLORA[key] = v;
+                out.textContent = v;
+            });
+            wrap.appendChild(name); wrap.appendChild(inp); wrap.appendChild(out);
+            slidersEl.appendChild(wrap);
+            p.inp = inp; p.out = out;
+        });
+        document.getElementById("labReset").addEventListener("click", function () {
+            PARAMS.forEach(function (p) {
+                FLORA[p[0]] = DEFAULTS[p[0]];
+                p.inp.value = DEFAULTS[p[0]];
+                p.out.textContent = DEFAULTS[p[0]];
+            });
+        });
+        document.getElementById("labExport").addEventListener("click", function () {
+            var json = JSON.stringify(Object.assign({}, FLORA), null, 2);
+            var ta = document.getElementById("labOut");
+            ta.value = json;
+            if (navigator.clipboard) navigator.clipboard.writeText(json).catch(function () {});
+            ta.select();
+        });
+    })();
+    </script>
+</body>
+</html>

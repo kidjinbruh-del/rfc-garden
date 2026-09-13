@@ -20,7 +20,7 @@ for (const h of hrefs) {
     const m = query.match(/layer=([a-z]+)/);
     if (m) ok(layers.has(m[1]), "layer link valid: " + h);
   }
-  if (frag) ok(ids.has(frag), "deep-link #" + frag + " is a real protocol");
+  if (frag && frag !== "mainContent" && frag !== "artMain") ok(ids.has(frag), "deep-link #" + frag + " is a real protocol");
 }
 // nav on all pages
 for (const f of ["index.html", "explore.html", "timeline.html", "guide.html", "learn.html", "contribute.html", "quiz.html", "stats.html", "teacher.html", "cheatsheet.html"]) {

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b1220">
     <link rel="manifest" href="manifest.webmanifest">
     <title data-i18n="title.article">Паспорт — RFC Garden</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260913">
     <style>
         .art-badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px; }
         .art-sec { margin-top: 30px; }
@@ -32,6 +32,7 @@
     </style>
 </head>
 <body data-theme="dark">
+    <a class="skip-link" href="#artMain" data-i18n="a11y.skip">Перейти к содержимому</a>
     <nav class="navbar">
         <div class="logo">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
@@ -43,6 +44,8 @@
             <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
             <li><a href="demo.html" data-i18n="nav.demo">Демо</a></li>
             <li><a href="linux.html" data-i18n="nav.linux">Линукс</a></li>
+            <li><a href="programming.html" data-i18n="nav.programming">Программирование</a></li>
+            <li><a href="virt.html" data-i18n="nav.virt">Виртуализация</a></li>
             <li><a href="timeline.html" data-i18n="nav.timeline">Таймлайн</a></li>
             <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
             <li><a href="learn.html" data-i18n="nav.learn">Обучение</a></li>
@@ -184,5 +187,6 @@
             });
         })();
     </script>
+    <script src="js/motion.js"></script>
 </body>
 </html>

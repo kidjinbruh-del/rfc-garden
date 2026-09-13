@@ -749,9 +749,12 @@ if ($("fileImport")) $("fileImport").addEventListener("change", (e) => {
     rd.readAsText(f);
 });
 
-// deep-link #rfc0793
+// deep-link #rfc0793 — хэш захватываем ДО resetAll:
+// resetAll → apply → closeCard чистит его через replaceState при старте
+const initialHash = (() => { try { return location.hash || ""; } catch (e) { return ""; } })();
 function fromHash() {
-    const m = location.hash.match(/^#([A-Za-z0-9-]+)$/);
+    const src = initialHash || location.hash;
+    const m = (src || "").match(/^#([A-Za-z0-9-]+)$/);
     if (!m) return;
     const target = protocolsData.protocols.find(
         (x) => x.id.toLowerCase() === m[1].toLowerCase());
