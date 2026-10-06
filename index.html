@@ -93,6 +93,21 @@
                         linear-gradient(0deg, var(--bg) 4%, transparent 30%);
             pointer-events: none;
         }
+        /* Телефон: текст занимает всю ширину, а эта подложка гасит сад только
+           слева (до 55% по горизонтали) — расчёт на две колонки. Правая
+           половина заголовка и абзаца оставалась поверх подписей протоколов.
+           Правка живёт здесь, а не в css/style.css: инлайновый <style> стоит
+           после подключённой таблицы стилей и при равной специфичности
+           выигрывает по порядку, поэтому правило из внешнего файла
+           просто не применялось. */
+        @media (max-width: 900px) {
+            .hero::after {
+                background: linear-gradient(180deg,
+                    color-mix(in srgb, var(--bg) 66%, transparent) 0%,
+                    color-mix(in srgb, var(--bg) 84%, transparent) 42%,
+                    var(--bg) 93%);
+            }
+        }
         .layers-strip { margin-top: -20px; }
         .layer-row {
             display: flex; align-items: stretch; gap: 14px; flex-wrap: wrap;
