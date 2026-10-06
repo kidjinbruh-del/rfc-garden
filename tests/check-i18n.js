@@ -26,7 +26,9 @@ ok(iconNames.size > 10, "icons.js defines icon set (got " + iconNames.size + ")"
 
 for (const page of pages) {
   const html = fs.readFileSync(path.join(dir, page), "utf8");
-  const srcs = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map((x) => x[1]);
+  // Метка версии (?v=) — часть сброса кэша, а не часть пути: сравниваем
+  // имя файла, иначе проверка ломается на каждой правке версии.
+  const srcs = [...html.matchAll(/<script\s+src="([^"]+)"/g)].map((x) => x[1].split("?")[0]);
   ok(srcs[0] === "js/i18n.js",
     page + ": i18n.js is first script (got " + (srcs[0] || "none") + ")");
   ok(srcs.includes("js/icons.js"), page + ": includes js/icons.js");

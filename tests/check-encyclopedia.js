@@ -29,7 +29,10 @@ ok(bad === 0, "encyclopedia: all profiles complete");
 for (const page of ["encyclopedia.html", "article.html"]) {
   const html = load(page);
   for (const s of ["js/i18n.js", "js/icons.js", "js/data.js", "js/profiles.js", "js/theme.js"]) {
-    if (!html.includes('src="' + s + '"')) ok(false, page + ": missing script " + s);
+    // Метка версии (?v=) не часть пути — сравниваем имя файла.
+  if (![...html.matchAll(/<script\s+src="([^"]+)"/g)].some((m) => m[1].split("?")[0] === s)) {
+    ok(false, page + ": missing script " + s);
+  }
   }
   ok(html.includes('id="langToggle"'), page + ": has #langToggle");
 }
