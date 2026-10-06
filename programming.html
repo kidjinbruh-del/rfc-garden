@@ -92,8 +92,8 @@
         <p class="sec-sub" data-i18n="prog.git.sub">Ветки, отмена без паники, удалённые репозитории.</p>
 
         <div class="demo-card" data-group="git">
-            <h3><span data-icon="link"></span>База: настройка и ежедневный цикл</h3>
-<div class="demo-code">git config --global user.name "Admin"
+            <h3><span data-icon="link"></span><span data-i18n="pg.h1">База: настройка и ежедневный цикл</h3></span>
+<div data-i18n="pg.c1" class="demo-code">git config --global user.name "Admin"
 git config --global user.email admin@example.com
 git clone git@host:repo.git
 git status -s && git add -A
@@ -103,17 +103,17 @@ git pull --rebase                      # без merge-мусора в истор
         </div>
 
         <div class="demo-card" data-group="git">
-            <h3><span data-icon="route"></span>Ветки</h3>
-<div class="demo-code">git branch feature/x && git switch feature/x
+            <h3><span data-icon="route"></span><span data-i18n="pg.h2">Ветки</h3></span>
+<div data-i18n="pg.c2" class="demo-code">git branch feature/x && git switch feature/x
 git switch -c hotfix/y                 # создать и перейти сразу
 git merge --no-ff feature/x            # слияние с узлом истории
 git branch -d feature/x                # удалить после мержа</div>
-            <p class="demo-note">Правило: main всегда зелёный. Работа — в ветках, вливание — через ревью.</p>
+            <p data-i18n="pg.n1" class="demo-note">Правило: main всегда зелёный. Работа — в ветках, вливание — через ревью.</p>
         </div>
 
         <div class="demo-card" data-group="git">
-            <h3><span data-icon="back"></span>Отмена без паники</h3>
-<div class="demo-code">git restore file                       # откатить файл (не в коммите)
+            <h3><span data-icon="back"></span><span data-i18n="pg.h3">Отмена без паники</h3></span>
+<div data-i18n="pg.c3" class="demo-code">git restore file                       # откатить файл (не в коммите)
 git revert HEAD                        # отмена коммитом — безопасно для запушенного
 git reset --soft HEAD~1                # передумал про коммит, изменения целы
 git reset --hard HEAD                  # СТЕРЕТЬ всё несохранённое — осторожно!
@@ -121,25 +121,25 @@ git reflog                             # журнал ВСЕХ движений 
         </div>
 
         <div class="demo-card" data-group="git">
-            <h3><span data-icon="packet"></span>Stash: отложить грязное</h3>
-<div class="demo-code">git stash push -m "wip"                 # спрятать незакоммиченное
+            <h3><span data-icon="packet"></span><span data-i18n="pg.h4">Stash: отложить грязное</h3></span>
+<div data-i18n="pg.c4" class="demo-code">git stash push -m "wip"                 # спрятать незакоммиченное
 git stash list
 git stash pop                          # вернуть
 git stash branch fix stash@{0}         # продолжить в отдельной ветке</div>
         </div>
 
         <div class="demo-card" data-group="git">
-            <h3><span data-icon="link"></span>Удалённые репозитории и PR</h3>
-<div class="demo-code">git remote -v
+            <h3><span data-icon="link"></span><span data-i18n="pg.h5">Удалённые репозитории и PR</h3></span>
+<div data-i18n="pg.c5" class="demo-code">git remote -v
 git fetch origin
 git log HEAD..origin/main              # что приехало, до мержа
 git push -u origin feature/x           # дальше — Pull Request в веб-морде</div>
-            <p class="demo-note">В main напрямую не пушат: ветка → PR → ревью → мерж. Так живут labspin и NetPulse.</p>
+            <p data-i18n="pg.n2" class="demo-note">В main напрямую не пушат: ветка → PR → ревью → мерж. Так живут labspin и NetPulse.</p>
         </div>
 
         <div class="demo-card" data-group="git">
-            <h3><span data-icon="search"></span>blame, bisect, ignore</h3>
-<div class="demo-code">git blame -L 10,20 file               # кто и когда правил строки
+            <h3><span data-icon="search"></span><span data-i18n="pg.h6">blame, bisect, ignore</h3></span>
+<div data-i18n="pg.c6" class="demo-code">git blame -L 10,20 file               # кто и когда правил строки
 git bisect start -- bad v1.0 good v0.9  # бинарный поиск коммита-виновника
 # .gitignore: *.log, .env, __pycache__/, *.pem — секреты и мусор не коммитят!
 git check-ignore -v file               # почему файл игнорируется</div>
@@ -149,17 +149,17 @@ git check-ignore -v file               # почему файл игнориру�
         <p class="sec-sub" data-i18n="prog.py.sub">Venv, безопасный subprocess, конфиги, логи.</p>
 
         <div class="demo-card" data-group="py">
-            <h3><span data-icon="packet"></span>venv и зависимости</h3>
-<div class="demo-code">python3 -m venv .venv && source .venv/bin/activate
+            <h3><span data-icon="packet"></span><span data-i18n="pg.h7">venv и зависимости</h3></span>
+<div data-i18n="pg.c7" class="demo-code">python3 -m venv .venv && source .venv/bin/activate
 pip install -U pip && pip install requests pyyaml
 pip freeze > requirements.txt
 deactivate</div>
-            <p class="demo-note">Системный pip — только через venv. Debian вообще запрещает установку мимо venv (externally-managed-environment).</p>
+            <p data-i18n="pg.n3" class="demo-note">Системный pip — только через venv. Debian вообще запрещает установку мимо venv (externally-managed-environment).</p>
         </div>
 
         <div class="demo-card" data-group="py">
-            <h3><span data-icon="book"></span>Скелет скрипта</h3>
-<div class="demo-code">#!/usr/bin/env python3
+            <h3><span data-icon="book"></span><span data-i18n="pg.h8">Скелет скрипта</h3></span>
+<div data-i18n="pg.c8" class="demo-code">#!/usr/bin/env python3
 import argparse, logging, sys
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 def main(host: str) -> int:
@@ -172,25 +172,25 @@ if __name__ == "__main__":
         </div>
 
         <div class="demo-card" data-group="py">
-            <h3><span data-icon="route"></span>subprocess безопасно</h3>
-<div class="demo-code">import subprocess
+            <h3><span data-icon="route"></span><span data-i18n="pg.h9">subprocess безопасно</h3></span>
+<div data-i18n="pg.c9" class="demo-code">import subprocess
 # правильно: список аргументов, без shell:
 subprocess.run(["ping", "-c", "2", host], check=True, capture_output=True, text=True)
 # shell=True + f-строка с вводом пользователя = инъекция команд</div>
-            <p class="demo-note">Так labspin запускает ping и ssh. check=True роняет скрипт при ненулевом коде — честное поведение.</p>
+            <p data-i18n="pg.n4" class="demo-note">Так labspin запускает ping и ssh. check=True роняет скрипт при ненулевом коде — честное поведение.</p>
         </div>
 
         <div class="demo-card" data-group="py">
-            <h3><span data-icon="stack"></span>yaml и json</h3>
-<div class="demo-code">import json, yaml
+            <h3><span data-icon="stack"></span><span data-i18n="pg.h10">yaml и json</h3></span>
+<div data-i18n="pg.c10" class="demo-code">import json, yaml
 cfg = yaml.safe_load(open("config.yaml"))  # safe_load, не load!
 print(json.dumps(cfg, indent=2, ensure_ascii=False))</div>
-            <p class="demo-note">yaml.load без Loader выполняет произвольный код из файла. Всегда safe_load.</p>
+            <p data-i18n="pg.n5" class="demo-note">yaml.load без Loader выполняет произвольный код из файла. Всегда safe_load.</p>
         </div>
 
         <div class="demo-card" data-group="py">
-            <h3><span data-icon="search"></span>Логи и запуск</h3>
-<div class="demo-code"># logging в файл с ротацией:
+            <h3><span data-icon="search"></span><span data-i18n="pg.h11">Логи и запуск</h3></span>
+<div data-i18n="pg.c11b" class="demo-code"># logging в файл с ротацией:
 from logging.handlers import RotatingFileHandler
 h = RotatingFileHandler("app.log", maxBytes=2_000_000, backupCount=5)
 # долгоживущее — systemd unit с Restart=on-failure, а не cron</div>
@@ -200,65 +200,65 @@ h = RotatingFileHandler("app.log", maxBytes=2_000_000, backupCount=5)
         <p class="sec-sub" data-i18n="prog.data.sub">Разбирать и дёргать HTTP как профи.</p>
 
         <div class="demo-card" data-group="data">
-            <h3><span data-icon="search"></span>jq: SQL для JSON</h3>
-<div class="demo-code">curl -s API | jq .                          # pretty-print
+            <h3><span data-icon="search"></span><span data-i18n="pg.h12">jq: SQL для JSON</h3></span>
+<div data-i18n="pg.c11" class="demo-code">curl -s API | jq .                          # pretty-print
 jq -r '.vms[] | "\(.name) \(.ip)"'         # строки без кавычек
 jq '.items | sort_by(.cpu) | reverse | .[0:3]'
 jq -e '.ok == true' > /dev/null && echo PASS  # проверка в скрипте</div>
         </div>
 
         <div class="demo-card" data-group="data">
-            <h3><span data-icon="link"></span>curl по API</h3>
-<div class="demo-code">curl -sS -X POST API -H "Content-Type: application/json" -H "X-Auth: $TOKEN" -d '{"a":1}'
+            <h3><span data-icon="link"></span><span data-i18n="pg.h13">curl по API</h3></span>
+<div data-i18n="pg.c12" class="demo-code">curl -sS -X POST API -H "Content-Type: application/json" -H "X-Auth: $TOKEN" -d '{"a":1}'
 curl -sSI https://site/ | head -5
 curl --fail-with-body https://site/      # код не 2xx = ненулевой exit</div>
-            <p class="demo-note">-sS: тихо, но ошибки показывай. Так NetPulse ходит в Proxmox API.</p>
+            <p data-i18n="pg.n6" class="demo-note">-sS: тихо, но ошибки показывай. Так NetPulse ходит в Proxmox API.</p>
         </div>
 
         <div class="demo-card" data-group="data">
-            <h3><span data-icon="packet"></span>yq: то же для YAML</h3>
-<div class="demo-code">yq '.vm_configs.stand1.network.ip' config.yaml
+            <h3><span data-icon="packet"></span><span data-i18n="pg.h14">yq: то же для YAML</h3></span>
+<div data-i18n="pg.c13" class="demo-code">yq '.vm_configs.stand1.network.ip' config.yaml
 yq -i '.checks.timeout = 10' config.yaml  # правка на месте</div>
         </div>
 
         <div class="demo-card" data-group="data">
-            <h3><span data-icon="book"></span>Токены и секреты в скриптах</h3>
-<div class="demo-code"># токен — в env, не в историю: export TOKEN=...
+            <h3><span data-icon="book"></span><span data-i18n="pg.h15">Токены и секреты в скриптах</h3></span>
+<div data-i18n="pg.c13b" class="demo-code"># токен — в env, не в историю: export TOKEN=...
 curl -sS -H "Authorization: Bearer $TOKEN" API
 # в Python: os.environ["TOKEN"] — KeyError лучше, чем тихий дефолт для секрета</div>
-            <p class="demo-note">Секреты не коммитят: .env + chmod 600 + .gitignore. Дальше — vault и DPAPI.</p>
+            <p data-i18n="pg.n7" class="demo-note">Секреты не коммитят: .env + chmod 600 + .gitignore. Дальше — vault и DPAPI.</p>
         </div>
 
         <h2 class="sec-title" style="font-size:22px; margin-top:36px;" data-i18n="prog.edit">Редакторы вглубь</h2>
         <p class="sec-sub" data-i18n="prog.edit.sub">Регистры и макросы vim, окна tmux, regex, современный тулкит.</p>
 
         <div class="demo-card" data-group="edit">
-            <h3><span data-icon="book"></span>vim: регистры и макросы</h3>
-<div class="demo-code">"ayy — yank строки в регистр a; "ap — вставить из него
+            <h3><span data-icon="book"></span><span data-i18n="pg.h16">vim: регистры и макросы</h3></span>
+<div data-i18n="pg.c14" class="demo-code">"ayy — yank строки в регистр a; "ap — вставить из него
 qa ... q — записать макрос в регистр a; @a — выполнить; @@ — повторить
 :split и :vsplit, Ctrl-w w — hopping по окнам; :tabnew — вкладки
 ~/.vimrc: set number relativenumber tabstop=4 expandtab hlsearch</div>
         </div>
 
         <div class="demo-card" data-group="edit">
-            <h3><span data-icon="route"></span>tmux: окна и автоматизация</h3>
-<div class="demo-code">Ctrl-b c — окно; Ctrl-b n/p — следующее/прошлое; Ctrl-b % и " — сплиты
+            <h3><span data-icon="route"></span><span data-i18n="pg.h17">tmux: окна и автоматизация</h3></span>
+<div data-i18n="pg.c15" class="demo-code">Ctrl-b c — окно; Ctrl-b n/p — следующее/прошлое; Ctrl-b % и " — сплиты
 tmux new -s work \; split-window -h \; attach  # раскладка одной командой
 ~/.tmux.conf: set -g mouse on</div>
         </div>
 
         <div class="demo-card" data-group="edit">
-            <h3><span data-icon="search"></span>regex на каждый день</h3>
-<div class="demo-code">^[0-9]{1,3}(\.[0-9]{1,3}){3}$      # IPv4 (грубо, но работает)
+            <h3><span data-icon="search"></span><span data-i18n="pg.h18">regex на каждый день</h3></span>
+<div data-i18n="pg.c16" class="demo-code">^[0-9]{1,3}(\.[0-9]{1,3}){3}$      # IPv4 (грубо, но работает)
 grep -P "sshd\[\d+\]: Failed" /var/log/auth.log
 sed -E 's/^# ?//'                   # раскомментировать строку</div>
         </div>
 
         <div class="demo-card" data-group="edit">
-            <h3><span data-icon="packet"></span>Современный тулкит</h3>
-            <div class="demo-row"><span class="pill info">ripgrep</span><span>rg -n "TODO" — быстрее grep -r, уважает .gitignore</span></div>
-            <div class="demo-row"><span class="pill info">fzf</span><span>vim $(fzf) — нечёткий выбор файла</span></div>
-            <div class="demo-row"><span class="pill info">bat / eza / fd</span><span>Читаемые замены cat, ls, find — но не на проде по умолчанию</span></div>
+            <h3><span data-icon="packet"></span><span data-i18n="pg.h19">Современный тулкит</h3></span>
+            <div class="demo-row"><span class="pill info">ripgrep</span><span data-i18n="pg.r1">rg -n "TODO" — быстрее grep -r, уважает .gitignore</span></div>
+            <div class="demo-row"><span class="pill info">fzf</span><span data-i18n="pg.r2">vim $(fzf) — нечёткий выбор файла</span></div>
+            <div class="demo-row"><span class="pill info">bat / eza / fd</span><span data-i18n="pg.r3">Читаемые замены cat, ls, find — но не на проде по умолчанию</span></div>
         </div>
 
         <div style="margin:36px 0 60px; display:flex; gap:14px; flex-wrap:wrap;">
