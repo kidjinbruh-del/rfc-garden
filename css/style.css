@@ -596,12 +596,50 @@ body[data-motion="deck"] #gardenCanvas { animation: canvasIn 1.6s ease both; }
     .btn-ripple { animation: none; opacity: 0; }
 }
 
+/* ---------- Пауза фоновых анимаций и отклик на палец ---------- */
+
+/* Классы ставит motion.js: anim-paused — вкладка свёрнута, anim-off — блок
+   уехал из экрана. Правило одно на всё дерево, поэтому не нужно пометить
+   каждую анимацию поимённо: на телефоне это экономит постоянную перерисовку. */
+html.anim-paused *,
+html.anim-off * {
+    animation-play-state: paused !important;
+}
+
+/* Нажатие. :hover на сенсорном экране не срабатывает, поэтому без этого
+   кнопка и чик никак не отвечают на палец. */
+.btn:active,
+.chip:active,
+.nav-menu a:active,
+.theme-btn:active,
+.demo-row:active,
+.toc a:active {
+    transform: translateY(1px) scale(.985);
+    filter: brightness(.92);
+}
+.btn, .chip, .nav-menu a, .theme-btn, .demo-row, .toc a {
+    transition: transform var(--tr), filter var(--tr),
+                color var(--tr), background var(--tr), box-shadow var(--tr);
+}
+/* Пока палец не отпущен — не даём эффекту «залипания» от :hover на тач-экранах */
+html.is-pressing .btn:hover,
+html.is-pressing .chip:hover,
+html.is-pressing .nav-menu a:hover {
+    transform: none;
+    filter: none;
+}
+
 /* ---------- Адаптив ---------- */
 @media (min-width: 901px) {
     /* Сад на главной — стабильно справа от текста, текст его не перекрывает */
     .hero #gardenCanvas { left: 36%; width: 64%; }
 }
 @media (max-width: 900px) {
+    /* Зерно — полноэкранный слой поверх всего: на телефоне это лишняя
+       композиция и визуальный шум поверх текста. На просторном экране
+       шрифт крупный и без него чище. */
+    .grain { display: none; }
+
     /* Навигация в две строки.
        Раньше пункты лежали в горизонтальной прокрутке со скрытой полосой:
        на телефоне «Сад» и дальше обрезались, а подсказки, что список
