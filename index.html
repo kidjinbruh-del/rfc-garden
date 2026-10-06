@@ -155,24 +155,6 @@
     <div id="cursorGlow" aria-hidden="true"></div>
     <div id="scrollbar" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
-    <div id="diagBox" style="position:fixed;left:0;bottom:0;z-index:9999;background:#000;color:#0f0;font:11px monospace;padding:4px 6px;max-width:100%"></div>
-    <script>
-      // ВРЕМЕННО: диагностика темы. Убрать после разбора.
-      (function () {
-        function paint(tag) {
-          var b = document.getElementById("diagBox");
-          if (!b) return;
-          var cs = getComputedStyle(document.body);
-          b.textContent = tag + " attr=" + document.body.getAttribute("data-theme")
-            + " bg=" + cs.getPropertyValue("--bg").trim()
-            + " bodyBG=" + cs.backgroundColor
-            + " sysLight=" + window.matchMedia("(prefers-color-scheme: light)").matches;
-        }
-        window.addEventListener("load", function () { paint("load"); });
-        setTimeout(function () { paint("t1"); }, 1200);
-        document.addEventListener("click", function () { setTimeout(function () { paint("click"); }, 300); }, true);
-      })();
-    </script>
 
     <section class="hero">
         <canvas id="gardenCanvas" role="img" data-i18n-attr="aria-label:hero.canvas.aria" aria-label="Анимированный сад сетевых протоколов RFC"></canvas>
