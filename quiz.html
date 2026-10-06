@@ -72,141 +72,143 @@
         </div>
     </main>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            "use strict";
-            const box = document.getElementById("quizBox");
-            const N = 10;
-            let order = [], idx = 0, score = 0, missed = [], t0 = 0, mode = "guess";
-            // сценарии «диагноза»: симптом → сломанный протокол
-            const DIAG = [
-                { id: "rfc1035", ru: "Сайты не открываются по именам, но ping 8.8.8.8 идёт. Что сломалось?", en: "Names don't resolve but ping 8.8.8.8 works. What's broken?" },
-                { id: "rfc5321", ru: "Письма зависают в исходящих и не уходят. Кто виноват?", en: "Mails are stuck in the outbox. Who is at fault?" },
-                { id: "rfc2131", ru: "Ноутбук подключился к Wi-Fi, но IP-адреса нет. Чего не хватает?", en: "Joined Wi-Fi but got no IP address. What's missing?" },
-                { id: "rfc5905", ru: "Часы на серверах разъехались. Что чинить?", en: "Server clocks have drifted. What to fix?" },
-                { id: "rfc0768", ru: "Стрим сыплется, хотя скорость высокая. Чей это профиль?", en: "Stream stutters despite high bandwidth. Whose profile is it?" },
-            ];
-            const byId = (id) => protocolsData.protocols.find((x) => x.id === id);
-            const total = () => mode === "diag" ? DIAG.length : N;
-            const pgLang = () => (document.documentElement.lang === "en" ? "en" : "ru");
-            const Q = (k, fb) => I18N.t(k, fb);
-            const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
-                lang: "языки", ai: "ИИ" };
-            const typeName = (o) => o.number ? "RFC " + o.number
-                : Q("cat." + o.category, RUCAT[o.category] || o.category);
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                "use strict";
+                const box = document.getElementById("quizBox");
+                const N = 10;
+                let order = [], idx = 0, score = 0, missed = [], t0 = 0, mode = "guess";
+                // сценарии «диагноза»: симптом → сломанный протокол
+                const DIAG = [
+                    { id: "rfc1035", ru: "Сайты не открываются по именам, но ping 8.8.8.8 идёт. Что сломалось?", en: "Names don't resolve but ping 8.8.8.8 works. What's broken?" },
+                    { id: "rfc5321", ru: "Письма зависают в исходящих и не уходят. Кто виноват?", en: "Mails are stuck in the outbox. Who is at fault?" },
+                    { id: "rfc2131", ru: "Ноутбук подключился к Wi-Fi, но IP-адреса нет. Чего не хватает?", en: "Joined Wi-Fi but got no IP address. What's missing?" },
+                    { id: "rfc5905", ru: "Часы на серверах разъехались. Что чинить?", en: "Server clocks have drifted. What to fix?" },
+                    { id: "rfc0768", ru: "Стрим сыплется, хотя скорость высокая. Чей это профиль?", en: "Stream stutters despite high bandwidth. Whose profile is it?" },
+                ];
+                const byId = (id) => protocolsData.protocols.find((x) => x.id === id);
+                const total = () => mode === "diag" ? DIAG.length : N;
+                const pgLang = () => (document.documentElement.lang === "en" ? "en" : "ru");
+                const Q = (k, fb) => I18N.t(k, fb);
+                const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
+                    lang: "языки", ai: "ИИ" };
+                const typeName = (o) => o.number ? "RFC " + o.number
+                    : Q("cat." + o.category, RUCAT[o.category] || o.category);
 
-            function shuffle(a) {
-                for (let i = a.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    const t = a[i]; a[i] = a[j]; a[j] = t;
+                function shuffle(a) {
+                    for (let i = a.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        const t = a[i]; a[i] = a[j]; a[j] = t;
+                    }
+                    return a;
                 }
-                return a;
-            }
-            function start() {
-                order = mode === "diag"
-                    ? shuffle(DIAG.slice())
-                    : shuffle(protocolsData.protocols.slice()).slice(0, N);
-                idx = 0; score = 0; missed = []; t0 = Date.now();
-                ask();
-            }
-            function ask() {
-                const sc = mode === "diag" ? order[idx] : null;
-                const p = sc ? byId(sc.id) : order[idx];
-                const useWhere = Math.random() < .4 && p.where;
-                const pool = shuffle(protocolsData.protocols.filter((x) => x.id !== p.id)).slice(0, 3);
-                const opts = shuffle([p].concat(pool));
-                box.innerHTML = "";
-                const bar = document.createElement("div");
-                bar.className = "quiz-progress";
-                bar.innerHTML = `<i style="width:${(idx / total()) * 100}%"></i>`;
-                box.appendChild(bar);
-                const q = document.createElement("div");
-                q.className = "quiz-q";
-                q.textContent = Q("q.q", `Вопрос ${idx + 1}/${total()}: что это?`)
-                    .replace("{i}", idx + 1).replace("{n}", total());
-                box.appendChild(q);
-                const h = document.createElement("div");
-                h.className = "quiz-hint";
-                h.textContent = sc ? sc[pgLang()]
-                    : useWhere
-                    ? Q("q.where", `Где встречается: ${p.where}`).replace("{w}", p.where)
-                    : p.description;
-                box.appendChild(h);
-                const wrap = document.createElement("div");
-                wrap.className = "quiz-opts";
-                opts.forEach((o) => {
-                    const b = document.createElement("button");
-                    b.className = "quiz-opt";
-                    b.textContent = `${o.name} · ${typeName(o)}`;
-                    b.addEventListener("click", () => answer(o.id === p.id, b, wrap, p));
-                    wrap.appendChild(b);
-                });
-                box.appendChild(wrap);
-            }
-            function answer(good, btn, wrap, p) {
-                const btns = wrap.querySelectorAll("button");
-                btns.forEach((b) => { b.disabled = true; });
-                btn.classList.add(good ? "good" : "bad");
-                if (good) { score++; }
-                else {
-                    missed.push(p);
-                    btns.forEach((b) => {
-                        if (b.textContent.indexOf(p.name) === 0) b.classList.add("good");
+                function start() {
+                    order = mode === "diag"
+                        ? shuffle(DIAG.slice())
+                        : shuffle(protocolsData.protocols.slice()).slice(0, N);
+                    idx = 0; score = 0; missed = []; t0 = Date.now();
+                    ask();
+                }
+                function ask() {
+                    const sc = mode === "diag" ? order[idx] : null;
+                    const p = sc ? byId(sc.id) : order[idx];
+                    const useWhere = Math.random() < .4 && p.where;
+                    const pool = shuffle(protocolsData.protocols.filter((x) => x.id !== p.id)).slice(0, 3);
+                    const opts = shuffle([p].concat(pool));
+                    box.innerHTML = "";
+                    const bar = document.createElement("div");
+                    bar.className = "quiz-progress";
+                    bar.innerHTML = `<i style="width:${(idx / total()) * 100}%"></i>`;
+                    box.appendChild(bar);
+                    const q = document.createElement("div");
+                    q.className = "quiz-q";
+                    q.textContent = Q("q.q", `Вопрос ${idx + 1}/${total()}: что это?`)
+                        .replace("{i}", idx + 1).replace("{n}", total());
+                    box.appendChild(q);
+                    const h = document.createElement("div");
+                    h.className = "quiz-hint";
+                    h.textContent = sc ? sc[pgLang()]
+                        : useWhere
+                        ? Q("q.where", `Где встречается: ${p.where}`).replace("{w}", p.where)
+                        : p.description;
+                    box.appendChild(h);
+                    const wrap = document.createElement("div");
+                    wrap.className = "quiz-opts";
+                    opts.forEach((o) => {
+                        const b = document.createElement("button");
+                        b.className = "quiz-opt";
+                        b.textContent = `${o.name} · ${typeName(o)}`;
+                        b.addEventListener("click", () => answer(o.id === p.id, b, wrap, p));
+                        wrap.appendChild(b);
                     });
+                    box.appendChild(wrap);
                 }
-                const f = document.createElement("div");
-                f.className = "quiz-fact";
-                f.innerHTML = ICON.render("lightbulb") + " " + (p.fact || "");
-                box.appendChild(f);
-                const nx = document.createElement("button");
-                nx.className = "btn btn-primary quiz-next";
-                nx.textContent = idx + 1 === total() ? Q("q.result", "Результат") : Q("q.next", "Дальше →");
-                nx.addEventListener("click", () => { idx++; idx < total() ? ask() : finish(); });
-                box.appendChild(nx);
-            }
-            function finish() {
-                const secs = Math.round((Date.now() - t0) / 1000);
-                box.innerHTML = "";
-                const r = document.createElement("div");
-                r.className = "quiz-result";
-                const praise =
-                    score === total() ? Q("q.perfect", "Идеально! Ты — корень сада 🌳") :
-                    score >= Math.ceil(total() * .7) ? Q("q.good", "Отлично! Почти ботаник сетей.") :
-                    score >= Math.ceil(total() * .4) ? Q("q.mid", "Неплохо. Загляни в сад и повтори.") :
-                    Q("q.low", "Стоит пройти гайд — и попробовать снова.");
-                r.innerHTML = `<div class="quiz-score">${score}/${total()}</div>
-                    <p class="sec-sub">${Q("q.time", "Время: {s} сек").replace("{s}", secs)} · ${praise}</p>`;
-                box.appendChild(r);
-                if (missed.length) {
-                    const rev = document.createElement("div");
-                    rev.className = "quiz-review";
-                    rev.innerHTML = `<strong>${Q("q.review", "Повторить:")}</strong> ` + missed.map((p) =>
-                        `<a href="explore.html#${p.id}">${p.name}</a>`).join(" · ");
-                    box.appendChild(rev);
+                function answer(good, btn, wrap, p) {
+                    const btns = wrap.querySelectorAll("button");
+                    btns.forEach((b) => { b.disabled = true; });
+                    btn.classList.add(good ? "good" : "bad");
+                    if (good) { score++; }
+                    else {
+                        missed.push(p);
+                        btns.forEach((b) => {
+                            if (b.textContent.indexOf(p.name) === 0) b.classList.add("good");
+                        });
+                    }
+                    const f = document.createElement("div");
+                    f.className = "quiz-fact";
+                    f.innerHTML = ICON.render("lightbulb") + " " + (p.fact || "");
+                    box.appendChild(f);
+                    const nx = document.createElement("button");
+                    nx.className = "btn btn-primary quiz-next";
+                    nx.textContent = idx + 1 === total() ? Q("q.result", "Результат") : Q("q.next", "Дальше →");
+                    nx.addEventListener("click", () => { idx++; idx < total() ? ask() : finish(); });
+                    box.appendChild(nx);
                 }
-                const again = document.createElement("button");
-                again.className = "btn btn-primary quiz-next";
-                again.textContent = Q("q.again", "↻ Ещё раз");
-                again.addEventListener("click", start);
-                box.appendChild(again);
-            }
-            const mg = document.getElementById("modeGuess");
-            const md = document.getElementById("modeDiag");
-            function setMode(m) {
-                mode = m;
-                if (mg) mg.classList.toggle("active", m === "guess");
-                if (md) md.classList.toggle("active", m === "diag");
+                function finish() {
+                    const secs = Math.round((Date.now() - t0) / 1000);
+                    box.innerHTML = "";
+                    const r = document.createElement("div");
+                    r.className = "quiz-result";
+                    const praise =
+                        score === total() ? Q("q.perfect", "Идеально! Ты — корень сада 🌳") :
+                        score >= Math.ceil(total() * .7) ? Q("q.good", "Отлично! Почти ботаник сетей.") :
+                        score >= Math.ceil(total() * .4) ? Q("q.mid", "Неплохо. Загляни в сад и повтори.") :
+                        Q("q.low", "Стоит пройти гайд — и попробовать снова.");
+                    r.innerHTML = `<div class="quiz-score">${score}/${total()}</div>
+                        <p class="sec-sub">${Q("q.time", "Время: {s} сек").replace("{s}", secs)} · ${praise}</p>`;
+                    box.appendChild(r);
+                    if (missed.length) {
+                        const rev = document.createElement("div");
+                        rev.className = "quiz-review";
+                        rev.innerHTML = `<strong>${Q("q.review", "Повторить:")}</strong> ` + missed.map((p) =>
+                            `<a href="explore.html#${p.id}">${p.name}</a>`).join(" · ");
+                        box.appendChild(rev);
+                    }
+                    const again = document.createElement("button");
+                    again.className = "btn btn-primary quiz-next";
+                    again.textContent = Q("q.again", "↻ Ещё раз");
+                    again.addEventListener("click", start);
+                    box.appendChild(again);
+                }
+                const mg = document.getElementById("modeGuess");
+                const md = document.getElementById("modeDiag");
+                function setMode(m) {
+                    mode = m;
+                    if (mg) mg.classList.toggle("active", m === "guess");
+                    if (md) md.classList.toggle("active", m === "diag");
+                    start();
+                }
+                if (mg) mg.addEventListener("click", () => setMode("guess"));
+                if (md) md.addEventListener("click", () => setMode("diag"));
                 start();
-            }
-            if (mg) mg.addEventListener("click", () => setMode("guess"));
-            if (md) md.addEventListener("click", () => setMode("diag"));
-            start();
-        })();
-    </script>
-    <script src="js/motion.js"></script>
+            })();
+});
+</script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>

@@ -445,6 +445,7 @@ class ProtocolGarden {
         this.allProtocols = [];
         this.particles = [];
         this.animationId = null;
+        this._watching = false;
 
         this.view = { x: 0, y: 0, s: 1 };
         this._viewTarget = null;
@@ -675,6 +676,7 @@ class ProtocolGarden {
         this.pathIds = null;
         this.positionProtocols();
         this._relink();
+        this.watchVisibility();
     }
 
     calculateSize(p) {
@@ -704,6 +706,41 @@ class ProtocolGarden {
     stop() {
         if (this.animationId) cancelAnimationFrame(this.animationId);
         this.animationId = null;
+    }
+
+    /**
+     * Пауза, когда сад не видно.
+     *
+     * draw() перезапускает сам себя 60 раз в секунду и без остановки рисует
+     * всю сцену с подписями. На телефоне это греет корпус, садит батарею и
+     * приводит к тому, что браузер выгружает вкладку, — пользователь потом
+     * возвращается и видит пустую страницу.
+     *
+     * Две причины остановиться: документ скрыт (свернули вкладку или ушли в
+     * другое приложение — на телефоне это обычное дело) и полотно уехало из
+     * экрана при прокрутке.
+     */
+    watchVisibility() {
+        if (this._watching) return;
+        this._watching = true;
+        // За экраном — считаем, что сад не виден.
+        try {
+            if (typeof IntersectionObserver !== "undefined") {
+                new IntersectionObserver((entries) => {
+                    for (const e of entries) {
+                        if (e.isIntersecting) this.start();
+                        else this.stop();
+                    }
+                }, { threshold: 0 }).observe(this.canvas);
+            }
+        } catch (e) {}
+        // Вкладка свёрнута: продолжать рисовать незачем.
+        try {
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) this.stop();
+                else this.start();
+            });
+        } catch (e) {}
     }
 
     updateStats() {

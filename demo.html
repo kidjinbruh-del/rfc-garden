@@ -87,105 +87,107 @@
         </div>
     </main>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            "use strict";
-            const T = (k, fb) => I18N.t(k, fb);
-            // Реальный прогон observe на localhost: ping PASS, TCP:9 FAIL (закрыт),
-            // дельта трафика хоста за время наблюдений.
-            const SAMPLE = {
-                netpulse: { home: "NetPulse", core_available: true, mode: "netpulse-core", psutil: true, error: "" },
-                host_traffic: {
-                    delta: { bytes_sent: 4036, bytes_recv: 700, packets_sent: 20, packets_recv: 12 }
-                },
-                stands: [{
-                    name: "stand-local", ip: "127.0.0.1", elapsed_ms: 2026,
-                    ping: { passed: true, rtt_ms: 17.4, detail: "echo-request -> echo-reply" },
-                    ports: [{ port: 9, passed: false, connect_ms: 2008.3, detail: "handshake failed: timed out" }],
-                    http: [],
-                    dns: { passed: true, answer: "127.0.0.1", ms: 0, detail: "IP задан напрямую, DNS не нужен" },
-                    trace: { ran: false, hops: [], reason: "tracer off" }
-                }],
-                edu: [
-                    { icon: "search", check: "ping (ICMP)", osi: "L3",
-                      wire: "ARP находит MAC соседа, дальше ICMP Echo-Request и Echo-Reply. rtt_ms — реальное время туда-обратно." },
-                    { icon: "handshake", check: "TCP-порт", osi: "L4",
-                      wire: "Рукопожатие SYN, SYN-ACK, ACK. Закрытый порт отвечает RST или тишиной — connect_ms это показывает." },
-                    { icon: "packet", check: "HTTP", osi: "L7",
-                      wire: "DNS, затем TCP-handshake, затем GET. Статус 200 и байты доказывают, что сервис отдал контент." },
-                    { icon: "dns", check: "DNS", osi: "L7",
-                      wire: "Запрос A-записи возвращает IP. Без ответа резолвера браузер не знает, куда слать SYN." },
-                    { icon: "route", check: "Трафик хоста", osi: "L1-L4",
-                      wire: "Счётчики интерфейсов растут на каждый пакет проверок. Дельта до и после — твой след в эфире." }
-                ]
-            };
-            function pill(ok, txt) {
-                return `<span class="pill ${ok ? "pass" : "fail"}">${txt}</span>`;
-            }
-            function render(ev) {
-                const np = ev.netpulse || {};
-                document.getElementById("demoMode").textContent =
-                    `${T("demo.mode", "Режим")}: ${np.mode || "?"} · psutil: ${np.psutil ? "on" : "off"}`;
-                const d = (ev.host_traffic && ev.host_traffic.delta) || {};
-                const sent = (d.bytes_sent || 0) + " / " + (d.bytes_recv || 0);
-                const grid = document.getElementById("trafficGrid");
-                grid.innerHTML = "";
-                [
-                    [sent, "bytes " + T("demo.sent", "отправлено") + " / " + T("demo.recv", "получено")],
-                    [((d.packets_sent || 0) + (d.packets_recv || 0)), T("demo.packets", "пакетов")]
-                ].forEach(([n, label]) => {
-                    const c = document.createElement("div");
-                    c.className = "stat-card";
-                    c.innerHTML = `<b>${n}</b><span>${label}</span>`;
-                    grid.appendChild(c);
-                });
-                const box = document.getElementById("standsBox");
-                box.innerHTML = "";
-                (ev.stands || []).forEach((s) => {
-                    const c = document.createElement("div");
-                    c.className = "demo-card";
-                    let rows = `<h3><span data-icon="sprout"></span>${s.name} · ${s.ip}</h3>`;
-                    rows += `<div class="demo-row">${pill(s.ping.passed, "ping")} <span>ICMP — ${s.ping.rtt_ms}ms (${s.ping.detail})</span></div>`;
-                    (s.ports || []).forEach((p) => {
-                        rows += `<div class="demo-row">${pill(p.passed, "TCP:" + p.port)} <span>${p.connect_ms}ms (${p.detail})</span></div>`;
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                "use strict";
+                const T = (k, fb) => I18N.t(k, fb);
+                // Реальный прогон observe на localhost: ping PASS, TCP:9 FAIL (закрыт),
+                // дельта трафика хоста за время наблюдений.
+                const SAMPLE = {
+                    netpulse: { home: "NetPulse", core_available: true, mode: "netpulse-core", psutil: true, error: "" },
+                    host_traffic: {
+                        delta: { bytes_sent: 4036, bytes_recv: 700, packets_sent: 20, packets_recv: 12 }
+                    },
+                    stands: [{
+                        name: "stand-local", ip: "127.0.0.1", elapsed_ms: 2026,
+                        ping: { passed: true, rtt_ms: 17.4, detail: "echo-request -> echo-reply" },
+                        ports: [{ port: 9, passed: false, connect_ms: 2008.3, detail: "handshake failed: timed out" }],
+                        http: [],
+                        dns: { passed: true, answer: "127.0.0.1", ms: 0, detail: "IP задан напрямую, DNS не нужен" },
+                        trace: { ran: false, hops: [], reason: "tracer off" }
+                    }],
+                    edu: [
+                        { icon: "search", check: "ping (ICMP)", osi: "L3",
+                          wire: "ARP находит MAC соседа, дальше ICMP Echo-Request и Echo-Reply. rtt_ms — реальное время туда-обратно." },
+                        { icon: "handshake", check: "TCP-порт", osi: "L4",
+                          wire: "Рукопожатие SYN, SYN-ACK, ACK. Закрытый порт отвечает RST или тишиной — connect_ms это показывает." },
+                        { icon: "packet", check: "HTTP", osi: "L7",
+                          wire: "DNS, затем TCP-handshake, затем GET. Статус 200 и байты доказывают, что сервис отдал контент." },
+                        { icon: "dns", check: "DNS", osi: "L7",
+                          wire: "Запрос A-записи возвращает IP. Без ответа резолвера браузер не знает, куда слать SYN." },
+                        { icon: "route", check: "Трафик хоста", osi: "L1-L4",
+                          wire: "Счётчики интерфейсов растут на каждый пакет проверок. Дельта до и после — твой след в эфире." }
+                    ]
+                };
+                function pill(ok, txt) {
+                    return `<span class="pill ${ok ? "pass" : "fail"}">${txt}</span>`;
+                }
+                function render(ev) {
+                    const np = ev.netpulse || {};
+                    document.getElementById("demoMode").textContent =
+                        `${T("demo.mode", "Режим")}: ${np.mode || "?"} · psutil: ${np.psutil ? "on" : "off"}`;
+                    const d = (ev.host_traffic && ev.host_traffic.delta) || {};
+                    const sent = (d.bytes_sent || 0) + " / " + (d.bytes_recv || 0);
+                    const grid = document.getElementById("trafficGrid");
+                    grid.innerHTML = "";
+                    [
+                        [sent, "bytes " + T("demo.sent", "отправлено") + " / " + T("demo.recv", "получено")],
+                        [((d.packets_sent || 0) + (d.packets_recv || 0)), T("demo.packets", "пакетов")]
+                    ].forEach(([n, label]) => {
+                        const c = document.createElement("div");
+                        c.className = "stat-card";
+                        c.innerHTML = `<b>${n}</b><span>${label}</span>`;
+                        grid.appendChild(c);
                     });
-                    (s.http || []).forEach((h) => {
-                        rows += `<div class="demo-row">${pill(h.passed, "HTTP")} <span>${h.detail} (${h.ms}ms)</span></div>`;
+                    const box = document.getElementById("standsBox");
+                    box.innerHTML = "";
+                    (ev.stands || []).forEach((s) => {
+                        const c = document.createElement("div");
+                        c.className = "demo-card";
+                        let rows = `<h3><span data-icon="sprout"></span>${s.name} · ${s.ip}</h3>`;
+                        rows += `<div class="demo-row">${pill(s.ping.passed, "ping")} <span>ICMP — ${s.ping.rtt_ms}ms (${s.ping.detail})</span></div>`;
+                        (s.ports || []).forEach((p) => {
+                            rows += `<div class="demo-row">${pill(p.passed, "TCP:" + p.port)} <span>${p.connect_ms}ms (${p.detail})</span></div>`;
+                        });
+                        (s.http || []).forEach((h) => {
+                            rows += `<div class="demo-row">${pill(h.passed, "HTTP")} <span>${h.detail} (${h.ms}ms)</span></div>`;
+                        });
+                        rows += `<div class="demo-row"><span class="pill info">DNS</span> <span>${s.dns.detail}</span></div>`;
+                        c.innerHTML = rows;
+                        box.appendChild(c);
                     });
-                    rows += `<div class="demo-row"><span class="pill info">DNS</span> <span>${s.dns.detail}</span></div>`;
-                    c.innerHTML = rows;
-                    box.appendChild(c);
-                });
-                const edu = document.getElementById("eduGrid");
-                edu.innerHTML = "";
-                (ev.edu || []).forEach((e) => {
-                    const c = document.createElement("div");
-                    c.className = "demo-card";
-                    const h = document.createElement("h3");
-                    const ic = document.createElement("span");
-                    ic.setAttribute("data-" + "icon", e.icon);
-                    h.appendChild(ic);
-                    h.appendChild(document.createTextNode(`${e.check} · ${e.osi}`));
-                    const tx = document.createElement("div");
-                    tx.textContent = e.wire;
-                    c.appendChild(h);
-                    c.appendChild(tx);
-                    edu.appendChild(c);
-                });
-                ICON.scan(document.querySelector("main"));
-            }
-            render(SAMPLE);
-            // Свежие данные: положи netpulse_evidence.json рядом со страницей.
-            fetch("netpulse_evidence.json", { cache: "no-store" })
-                .then((r) => { if (!r.ok) throw new Error("no evidence"); return r.json(); })
-                .then((ev) => { if (ev && ev.stands) render(ev); })
-                .catch(() => {});
-        })();
-    </script>
-    <script src="js/motion.js"></script>
+                    const edu = document.getElementById("eduGrid");
+                    edu.innerHTML = "";
+                    (ev.edu || []).forEach((e) => {
+                        const c = document.createElement("div");
+                        c.className = "demo-card";
+                        const h = document.createElement("h3");
+                        const ic = document.createElement("span");
+                        ic.setAttribute("data-" + "icon", e.icon);
+                        h.appendChild(ic);
+                        h.appendChild(document.createTextNode(`${e.check} · ${e.osi}`));
+                        const tx = document.createElement("div");
+                        tx.textContent = e.wire;
+                        c.appendChild(h);
+                        c.appendChild(tx);
+                        edu.appendChild(c);
+                    });
+                    ICON.scan(document.querySelector("main"));
+                }
+                render(SAMPLE);
+                // Свежие данные: положи netpulse_evidence.json рядом со страницей.
+                fetch("netpulse_evidence.json", { cache: "no-store" })
+                    .then((r) => { if (!r.ok) throw new Error("no evidence"); return r.json(); })
+                    .then((ev) => { if (ev && ev.stands) render(ev); })
+                    .catch(() => {});
+            })();
+});
+</script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>

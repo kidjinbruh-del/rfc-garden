@@ -59,129 +59,131 @@
 
     <div class="lab-grid" id="labGrid"></div>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/garden.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/theme.js" defer></script>
+    <script src="js/garden.js" defer></script>
     <script>
+document.addEventListener('DOMContentLoaded', function () {
     (function () {
-        document.getElementById("labVer").textContent = "flora " + (window.__FLORA_VERSION || "?");
-        var TYPES = [
-            { type: "tree", color: "#4CAF50", title: "Tree — дерево" },
-            { type: "vine", color: "#2196F3", title: "Vine — лиана" },
-            { type: "flower", color: "#E91E63", title: "Flower — цветок" },
-            { type: "mushroom", color: "#9C27B0", title: "Mushroom — гриб" },
-            { type: "sprout", color: "#CDDC39", title: "Sprout — росток" },
-        ];
-        var COLORS = ["#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#CDDC39", "#FF9800", "#00BCD4", "#FF5722"];
-        var grid = document.getElementById("labGrid");
-        var cards = TYPES.map(function (t, i) {
-            var card = document.createElement("div");
-            card.className = "lab-card";
-            var head = document.createElement("header");
-            var b = document.createElement("b");
-            b.textContent = t.title;
-            var sel = document.createElement("select");
-            sel.className = "lab-color";
-            COLORS.forEach(function (c) {
-                var o = document.createElement("option");
-                o.value = c; o.textContent = c;
-                if (c === t.color) o.selected = true;
-                sel.appendChild(o);
+            document.getElementById("labVer").textContent = "flora " + (window.__FLORA_VERSION || "?");
+            var TYPES = [
+                { type: "tree", color: "#4CAF50", title: "Tree — дерево" },
+                { type: "vine", color: "#2196F3", title: "Vine — лиана" },
+                { type: "flower", color: "#E91E63", title: "Flower — цветок" },
+                { type: "mushroom", color: "#9C27B0", title: "Mushroom — гриб" },
+                { type: "sprout", color: "#CDDC39", title: "Sprout — росток" },
+            ];
+            var COLORS = ["#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#CDDC39", "#FF9800", "#00BCD4", "#FF5722"];
+            var grid = document.getElementById("labGrid");
+            var cards = TYPES.map(function (t, i) {
+                var card = document.createElement("div");
+                card.className = "lab-card";
+                var head = document.createElement("header");
+                var b = document.createElement("b");
+                b.textContent = t.title;
+                var sel = document.createElement("select");
+                sel.className = "lab-color";
+                COLORS.forEach(function (c) {
+                    var o = document.createElement("option");
+                    o.value = c; o.textContent = c;
+                    if (c === t.color) o.selected = true;
+                    sel.appendChild(o);
+                });
+                head.appendChild(b); head.appendChild(sel);
+                var cv = document.createElement("canvas");
+                cv.width = 300; cv.height = 380;
+                card.appendChild(head); card.appendChild(cv);
+                grid.appendChild(card);
+                var color = t.color;
+                sel.addEventListener("change", function () { color = sel.value; });
+                return {
+                    type: t.type, cv: cv, ctx: cv.getContext("2d"),
+                    color: function () { return color; },
+                    proto: {
+                        id: "lab-" + t.type, name: "Demo", number: 1,
+                        x: 150, y: 205, size: 120, color: t.color, plant: t.type,
+                        pulse: 1 + i * 1.3, born: Date.now() - 5000,
+                        targetX: null, targetY: null,
+                        dependsOn: [], usedBy: ["a", "b", "c"], status: "active",
+                    },
+                };
             });
-            head.appendChild(b); head.appendChild(sel);
-            var cv = document.createElement("canvas");
-            cv.width = 300; cv.height = 380;
-            card.appendChild(head); card.appendChild(cv);
-            grid.appendChild(card);
-            var color = t.color;
-            sel.addEventListener("change", function () { color = sel.value; });
-            return {
-                type: t.type, cv: cv, ctx: cv.getContext("2d"),
-                color: function () { return color; },
-                proto: {
-                    id: "lab-" + t.type, name: "Demo", number: 1,
-                    x: 150, y: 205, size: 120, color: t.color, plant: t.type,
-                    pulse: 1 + i * 1.3, born: Date.now() - 5000,
-                    targetX: null, targetY: null,
-                    dependsOn: [], usedBy: ["a", "b", "c"], status: "active",
-                },
-            };
-        });
 
-        // один лёгкий инстанс движка только как контекст рисования
-        var ghost = document.createElement("canvas");
-        document.body.appendChild(ghost);
-        ghost.style.display = "none";
-        var g = new ProtocolGarden(ghost.id || (ghost.id = "labGhost"));
-        g._sh = 1;
-        g.focusId = null;
-        g.compareIds = [];
+            // один лёгкий инстанс движка только как контекст рисования
+            var ghost = document.createElement("canvas");
+            document.body.appendChild(ghost);
+            ghost.style.display = "none";
+            var g = new ProtocolGarden(ghost.id || (ghost.id = "labGhost"));
+            g._sh = 1;
+            g.focusId = null;
+            g.compareIds = [];
 
-        function frame() {
-            for (var i = 0; i < cards.length; i++) {
-                var c = cards[i], ctx = c.ctx;
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, 300, 380);
-                g.ctx = ctx;
-                g._paintBackground(ctx, 300, 380, true);
-                c.proto.pulse += 0.02;
-                c.proto.color = c.color();
-                g.drawPlant(ctx, c.proto);
+            function frame() {
+                for (var i = 0; i < cards.length; i++) {
+                    var c = cards[i], ctx = c.ctx;
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    ctx.clearRect(0, 0, 300, 380);
+                    g.ctx = ctx;
+                    g._paintBackground(ctx, 300, 380, true);
+                    c.proto.pulse += 0.02;
+                    c.proto.color = c.color();
+                    g.drawPlant(ctx, c.proto);
+                }
+                requestAnimationFrame(frame);
             }
-            requestAnimationFrame(frame);
-        }
-        frame();
+            frame();
 
-        // ползунки → FLORA
-        var PARAMS = [
-            ["seed", 0, 9, 1, "вариант формы"],
-            ["petal", 0.5, 1.8, 0.05, "длина лепестков"],
-            ["crown", 0.2, 1.5, 0.05, "плотность короны"],
-            ["shard", 0.5, 2, 0.05, "размер кристаллов"],
-            ["tube", 0.5, 2.5, 0.05, "толщина стеблей"],
-            ["orb", 0.5, 2, 0.05, "размер орб"],
-            ["glow", 0, 2, 0.05, "сила свечения"],
-            ["aura", 0.5, 2, 0.05, "радиус ауры"],
-        ];
-        var slidersEl = document.getElementById("sliders");
-        var DEFAULTS = {};
-        PARAMS.forEach(function (p) {
-            var key = p[0];
-            DEFAULTS[key] = FLORA[key];
-            var wrap = document.createElement("label");
-            wrap.className = "sl";
-            var name = document.createElement("span");
-            name.textContent = p[4] + " · " + key;
-            var inp = document.createElement("input");
-            inp.type = "range"; inp.min = p[1]; inp.max = p[2]; inp.step = p[3]; inp.value = FLORA[key];
-            var out = document.createElement("output");
-            out.textContent = FLORA[key];
-            inp.addEventListener("input", function () {
-                var v = parseFloat(inp.value);
-                if (key === "seed") v = Math.round(v);
-                FLORA[key] = v;
-                out.textContent = v;
-            });
-            wrap.appendChild(name); wrap.appendChild(inp); wrap.appendChild(out);
-            slidersEl.appendChild(wrap);
-            p.inp = inp; p.out = out;
-        });
-        document.getElementById("labReset").addEventListener("click", function () {
+            // ползунки → FLORA
+            var PARAMS = [
+                ["seed", 0, 9, 1, "вариант формы"],
+                ["petal", 0.5, 1.8, 0.05, "длина лепестков"],
+                ["crown", 0.2, 1.5, 0.05, "плотность короны"],
+                ["shard", 0.5, 2, 0.05, "размер кристаллов"],
+                ["tube", 0.5, 2.5, 0.05, "толщина стеблей"],
+                ["orb", 0.5, 2, 0.05, "размер орб"],
+                ["glow", 0, 2, 0.05, "сила свечения"],
+                ["aura", 0.5, 2, 0.05, "радиус ауры"],
+            ];
+            var slidersEl = document.getElementById("sliders");
+            var DEFAULTS = {};
             PARAMS.forEach(function (p) {
-                FLORA[p[0]] = DEFAULTS[p[0]];
-                p.inp.value = DEFAULTS[p[0]];
-                p.out.textContent = DEFAULTS[p[0]];
+                var key = p[0];
+                DEFAULTS[key] = FLORA[key];
+                var wrap = document.createElement("label");
+                wrap.className = "sl";
+                var name = document.createElement("span");
+                name.textContent = p[4] + " · " + key;
+                var inp = document.createElement("input");
+                inp.type = "range"; inp.min = p[1]; inp.max = p[2]; inp.step = p[3]; inp.value = FLORA[key];
+                var out = document.createElement("output");
+                out.textContent = FLORA[key];
+                inp.addEventListener("input", function () {
+                    var v = parseFloat(inp.value);
+                    if (key === "seed") v = Math.round(v);
+                    FLORA[key] = v;
+                    out.textContent = v;
+                });
+                wrap.appendChild(name); wrap.appendChild(inp); wrap.appendChild(out);
+                slidersEl.appendChild(wrap);
+                p.inp = inp; p.out = out;
             });
-        });
-        document.getElementById("labExport").addEventListener("click", function () {
-            var json = JSON.stringify(Object.assign({}, FLORA), null, 2);
-            var ta = document.getElementById("labOut");
-            ta.value = json;
-            if (navigator.clipboard) navigator.clipboard.writeText(json).catch(function () {});
-            ta.select();
-        });
-    })();
-    </script>
+            document.getElementById("labReset").addEventListener("click", function () {
+                PARAMS.forEach(function (p) {
+                    FLORA[p[0]] = DEFAULTS[p[0]];
+                    p.inp.value = DEFAULTS[p[0]];
+                    p.out.textContent = DEFAULTS[p[0]];
+                });
+            });
+            document.getElementById("labExport").addEventListener("click", function () {
+                var json = JSON.stringify(Object.assign({}, FLORA), null, 2);
+                var ta = document.getElementById("labOut");
+                ta.value = json;
+                if (navigator.clipboard) navigator.clipboard.writeText(json).catch(function () {});
+                ta.select();
+            });
+        })();
+});
+</script>
 </body>
 </html>

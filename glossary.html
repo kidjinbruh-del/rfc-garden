@@ -67,103 +67,105 @@
         </div>
     </main>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            "use strict";
-            const T = (k, fb) => I18N.t(k, fb);
-            const HAND = [
-                ["Латентность", "Время в пути пакета туда-обратно. Меньше — лучше."],
-                ["Джиттер", "Разброс задержек. Враг звонков и игр."],
-                ["Потери", "Доля пакетов, не дошедших до цели. TCP пересылает, UDP — нет."],
-                ["Пропускная способность", "Ширина трубы: сколько бит в секунду. Не путать с латентностью."],
-                ["Пинг", "Проверка связности утилитой ping (ICMP echo). Первое лекарство при жалобах."],
-                ["TTL", "Счётчик жизни пакета: каждый роутер вычитает 1, на нуле пакет умирает."],
-                ["MTU", "Максимальный размер пакета на линии. Больше — фрагментация."],
-                ["Сокет", "Пара IP + порт: конечная точка соединения."],
-                ["Порт", "Номер двери в компьютере: 80 — HTTP, 443 — HTTPS, 22 — SSH."],
-                ["Handshake", "Рукопожатие: SYN → SYN-ACK → ACK перед разговором."],
-                ["Broadcast", "Кричать всем в локалке сразу."],
-                ["Multicast", "Говорить группе подписчиков: IPTV, OSPF-приветы."],
-                ["Anycast", "Один адрес — много мест. Ближайший отвечает (DNS-корни, CDN)."],
-                ["Хоп", "Один шаг пакета: компьютер → роутер → роутер → цель."],
-                ["Фрагментация", "Нарезка большого пакета под MTU линии. Собирает получатель."],
-                ["Инкапсуляция", "Конверт в конверте: каждый уровень добавляет свой заголовок."],
-            ];
-            const terms = protocolsData.protocols.map((p) => ({
-                t: p.name, d: p.description, id: p.id,
-            })).concat(HAND.map((h) => ({ t: h[0], d: h[1], id: null })));
-            terms.sort((a, b) => a.t.localeCompare(b.t, "ru"));
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                "use strict";
+                const T = (k, fb) => I18N.t(k, fb);
+                const HAND = [
+                    ["Латентность", "Время в пути пакета туда-обратно. Меньше — лучше."],
+                    ["Джиттер", "Разброс задержек. Враг звонков и игр."],
+                    ["Потери", "Доля пакетов, не дошедших до цели. TCP пересылает, UDP — нет."],
+                    ["Пропускная способность", "Ширина трубы: сколько бит в секунду. Не путать с латентностью."],
+                    ["Пинг", "Проверка связности утилитой ping (ICMP echo). Первое лекарство при жалобах."],
+                    ["TTL", "Счётчик жизни пакета: каждый роутер вычитает 1, на нуле пакет умирает."],
+                    ["MTU", "Максимальный размер пакета на линии. Больше — фрагментация."],
+                    ["Сокет", "Пара IP + порт: конечная точка соединения."],
+                    ["Порт", "Номер двери в компьютере: 80 — HTTP, 443 — HTTPS, 22 — SSH."],
+                    ["Handshake", "Рукопожатие: SYN → SYN-ACK → ACK перед разговором."],
+                    ["Broadcast", "Кричать всем в локалке сразу."],
+                    ["Multicast", "Говорить группе подписчиков: IPTV, OSPF-приветы."],
+                    ["Anycast", "Один адрес — много мест. Ближайший отвечает (DNS-корни, CDN)."],
+                    ["Хоп", "Один шаг пакета: компьютер → роутер → роутер → цель."],
+                    ["Фрагментация", "Нарезка большого пакета под MTU линии. Собирает получатель."],
+                    ["Инкапсуляция", "Конверт в конверте: каждый уровень добавляет свой заголовок."],
+                ];
+                const terms = protocolsData.protocols.map((p) => ({
+                    t: p.name, d: p.description, id: p.id,
+                })).concat(HAND.map((h) => ({ t: h[0], d: h[1], id: null })));
+                terms.sort((a, b) => a.t.localeCompare(b.t, "ru"));
 
-            const grid = document.getElementById("glossGrid");
-            const q = document.getElementById("glossSearch");
-            const abc = document.getElementById("glossAbc");
-            const count = document.getElementById("glossCount");
-            let letter = "all";
+                const grid = document.getElementById("glossGrid");
+                const q = document.getElementById("glossSearch");
+                const abc = document.getElementById("glossAbc");
+                const count = document.getElementById("glossCount");
+                let letter = "all";
 
-            const letters = [];
-            terms.forEach((t) => {
-                const L = (t.t[0] || "").toUpperCase();
-                if (L && letters.indexOf(L) === -1) letters.push(L);
-            });
-            letters.sort();
-            const allBtn = document.createElement("button");
-            allBtn.textContent = "•";
-            allBtn.className = "active";
-            allBtn.setAttribute("aria-label", "Все");
-            allBtn.addEventListener("click", () => { letter = "all"; syncAbc(); render(); });
-            abc.appendChild(allBtn);
-            letters.forEach((L) => {
-                const b = document.createElement("button");
-                b.textContent = L;
-                b.addEventListener("click", () => { letter = L; syncAbc(); render(); });
-                abc.appendChild(b);
-            });
-            function syncAbc() {
-                Array.prototype.forEach.call(abc.children, (b) => {
-                    b.classList.toggle("active", b.textContent === (letter === "all" ? "•" : letter));
-                });
-            }
-            function render() {
-                const needle = (q.value || "").trim().toLowerCase();
-                grid.innerHTML = "";
-                let n = 0;
+                const letters = [];
                 terms.forEach((t) => {
-                    if (letter !== "all" && (t.t[0] || "").toUpperCase() !== letter) return;
-                    if (needle && (t.t + " " + t.d).toLowerCase().indexOf(needle) === -1) return;
-                    n++;
-                    const card = document.createElement("div");
-                    card.className = "card gloss-card";
-                    const h = document.createElement("h3");
-                    h.textContent = t.t;
-                    const p = document.createElement("p");
-                    p.textContent = t.d;
-                    card.appendChild(h);
-                    card.appendChild(p);
-                    if (t.id) {
-                        const a = document.createElement("a");
-                        a.className = "gloss-link";
-                        a.href = "article.html?id=" + t.id;
-                        a.textContent = T("gl.open", "Открыть →");
-                        card.appendChild(a);
-                    }
-                    grid.appendChild(card);
+                    const L = (t.t[0] || "").toUpperCase();
+                    if (L && letters.indexOf(L) === -1) letters.push(L);
                 });
-                count.textContent = T("gl.count", "{n} терминов").replace("{n}", n);
-                if (!n) {
-                    const p = document.createElement("p");
-                    p.className = "sec-sub";
-                    p.textContent = T("gl.empty", "Ничего не найдено — попробуй другой запрос.");
-                    grid.appendChild(p);
+                letters.sort();
+                const allBtn = document.createElement("button");
+                allBtn.textContent = "•";
+                allBtn.className = "active";
+                allBtn.setAttribute("aria-label", "Все");
+                allBtn.addEventListener("click", () => { letter = "all"; syncAbc(); render(); });
+                abc.appendChild(allBtn);
+                letters.forEach((L) => {
+                    const b = document.createElement("button");
+                    b.textContent = L;
+                    b.addEventListener("click", () => { letter = L; syncAbc(); render(); });
+                    abc.appendChild(b);
+                });
+                function syncAbc() {
+                    Array.prototype.forEach.call(abc.children, (b) => {
+                        b.classList.toggle("active", b.textContent === (letter === "all" ? "•" : letter));
+                    });
                 }
-            }
-            q.addEventListener("input", render);
-            render();
-        })();
-    </script>
-    <script src="js/motion.js"></script>
+                function render() {
+                    const needle = (q.value || "").trim().toLowerCase();
+                    grid.innerHTML = "";
+                    let n = 0;
+                    terms.forEach((t) => {
+                        if (letter !== "all" && (t.t[0] || "").toUpperCase() !== letter) return;
+                        if (needle && (t.t + " " + t.d).toLowerCase().indexOf(needle) === -1) return;
+                        n++;
+                        const card = document.createElement("div");
+                        card.className = "card gloss-card";
+                        const h = document.createElement("h3");
+                        h.textContent = t.t;
+                        const p = document.createElement("p");
+                        p.textContent = t.d;
+                        card.appendChild(h);
+                        card.appendChild(p);
+                        if (t.id) {
+                            const a = document.createElement("a");
+                            a.className = "gloss-link";
+                            a.href = "article.html?id=" + t.id;
+                            a.textContent = T("gl.open", "Открыть →");
+                            card.appendChild(a);
+                        }
+                        grid.appendChild(card);
+                    });
+                    count.textContent = T("gl.count", "{n} терминов").replace("{n}", n);
+                    if (!n) {
+                        const p = document.createElement("p");
+                        p.className = "sec-sub";
+                        p.textContent = T("gl.empty", "Ничего не найдено — попробуй другой запрос.");
+                        grid.appendChild(p);
+                    }
+                }
+                q.addEventListener("input", render);
+                render();
+            })();
+});
+</script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>

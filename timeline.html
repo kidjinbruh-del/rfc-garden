@@ -39,45 +39,47 @@
         <div class="timeline" id="timeline"></div>
     </main>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            var box = document.getElementById('timeline');
-            var items = protocolsData.protocols.slice()
-                .sort(function (a, b) { return a.year - b.year; });
-            for (var i = 0; i < items.length; i++) {
-                var p = items[i];
-                var div = document.createElement('div');
-                div.className = 'tl-item';
-                div.style.setProperty('--dot', p.color);
-                div.setAttribute('data-id', p.id);
-                div.tabIndex = 0;
-                div.setAttribute('role', 'button');
-                div.setAttribute('aria-label', p.name + ' — RFC ' + p.number + ', ' + p.year);
-                div.addEventListener('click', function () {
-                    location.href = 'explore.html#' + this.getAttribute('data-id');
-                });
-                div.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter') location.href = 'explore.html#' + this.getAttribute('data-id');
-                });
-                var RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
-                lang: "языки", ai: "ИИ" };
-                var st = I18N.t('status.' + p.status, { active: 'активен', updated: 'обновлён',
-                             legacy: 'устарел' }[p.status] || p.status);
-                var tag = p.number ? 'RFC ' + p.number
-                    : I18N.t('cat.' + p.category, RUCAT[p.category] || p.category);
-                div.innerHTML =
-                    '<div class="tl-year">' + p.year + ' · ' + st + '</div>' +
-                    '<div class="tl-name">' + p.name +
-                    '<span>' + tag + '</span></div>' +
-                    '<div class="tl-desc">' + p.description + '</div>';
-                box.appendChild(div);
-            }
-        })();
-    </script>
-    <script src="js/motion.js"></script>
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                var box = document.getElementById('timeline');
+                var items = protocolsData.protocols.slice()
+                    .sort(function (a, b) { return a.year - b.year; });
+                for (var i = 0; i < items.length; i++) {
+                    var p = items[i];
+                    var div = document.createElement('div');
+                    div.className = 'tl-item';
+                    div.style.setProperty('--dot', p.color);
+                    div.setAttribute('data-id', p.id);
+                    div.tabIndex = 0;
+                    div.setAttribute('role', 'button');
+                    div.setAttribute('aria-label', p.name + ' — RFC ' + p.number + ', ' + p.year);
+                    div.addEventListener('click', function () {
+                        location.href = 'explore.html#' + this.getAttribute('data-id');
+                    });
+                    div.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') location.href = 'explore.html#' + this.getAttribute('data-id');
+                    });
+                    var RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
+                    lang: "языки", ai: "ИИ" };
+                    var st = I18N.t('status.' + p.status, { active: 'активен', updated: 'обновлён',
+                                 legacy: 'устарел' }[p.status] || p.status);
+                    var tag = p.number ? 'RFC ' + p.number
+                        : I18N.t('cat.' + p.category, RUCAT[p.category] || p.category);
+                    div.innerHTML =
+                        '<div class="tl-year">' + p.year + ' · ' + st + '</div>' +
+                        '<div class="tl-name">' + p.name +
+                        '<span>' + tag + '</span></div>' +
+                        '<div class="tl-desc">' + p.description + '</div>';
+                    box.appendChild(div);
+                }
+            })();
+});
+</script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>

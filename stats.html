@@ -62,69 +62,71 @@
         </div>
     </main>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            "use strict";
-            const ps = protocolsData.protocols;
-            const T = (k, fb) => I18N.t(k, fb);
-            const conn = (p) => (p.dependsOn?.length || 0) + (p.usedBy?.length || 0);
-            const years = ps.map((p) => p.year);
-            const cards = [
-                [ps.length, T("st.protocols", "объектов")],
-                [ps.reduce((s, p) => s + (p.dependsOn?.length || 0), 0), T("st.links", "связей")],
-                [Math.min.apply(null, years), T("st.oldest", "самый старый")],
-                [Math.max.apply(null, years), T("st.newest", "самый новый")],
-                [new Set(ps.map((p) => p.layer)).size, T("st.layersCount", "слоёв")],
-                [new Set(ps.map((p) => p.category)).size, T("st.purposes", "назначений")],
-            ];
-            const grid = document.getElementById("statGrid");
-            cards.forEach(([n, label]) => {
-                const d = document.createElement("div");
-                d.className = "stat-card";
-                d.innerHTML = `<b>${n}</b><span>${label}</span>`;
-                grid.appendChild(d);
-            });
-            function bars(boxId, rows) {
-                const box = document.getElementById(boxId);
-                const max = Math.max.apply(null, rows.map((r) => r.count));
-                rows.forEach((r) => {
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                "use strict";
+                const ps = protocolsData.protocols;
+                const T = (k, fb) => I18N.t(k, fb);
+                const conn = (p) => (p.dependsOn?.length || 0) + (p.usedBy?.length || 0);
+                const years = ps.map((p) => p.year);
+                const cards = [
+                    [ps.length, T("st.protocols", "объектов")],
+                    [ps.reduce((s, p) => s + (p.dependsOn?.length || 0), 0), T("st.links", "связей")],
+                    [Math.min.apply(null, years), T("st.oldest", "самый старый")],
+                    [Math.max.apply(null, years), T("st.newest", "самый новый")],
+                    [new Set(ps.map((p) => p.layer)).size, T("st.layersCount", "слоёв")],
+                    [new Set(ps.map((p) => p.category)).size, T("st.purposes", "назначений")],
+                ];
+                const grid = document.getElementById("statGrid");
+                cards.forEach(([n, label]) => {
                     const d = document.createElement("div");
-                    d.className = "bar-row";
-                    d.innerHTML = `<span class="bl">${r.link}</span>
-                        <span class="bar-track"><i style="width:${Math.round((r.count / max) * 100)}%;background:${r.color}"></i></span>
-                        <span class="bar-num">${r.count}</span>`;
-                    box.appendChild(d);
+                    d.className = "stat-card";
+                    d.innerHTML = `<b>${n}</b><span>${label}</span>`;
+                    grid.appendChild(d);
                 });
-            }
-            bars("topBars", ps.map((p) => ({ p, count: conn(p) }))
-                .sort((a, b) => b.count - a.count).slice(0, 8)
-                .map(({ p, count }) => ({
-                    link: `<a href="explore.html#${p.id}">${p.name}</a>`,
-                    count, color: p.color,
-                })));
-            const layerNames = {
-                application: T("layer.app", "Application"),
-                presentation: T("layer.presentation", "Security"),
-                session: T("layer.session", "Session"),
-                transport: T("layer.transport", "Transport"),
-                network: T("layer.network", "Network"),
-                link: T("layer.link", "Link"),
-                physical: T("layer.physical", "Physical"),
-            };
-            const byLayer = {};
-            ps.forEach((p) => { byLayer[p.layer] = (byLayer[p.layer] || 0) + 1; });
-            bars("layerBars", Object.keys(byLayer).map((l) => {
-                const c = (ps.find((p) => p.layer === l) || {}).color || "#34d399";
-                return { link: `<a href="explore.html?layer=${l}">${layerNames[l] || l}</a>`,
-                    count: byLayer[l], color: c };
-            }));
-        })();
-    </script>
-    <script src="js/progress.js"></script>
-    <script src="js/motion.js"></script>
+                function bars(boxId, rows) {
+                    const box = document.getElementById(boxId);
+                    const max = Math.max.apply(null, rows.map((r) => r.count));
+                    rows.forEach((r) => {
+                        const d = document.createElement("div");
+                        d.className = "bar-row";
+                        d.innerHTML = `<span class="bl">${r.link}</span>
+                            <span class="bar-track"><i style="width:${Math.round((r.count / max) * 100)}%;background:${r.color}"></i></span>
+                            <span class="bar-num">${r.count}</span>`;
+                        box.appendChild(d);
+                    });
+                }
+                bars("topBars", ps.map((p) => ({ p, count: conn(p) }))
+                    .sort((a, b) => b.count - a.count).slice(0, 8)
+                    .map(({ p, count }) => ({
+                        link: `<a href="explore.html#${p.id}">${p.name}</a>`,
+                        count, color: p.color,
+                    })));
+                const layerNames = {
+                    application: T("layer.app", "Application"),
+                    presentation: T("layer.presentation", "Security"),
+                    session: T("layer.session", "Session"),
+                    transport: T("layer.transport", "Transport"),
+                    network: T("layer.network", "Network"),
+                    link: T("layer.link", "Link"),
+                    physical: T("layer.physical", "Physical"),
+                };
+                const byLayer = {};
+                ps.forEach((p) => { byLayer[p.layer] = (byLayer[p.layer] || 0) + 1; });
+                bars("layerBars", Object.keys(byLayer).map((l) => {
+                    const c = (ps.find((p) => p.layer === l) || {}).color || "#34d399";
+                    return { link: `<a href="explore.html?layer=${l}">${layerNames[l] || l}</a>`,
+                        count: byLayer[l], color: c };
+                }));
+            })();
+});
+</script>
+    <script src="js/progress.js" defer></script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>

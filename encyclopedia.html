@@ -67,91 +67,93 @@
     <footer>
         <div><h4>RFC Garden</h4><p data-i18n="foot.mit">Open Source · MIT</p></div>
     </footer>
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/profiles.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/profiles.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            "use strict";
-            const T = (k, fb) => I18N.t(k, fb);
-            const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
-                lang: "языки", ai: "ИИ" };
-            const RULAYER = { application: "прикладной", presentation: "защита",
-                session: "сеансовый", transport: "транспортный", network: "сетевой",
-                link: "канальный", physical: "физический" };
-            const typeName = (p) => p.number ? "RFC " + p.number
-                : T("cat." + p.category, RUCAT[p.category] || p.category);
-            const grid = document.getElementById("encyGrid");
-            const q = document.getElementById("encySearch");
-            const catSel = document.getElementById("encyCat");
-            const layerSel = document.getElementById("encyLayer");
-            const count = document.getElementById("encyCount");
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                "use strict";
+                const T = (k, fb) => I18N.t(k, fb);
+                const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
+                    lang: "языки", ai: "ИИ" };
+                const RULAYER = { application: "прикладной", presentation: "защита",
+                    session: "сеансовый", transport: "транспортный", network: "сетевой",
+                    link: "канальный", physical: "физический" };
+                const typeName = (p) => p.number ? "RFC " + p.number
+                    : T("cat." + p.category, RUCAT[p.category] || p.category);
+                const grid = document.getElementById("encyGrid");
+                const q = document.getElementById("encySearch");
+                const catSel = document.getElementById("encyCat");
+                const layerSel = document.getElementById("encyLayer");
+                const count = document.getElementById("encyCount");
 
-            function buildSelect(sel, values, labelOf, allLabel) {
-                sel.innerHTML = "";
-                const all = document.createElement("option");
-                all.value = "all"; all.textContent = allLabel;
-                sel.appendChild(all);
-                values.forEach((v) => {
-                    const o = document.createElement("option");
-                    o.value = v; o.textContent = labelOf(v);
-                    sel.appendChild(o);
-                });
-                sel.value = "all";
-            }
-            const cats = [];
-            protocolsData.protocols.forEach((p) => {
-                if (cats.indexOf(p.category) === -1) cats.push(p.category);
-            });
-            cats.sort();
-            const catLabel = (c) => T("cat." + c, (RUCAT[c] || c).replace("_", " "));
-            buildSelect(catSel, cats, catLabel, T("cat.all", "Все назначения"));
-            const layers = ["application", "presentation", "session", "transport",
-                "network", "link", "physical"];
-            buildSelect(layerSel, layers,
-                (l) => T("layer." + l, RULAYER[l] || l),
-                T("e.layer.all", "Все уровни"));
-
-            function render() {
-                const query = (q.value || "").trim().toLowerCase();
-                const cf = catSel.value, lf = layerSel.value;
-                grid.innerHTML = "";
-                let shown = 0, full = 0;
+                function buildSelect(sel, values, labelOf, allLabel) {
+                    sel.innerHTML = "";
+                    const all = document.createElement("option");
+                    all.value = "all"; all.textContent = allLabel;
+                    sel.appendChild(all);
+                    values.forEach((v) => {
+                        const o = document.createElement("option");
+                        o.value = v; o.textContent = labelOf(v);
+                        sel.appendChild(o);
+                    });
+                    sel.value = "all";
+                }
+                const cats = [];
                 protocolsData.protocols.forEach((p) => {
-                    const hay = (p.name + " " + (p.fullName || "") + " " +
-                        (p.description || "")).toLowerCase();
-                    if (query && !hay.includes(query)) return;
-                    if (cf !== "all" && p.category !== cf) return;
-                    if (lf !== "all" && p.layer !== lf) return;
-                    shown++;
-                    const hasFull = !!(window.PROFILES && window.PROFILES[p.id]);
-                    if (hasFull) full++;
-                    const card = document.createElement("a");
-                    card.className = "card ency-card";
-                    card.href = "article.html?id=" + p.id;
-                    card.innerHTML =
-                        '<div class="card-icon">' + ICON.render(p.plant || "sprout") + "</div>" +
-                        "<h3>" + p.name + "</h3>" +
-                        '<div class="badge-row"><span class="badge-kind">' +
-                        typeName(p) + " · " + p.year + "</span>" +
-                        (hasFull ? '<span class="badge-full">' +
-                            T("enc.full", "Полный паспорт") + "</span>" : "") +
-                        "</div>" +
-                        '<p class="desc">' + (p.description || "") + "</p>" +
-                        '<span class="read">' + T("enc.read", "Читать паспорт →") + "</span>";
-                    grid.appendChild(card);
+                    if (cats.indexOf(p.category) === -1) cats.push(p.category);
                 });
-                count.textContent = shown + " / " + protocolsData.protocols.length +
-                    " · " + full + " " + T("enc.fullCount", "полных");
-            }
-            q.addEventListener("input", render);
-            catSel.addEventListener("change", render);
-            layerSel.addEventListener("change", render);
-            render();
-        })();
-    </script>
-    <script src="js/motion.js"></script>
+                cats.sort();
+                const catLabel = (c) => T("cat." + c, (RUCAT[c] || c).replace("_", " "));
+                buildSelect(catSel, cats, catLabel, T("cat.all", "Все назначения"));
+                const layers = ["application", "presentation", "session", "transport",
+                    "network", "link", "physical"];
+                buildSelect(layerSel, layers,
+                    (l) => T("layer." + l, RULAYER[l] || l),
+                    T("e.layer.all", "Все уровни"));
+
+                function render() {
+                    const query = (q.value || "").trim().toLowerCase();
+                    const cf = catSel.value, lf = layerSel.value;
+                    grid.innerHTML = "";
+                    let shown = 0, full = 0;
+                    protocolsData.protocols.forEach((p) => {
+                        const hay = (p.name + " " + (p.fullName || "") + " " +
+                            (p.description || "")).toLowerCase();
+                        if (query && !hay.includes(query)) return;
+                        if (cf !== "all" && p.category !== cf) return;
+                        if (lf !== "all" && p.layer !== lf) return;
+                        shown++;
+                        const hasFull = !!(window.PROFILES && window.PROFILES[p.id]);
+                        if (hasFull) full++;
+                        const card = document.createElement("a");
+                        card.className = "card ency-card";
+                        card.href = "article.html?id=" + p.id;
+                        card.innerHTML =
+                            '<div class="card-icon">' + ICON.render(p.plant || "sprout") + "</div>" +
+                            "<h3>" + p.name + "</h3>" +
+                            '<div class="badge-row"><span class="badge-kind">' +
+                            typeName(p) + " · " + p.year + "</span>" +
+                            (hasFull ? '<span class="badge-full">' +
+                                T("enc.full", "Полный паспорт") + "</span>" : "") +
+                            "</div>" +
+                            '<p class="desc">' + (p.description || "") + "</p>" +
+                            '<span class="read">' + T("enc.read", "Читать паспорт →") + "</span>";
+                        grid.appendChild(card);
+                    });
+                    count.textContent = shown + " / " + protocolsData.protocols.length +
+                        " · " + full + " " + T("enc.fullCount", "полных");
+                }
+                q.addEventListener("input", render);
+                catSel.addEventListener("change", render);
+                layerSel.addEventListener("change", render);
+                render();
+            })();
+});
+</script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>

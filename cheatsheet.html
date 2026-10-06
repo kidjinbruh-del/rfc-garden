@@ -59,40 +59,42 @@
         </div>
     </main>
 
-    <script src="js/i18n.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/theme.js"></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/icons.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/theme.js" defer></script>
     <script>
-        (function () {
-            "use strict";
-            const t = document.getElementById("sheetTable");
-            const T = (k, fb) => I18N.t(k, fb);
-            const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
-                lang: "языки", ai: "ИИ" };
-            const typeName = (p) => p.number ? T("kind.protocol", "Протокол")
-                : T("cat." + p.category, RUCAT[p.category] || p.category);
-            const st = {
-                active: T("status.active", "активен"),
-                updated: T("status.updated", "обновлён"),
-                legacy: T("status.legacy", "устарел"),
-            };
-            let html = "<tr><th>" + T("table.protocol", "Протокол") + "</th><th>RFC</th><th>" +
-                T("table.year", "Год") + "</th><th>" + T("table.layer", "Слой") + "</th><th>" +
-                T("table.status", "Статус") + "</th><th>" + T("table.kind", "Тип") + "</th><th>" +
-                T("cs.what", "Что это") + "</th></tr>";
-            protocolsData.protocols.slice()
-                .sort((a, b) => a.year - b.year || (a.number || 0) - (b.number || 0))
-                .forEach((p) => {
-                    html += `<tr><td><strong>${p.name}</strong></td>` +
-                        `<td class="mono">${p.number || "—"}</td><td class="mono">${p.year}</td>` +
-                        `<td>${T("layer." + p.layer, p.layer)}</td><td>${st[p.status] || p.status}</td>` +
-                        `<td>${typeName(p)}</td>` +
-                        `<td>${p.description}</td></tr>`;
-                });
-            t.innerHTML = html;
-        })();
-    </script>
-    <script src="js/motion.js"></script>
+document.addEventListener('DOMContentLoaded', function () {
+    (function () {
+                "use strict";
+                const t = document.getElementById("sheetTable");
+                const T = (k, fb) => I18N.t(k, fb);
+                const RUCAT = { hardware: "железо", os: "ОС", virt: "виртуализация",
+                    lang: "языки", ai: "ИИ" };
+                const typeName = (p) => p.number ? T("kind.protocol", "Протокол")
+                    : T("cat." + p.category, RUCAT[p.category] || p.category);
+                const st = {
+                    active: T("status.active", "активен"),
+                    updated: T("status.updated", "обновлён"),
+                    legacy: T("status.legacy", "устарел"),
+                };
+                let html = "<tr><th>" + T("table.protocol", "Протокол") + "</th><th>RFC</th><th>" +
+                    T("table.year", "Год") + "</th><th>" + T("table.layer", "Слой") + "</th><th>" +
+                    T("table.status", "Статус") + "</th><th>" + T("table.kind", "Тип") + "</th><th>" +
+                    T("cs.what", "Что это") + "</th></tr>";
+                protocolsData.protocols.slice()
+                    .sort((a, b) => a.year - b.year || (a.number || 0) - (b.number || 0))
+                    .forEach((p) => {
+                        html += `<tr><td><strong>${p.name}</strong></td>` +
+                            `<td class="mono">${p.number || "—"}</td><td class="mono">${p.year}</td>` +
+                            `<td>${T("layer." + p.layer, p.layer)}</td><td>${st[p.status] || p.status}</td>` +
+                            `<td>${typeName(p)}</td>` +
+                            `<td>${p.description}</td></tr>`;
+                    });
+                t.innerHTML = html;
+            })();
+});
+</script>
+    <script src="js/motion.js" defer></script>
 </body>
 </html>
