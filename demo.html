@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b1220">
-    <link rel="manifest" href="manifest.webmanifest?v=20261006-5">
+    <link rel="manifest" href="manifest.webmanifest?v=20261006-9">
     <title data-i18n="title.demo">Живое демо — RFC Garden</title>
-    <link rel="stylesheet" href="css/style.css?v=20261006-5">
+    <link rel="stylesheet" href="css/style.css?v=20261006-9">
     <style>
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin: 24px 0; }
         .stat-card { background: var(--bg-panel); border: 1px solid var(--line);
@@ -87,10 +87,10 @@
         </div>
     </main>
 
-    <script src="js/i18n.js?v=20261006-5" defer></script>
-    <script src="js/icons.js?v=20261006-5" defer></script>
-    <script src="js/data.js?v=20261006-5" defer></script>
-    <script src="js/theme.js?v=20261006-5" defer></script>
+    <script src="js/i18n.js?v=20261006-9" defer></script>
+    <script src="js/icons.js?v=20261006-9" defer></script>
+    <script src="js/data.js?v=20261006-9" defer></script>
+    <script src="js/theme.js?v=20261006-9" defer></script>
     <script>
 document.addEventListener('DOMContentLoaded', function () {
     (function () {
@@ -124,6 +124,57 @@ document.addEventListener('DOMContentLoaded', function () {
                           wire: "Счётчики интерфейсов растут на каждый пакет проверок. Дельта до и после — твой след в эфире." }
                     ]
                 };
+                                // Данные приезжают из netpulse_evidence.json — это вывод labspin,
+                // и появляется он на странице как есть. Поэтому перевод живёт здесь,
+                // рядом с данными, а не в разметке. Ключ — имя проверки (check):
+                // оно одно из пяти и меняется только вместе с кодом labspin.
+                // Уровень OSI переводится отдельно: в примере он «L3», в свежих
+                // данных — «L3 — сетевой», и обе формы приходится знать.
+                const EDU_EN = {
+                        "ping (ICMP)": [
+                            "ping (ICMP)",
+                            "ARP finds the neighbour's MAC, then ICMP Echo-Request and Echo-Reply. Every reply is live proof that L1/L2/L3 between the hosts are in order."
+                        ],
+                        "TCP-порт": [
+                            "TCP port",
+                            "A three-step handshake: SYN -> SYN-ACK -> ACK. If the port is closed you get an RST or silence (timeout). connect_ms shows the handshake time."
+                        ],
+                        "HTTP": [
+                            "HTTP",
+                            "DNS (if a name) -> TCP handshake -> HTTP GET -> status + body. A 200 status and a byte count prove the service returned content."
+                        ],
+                        "DNS": [
+                            "DNS",
+                            "An A-record query returns an IP. Without a resolver answer the browser has nowhere to send the SYN."
+                        ],
+                        "Трафик хоста": [
+                            "Host traffic",
+                            "Interface counters grow with every probe packet. The delta before and after is your trace on the wire."
+                        ]
+                };
+
+                const OSI_EN = {
+                        "L3 — сетевой": "L3 — network",
+                        "L4 — транспортный": "L4 — transport",
+                        "L7 — прикладной (поверх TCP)": "L7 — application (over TCP)",
+                        "L7 (служба имён)": "L7 (name service)",
+                        "L1–L4 в цифрах": "L1–L4 in numbers"
+                };
+
+                const DETAIL_EN = {
+                        "IP задан напрямую, DNS не нужен": "The IP is set directly, no DNS needed"
+                };
+
+                function det(s) {
+                    if (I18N.lang !== "en" || !s) return s || "";
+                    return DETAIL_EN[s] || s;
+                }
+
+                function osi(s) {
+                    if (I18N.lang !== "en" || !s) return s || "";
+                    return OSI_EN[s] || s;
+                }
+
                 function pill(ok, txt) {
                     return `<span class="pill ${ok ? "pass" : "fail"}">${txt}</span>`;
                 }
@@ -150,14 +201,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const c = document.createElement("div");
                         c.className = "demo-card";
                         let rows = `<h3><span data-icon="sprout"></span>${s.name} · ${s.ip}</h3>`;
-                        rows += `<div class="demo-row">${pill(s.ping.passed, "ping")} <span>ICMP — ${s.ping.rtt_ms}ms (${s.ping.detail})</span></div>`;
+                        rows += `<div class="demo-row">${pill(s.ping.passed, "ping")} <span>ICMP — ${s.ping.rtt_ms}ms (${det(s.ping.detail)})</span></div>`;
                         (s.ports || []).forEach((p) => {
-                            rows += `<div class="demo-row">${pill(p.passed, "TCP:" + p.port)} <span>${p.connect_ms}ms (${p.detail})</span></div>`;
+                            rows += `<div class="demo-row">${pill(p.passed, "TCP:" + p.port)} <span>${p.connect_ms}ms (${det(p.detail)})</span></div>`;
                         });
                         (s.http || []).forEach((h) => {
-                            rows += `<div class="demo-row">${pill(h.passed, "HTTP")} <span>${h.detail} (${h.ms}ms)</span></div>`;
+                            rows += `<div class="demo-row">${pill(h.passed, "HTTP")} <span>${det(h.detail)} (${h.ms}ms)</span></div>`;
                         });
-                        rows += `<div class="demo-row"><span class="pill info">DNS</span> <span>${s.dns.detail}</span></div>`;
+                        rows += `<div class="demo-row"><span class="pill info">DNS</span> <span>${det(s.dns.detail)}</span></div>`;
                         c.innerHTML = rows;
                         box.appendChild(c);
                     });
@@ -170,9 +221,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         const ic = document.createElement("span");
                         ic.setAttribute("data-" + "icon", e.icon);
                         h.appendChild(ic);
-                        h.appendChild(document.createTextNode(`${e.check} · ${e.osi}`));
+                        const en = I18N.lang === "en" ? EDU_EN[e.check] : null;
+                        h.appendChild(document.createTextNode(`${en ? en[0] : e.check} · ${osi(e.osi)}`));
                         const tx = document.createElement("div");
-                        tx.textContent = e.wire;
+                        tx.textContent = en ? en[1] : e.wire;
                         c.appendChild(h);
                         c.appendChild(tx);
                         edu.appendChild(c);
@@ -188,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })();
 });
 </script>
-    <script src="js/motion.js?v=20261006-5" defer></script>
-    <script src="js/anim.js?v=20261006-5" defer></script>
+    <script src="js/motion.js?v=20261006-9" defer></script>
+    <script src="js/anim.js?v=20261006-9" defer></script>
 </body>
 </html>

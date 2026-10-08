@@ -780,7 +780,178 @@ var D = {
     "vt.h26": "labspin versus Terraform",
     "vt.r4": "An imperative script: brought it up, checked it, reported it. Ideal for training stands",
     "vt.r5": "Declarative state: plan → apply → drift becomes visible. For long-lived infrastructure",
+
+    // ---- Живое демо и вклад ----
+    "c.step2.code": "{\n  \"id\": \"rfc9001\",\n  \"number\": 9001,\n  \"name\": \"TLS 1.3\",\n  \"fullName\": \"Transport Layer Security\",\n  \"year\": 2018,\n  \"status\": \"active\",          // active | updated | legacy\n  \"layer\": \"presentation\",     // application | transport | network\n  \"category\": \"security\",\n  \"plant\": \"tree\",             // tree | vine | flower | mushroom | sprout\n  \"description\": \"Connection encryption in plain words.\",\n  \"dependsOn\": [\"rfc0793\"],    // ids of the foundational protocols\n  \"usedBy\": [],\n  \"replaces\": [],              // which RFCs it supersedes\n  \"replacedBy\": [],            // what supersedes it\n  \"color\": \"#4DD0E1\"\n}",
+
+    // ---- Стенд дизайна растений ----
+    "title.flora": "Flora Lab — plant design stand",
+    "flora.intro": "A design stand for the techno-flora. Move the sliders and all five types redraw live.<br>Found something you like — press “Export JSON” and send me the text from the field below, and I will bake those values into <code>js/garden.js</code> as the defaults.<br>Hard-refresh the page (Ctrl+F5) if the preview does not match the garden.",
+    "flora.export": "Export JSON",
+    "flora.reset": "Reset",
+    "flora.open": "Open the garden",
+    "flora.placeholder": "The JSON will appear here after the export…",
 };
+
+// Описания протоколов. Русский текст живёт в data.js и является
+// значением по умолчанию; здесь — английский по id протокола.
+// Словарь один на все страницы: описание выводится в семи местах,
+// и переводить его в каждой разметке отдельно бессмысленно.
+var P = {
+    "rfc0791": "The main routing protocol of the internet. Handles addressing and packet fragmentation.",
+    "rfc0792": "Network control messages: ping, delivery errors, diagnostics. The voice of the network when something goes wrong.",
+    "rfc0793": "A reliable connection-oriented protocol. Guarantees delivery and ordering of packets.",
+    "rfc0768": "A connectionless protocol. Fast, with no delivery guarantee. Streaming, games, DNS.",
+    "rfc0826": "Finds a device's MAC address from its IP address on the local network.",
+    "rfc1035": "The domain name system: turns readable addresses (google.com) into IP addresses.",
+    "rfc5321": "Transfer of email between servers.",
+    "rfc0959": "One of the oldest file transfer protocols. Being phased out.",
+    "rfc1939": "Fetching mail from a server: downloads messages to the device and usually deletes them there.",
+    "rfc3501": "Mail access right on the server: messages stay synchronised across devices.",
+    "rfc2131": "Hands out IP addresses and network settings automatically on connection.",
+    "rfc5905": "Clock synchronisation: keeps time accurate across billions of devices.",
+    "rfc2616": "The hypertext protocol — the foundation of the World Wide Web.",
+    "rfc7540": "Multiplexing of requests and header compression over TCP.",
+    "rfc8200": "The new generation of IP: 128-bit addresses — enough for everything.",
+    "rfc8446": "Connection encryption: the lock on the internet's door. HTTPS = HTTP + TLS.",
+    "rfc4253": "Secure remote access to machines over an encrypted channel.",
+    "rfc4271": "The routing protocol between autonomous systems. The skeleton of the internet: who is connected to whom.",
+    "rfc6455": "A bidirectional channel over HTTP: chats, games, live updates.",
+    "rfc9000": "A new transport from Google: TLS built in, instant handshake. The future of the web.",
+    "rfc9114": "HTTP over QUIC: no TCP latency, resilient to packet loss.",
+    "rfc1034": "The fundamentals of DNS: zones, servers, hierarchy. The conceptual base for RFC 1035.",
+    "rfc3848": "DHCP options for IPv4: handing out addresses, routes and DNS servers.",
+    "rfc9106": "A password hashing function: secure storage of credentials.",
+    "rfc2326": "The streaming control protocol: play, pause, stop for real-time video and audio.",
+    "rfc3986": "The address format standard: how to write links everyone understands.",
+    "rfc6265": "Cookies are how sites remember you between requests.",
+    "rfc4566": "The session description format: codecs, addresses and ports for VoIP and video conferencing.",
+    "rfc5766": "NAT traversal for WebRTC: finds a path even through routers and firewalls.",
+    "rfc1157": "Network monitoring: routers report their load and failures themselves.",
+    "rfc0854": "Ancient remote control: you type commands on someone else's machine.",
+    "rfc1122": "The constitution of the internet: what every host on the network must be able to do.",
+    "rfc1436": "The internet before the web: menus of text documents instead of sites.",
+    "rfc1738": "The first address format: how to write links everyone understands.",
+    "rfc1918": "Private addresses: 192.168.x.x, which are not routable on the internet.",
+    "rfc1945": "The first web protocol: one request per connection — slow, but it worked.",
+    "rfc2617": "The classic \"enter your login and password\" box: how a site checks who you are.",
+    "rfc2818": "Ordinary HTTP inside a TLS tunnel: the lock in the address bar.",
+    "rfc3261": "IP telephony: sets up calls the way HTTP opens pages.",
+    "rfc3550": "Voice and video in calls: better to lose a frame than to freeze.",
+    "rfc3711": "The same RTP, but encrypted: confidential calls.",
+    "rfc3977": "Usenet newsgroups: the ancestor of forums and Reddit.",
+    "rfc4511": "The corporate directory: one login for mail, Wi-Fi and the printer.",
+    "rfc4960": "A hybrid of TCP and UDP: reliable, but message-based rather than a stream.",
+    "rfc5246": "Encryption of the 2010s: the internet's lock before version 1.3.",
+    "rfc5322": "The anatomy of an email: subject, from, to — a format that hasn't changed in decades.",
+    "rfc6749": "The \"Sign in with Google\" button: the site never sees your password, only a token.",
+    "rfc7252": "HTTP for light bulbs: the same REST, but lighter and over UDP.",
+    "rfc7519": "Login tokens: three parts separated by dots; the signature prevents forgery.",
+    "rfc8484": "Private DNS inside HTTPS: your provider cannot see your queries.",
+};
+
+// Перевод описания протокола. В русском режиме возвращается
+// исходный текст из data.js, в английском — перевод отсюда.
+function pd(id, fallback) {
+    if (lang !== "en") return fallback;
+    var v = P[id];
+    return v || fallback;
+}
+
+// Железо, ОС, виртуализация, языки и ИИ: у этих записей нет
+// rfc-номера, но описания показываются наравне с остальными.
+// n — имя, f — расшифровка, d — описание.
+var W = {
+    "rfc1034": {"n": "DNS (structure)"},
+    "hw-router": {"n": "Router", "f": "Router", "d": "The box that decides where to send a packet next. A home router hands out Wi-Fi and hides the network behind NAT."},
+    "hw-switch": {"n": "Switch", "f": "Switch", "d": "Learns MAC addresses and sends frames only to the right port: quiet and fast."},
+    "hw-firewall": {"n": "Firewall", "f": "Firewall", "d": "A guard at the network border: cuts unwanted connections according to the rules."},
+    "hw-wifi": {"n": "Wi-Fi access point", "f": "Wireless Access Point", "d": "A bridge between air and wires: hands out internet over a radio channel."},
+    "hw-modem": {"n": "Modem", "f": "Modem", "d": "A translator between digits and dial tones: this is how the internet once came over a phone line."},
+    "hw-lb": {"n": "Load balancer", "f": "Load Balancer", "d": "Spreads requests across servers so that none of them collapses under load."},
+    "os-unix": {"n": "UNIX", "f": "UNIX", "d": "The forefather: pipes, sockets and the idea that everything is a file come from here."},
+    "os-linux": {"n": "Linux", "f": "Linux", "d": "A free kernel: from routers and Android to supercomputers."},
+    "os-windows": {"n": "Windows", "f": "Microsoft Windows", "d": "The system on nine out of ten home PCs: windows, drivers and compatibility for decades."},
+    "os-macos": {"n": "macOS", "f": "macOS", "d": "UNIX with a human face: Darwin inside, design outside."},
+    "os-android": {"n": "Android", "f": "Android", "d": "Linux in your pocket: the most popular operating system on the planet."},
+    "os-ios": {"n": "iOS", "f": "iOS", "d": "The iPhone's system: strict rules and smooth animations."},
+    "virt-hypervisor": {"n": "Hypervisor", "f": "Hypervisor", "d": "A computer inside a computer: cuts the hardware into isolated pieces."},
+    "virt-docker": {"n": "Docker", "f": "Docker", "d": "Containers: an application travels with its dependencies and runs the same everywhere."},
+    "virt-k8s": {"n": "Kubernetes", "f": "Kubernetes", "d": "The container conductor: restarts what has fallen and scales under load."},
+    "lang-c": {"n": "C", "f": "C Programming Language", "d": "The mother of systems languages: UNIX, Linux and half the garden are written in it."},
+    "lang-python": {"n": "Python", "f": "Python", "d": "Reads almost like English: neural networks, scripts and backends."},
+    "lang-js": {"n": "JavaScript", "f": "JavaScript", "d": "The language of the browser: it brings pages to life, and with Node.js — servers too."},
+    "lang-go": {"n": "Go", "f": "Go", "d": "As simple as C, with goroutines built in: the language of Docker and Kubernetes."},
+    "lang-rust": {"n": "Rust", "f": "Rust", "d": "The speed of C without the footguns: the compiler won't let you shoot yourself in the foot."},
+    "ai-neural": {"n": "Neural networks", "f": "Deep Neural Networks", "d": "Layers of artificial neurons that learn from examples: from cats in photos to speech."},
+    "ai-llm": {"n": "LLM", "f": "Large Language Models", "d": "Huge models predicting the next word: chatbots and assistants."}
+};
+
+// Термины глоссария из HAND (glossary.html). Сам список остаётся
+// в странице: порядок и отбор по буквам зависят от разметки.
+// GR — русский термин в ключ (по нему ищем), GT — ключ в
+// [английский термин, английское описание].
+var GR = {
+    "Латентность": "gd.latency",
+    "Джиттер": "gd.jitter",
+    "Потери": "gd.loss",
+    "Пропускная способность": "gd.bandwidth",
+    "Пинг": "gd.ping",
+    "TTL": "gd.ttl",
+    "MTU": "gd.mtu",
+    "Сокет": "gd.socket",
+    "Порт": "gd.port",
+    "Handshake": "gd.handshake",
+    "Broadcast": "gd.broadcast",
+    "Multicast": "gd.multicast",
+    "Anycast": "gd.anycast",
+    "Хоп": "gd.hop",
+    "Фрагментация": "gd.fragmentation",
+    "Инкапсуляция": "gd.encapsulation"
+};
+
+var GT = {
+    "gd.latency": ["Latency", "The round-trip time of a packet. Less is better."],
+    "gd.jitter": ["Jitter", "The spread of delays. The enemy of calls and games."],
+    "gd.loss": ["Loss", "The share of packets that never made it. TCP retransmits, UDP does not."],
+    "gd.bandwidth": ["Throughput", "The width of the pipe: bits per second. Not to be confused with latency."],
+    "gd.ping": ["Ping", "A reachability check with the ping utility (ICMP echo). The first remedy for complaints."],
+    "gd.ttl": ["TTL", "A packet's lifetime counter: every router subtracts 1, at zero the packet dies."],
+    "gd.mtu": ["MTU", "The largest packet size on the line. More than that and fragmentation starts."],
+    "gd.socket": ["Socket", "A pair of IP + port: the endpoint of a connection."],
+    "gd.port": ["Port", "A door number in a computer: 80 — HTTP, 443 — HTTPS, 22 — SSH."],
+    "gd.handshake": ["Handshake", "The greeting: SYN → SYN-ACK → ACK before the talk begins."],
+    "gd.broadcast": ["Broadcast", "Shouting to everyone on the local network at once."],
+    "gd.multicast": ["Multicast", "Talking to a group of subscribers: IPTV, OSPF hellos."],
+    "gd.anycast": ["Anycast", "One address — many places. The nearest one answers (DNS roots, CDNs)."],
+    "gd.hop": ["Hop", "One step of a packet: computer → router → router → destination."],
+    "gd.fragmentation": ["Fragmentation", "Cutting a large packet down to the MTU of the line. The receiver reassembles it."],
+    "gd.encapsulation": ["Encapsulation", "An envelope inside an envelope: every layer adds its own header."]
+};
+
+// Перевод термина глоссария по его русскому названию.
+function gh(ruTerm, ruDesc) {
+    if (lang !== "en") return [ruTerm, ruDesc];
+    var v = GT[GR[ruTerm]];
+    return v ? v : [ruTerm, ruDesc];
+}
+
+// Подстановка перевода в сами записи data.js. Вызывается оттуда
+// при загрузке: i18n.js подключается раньше data.js, поэтому
+// перевод попадает и в карточки, и в canvas сада, и в бегущую строку.
+function pl(list) {
+    if (lang !== "en" || !list) return;
+    for (var i = 0; i < list.length; i++) {
+        var p = list[i];
+        if (P[p.id]) p.description = P[p.id];
+        var w = W[p.id];
+        if (w) {
+            if (w.n) p.name = w.n;
+            if (w.f) p.fullName = w.f;
+            if (w.d) p.description = w.d;
+        }
+    }
+}
 
 function t(key, fallback) {
     if (lang === "en") {
@@ -835,7 +1006,7 @@ if (document.readyState === "loading") {
     apply();
 }
 
-window.I18N = { t: t, apply: apply, toggle: toggle, get lang() { return lang; } };
+window.I18N = { t: t, pd: pd, pl: pl, gh: gh, pl: pl, apply: apply, toggle: toggle, get lang() { return lang; } };
 
 var lt = document.getElementById("langToggle");
 if (lt) lt.addEventListener("click", toggle);

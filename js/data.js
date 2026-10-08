@@ -221,3 +221,7 @@ const protocolsData = {
           "dependsOn": ["ai-neural"], "usedBy": [], "replaces": [], "replacedBy": [], "color": "#7E57C2", "url": "https://en.wikipedia.org/wiki/Large_language_model" },
     ]
 };
+
+// Перевод названий и описаний, если включён английский.
+// i18n.js подключается раньше, так что I18N.pl здесь уже есть.
+if (typeof I18N !== "undefined" && I18N.pl) I18N.pl(protocolsData.protocols);

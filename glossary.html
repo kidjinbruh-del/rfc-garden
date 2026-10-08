@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b1220">
-    <link rel="manifest" href="manifest.webmanifest?v=20261006-5">
+    <link rel="manifest" href="manifest.webmanifest?v=20261006-9">
     <meta name="description" content="Глоссарий RFC Garden — термины сада одной строкой.">
     <title data-i18n="title.glossary">Глоссарий — RFC Garden</title>
-    <link rel="stylesheet" href="css/style.css?v=20261006-5">
+    <link rel="stylesheet" href="css/style.css?v=20261006-9">
     <style>
         .gloss-tools { display: flex; gap: 12px; flex-wrap: wrap; margin: 22px 0 18px; align-items: center; }
         .gloss-abc { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -67,10 +67,10 @@
         </div>
     </main>
 
-    <script src="js/i18n.js?v=20261006-5" defer></script>
-    <script src="js/icons.js?v=20261006-5" defer></script>
-    <script src="js/data.js?v=20261006-5" defer></script>
-    <script src="js/theme.js?v=20261006-5" defer></script>
+    <script src="js/i18n.js?v=20261006-9" defer></script>
+    <script src="js/icons.js?v=20261006-9" defer></script>
+    <script src="js/data.js?v=20261006-9" defer></script>
+    <script src="js/theme.js?v=20261006-9" defer></script>
     <script>
 document.addEventListener('DOMContentLoaded', function () {
     (function () {
@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     ["Инкапсуляция", "Конверт в конверте: каждый уровень добавляет свой заголовок."],
                 ];
                 const terms = protocolsData.protocols.map((p) => ({
-                    t: p.name, d: p.description, id: p.id,
-                })).concat(HAND.map((h) => ({ t: h[0], d: h[1], id: null })));
-                terms.sort((a, b) => a.t.localeCompare(b.t, "ru"));
+                    t: p.name, d: I18N.pd(p.id, p.description), id: p.id,
+                })).concat(HAND.map((h) => { const g = I18N.gh(h[0], h[1]); return { t: g[0], d: g[1], id: null }; }));
+                terms.sort((a, b) => a.t.localeCompare(b.t, I18N.lang === "en" ? "en" : "ru"));
 
                 const grid = document.getElementById("glossGrid");
                 const q = document.getElementById("glossSearch");
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })();
 });
 </script>
-    <script src="js/motion.js?v=20261006-5" defer></script>
-    <script src="js/anim.js?v=20261006-5" defer></script>
+    <script src="js/motion.js?v=20261006-9" defer></script>
+    <script src="js/anim.js?v=20261006-9" defer></script>
 </body>
 </html>

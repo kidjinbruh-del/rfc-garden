@@ -237,7 +237,7 @@ function renderCard(p) {
     $("pcBadges").innerHTML =
         `<span class="badge st-${p.status}">${statusLabel(p.status)}</span>` +
         `<span class="badge">${catLabel(p.category)}</span>`;
-    $("pcDesc").textContent = p.description || "";
+    $("pcDesc").textContent = I18N.pd(p.id, p.description || "");
     $("pcWhere").textContent = p.where
         ? T("card.where", "Где встречается: {w}").replace("{w}", p.where) : "";
     $("pcFact").innerHTML = p.fact
@@ -561,7 +561,7 @@ function cmpCol(p) {
         <h4>${p.name}</h4>
         <div><span class="badge st-${p.status}">${statusLabel(p.status)}</span>
         <span class="badge">${layerLabel(p.layer)}</span></div>
-        <p>${p.description || ""}</p>
+        <p>${I18N.pd(p.id, p.description || "")}</p>
         <div class="cmp-meta">${T("cmp.links", `Связей: {n}`).replace("{n}", conn)} · ${p.where || ""}</div>
     </div>`;
 }

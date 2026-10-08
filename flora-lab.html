@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flora Lab — стенд дизайна растений</title>
-    <link rel="stylesheet" href="css/style.css?v=20261006-5">
+    <title data-i18n="title.flora">Flora Lab — стенд дизайна растений</title>
+    <link rel="stylesheet" href="css/style.css?v=20261006-9">
     <style>
         body { max-width: 1400px; margin: 0 auto; padding: 24px; }
         .lab-head h1 { margin: 0 0 6px; font-size: 26px; }
@@ -32,17 +32,17 @@
             <a href="index.html">RFC Garden</a>
         </div>
         <ul class="nav-menu">
-            <li><a href="index.html">Главная</a></li>
-            <li><a href="explore.html">Сад</a></li>
-            <li><a href="encyclopedia.html">Энциклопедия</a></li>
-            <li><a href="guide.html">Гайд</a></li>
+            <li><a href="index.html" data-i18n="nav.home">Главная</a></li>
+            <li><a href="explore.html" data-i18n="nav.garden">Сад</a></li>
+            <li><a href="encyclopedia.html" data-i18n="nav.encyclopedia">Энциклопедия</a></li>
+            <li><a href="guide.html" data-i18n="nav.guide">Гайд</a></li>
         </ul>
         <button id="themeToggle" class="theme-btn" aria-label="Тема" data-i18n-attr="aria-label:theme.aria"></button>
         <button id="langToggle" class="theme-btn" aria-label="Switch to English">EN</button>
     </nav>
     <div class="lab-head">
         <h1>Flora Lab <span class="lab-ver" id="labVer"></span></h1>
-        <p>Стенд дизайна техно-флоры. Крути ползунки — все пять типов перерисуются живьём.
+        <p data-i18n-html="flora.intro">Стенд дизайна техно-флоры. Крути ползунки — все пять типов перерисуются живьём.
         Нашёл красоту — жми «Экспорт JSON» и присылай мне текст из поля ниже, я зашью значения в <code>js/garden.js</code> как дефолт.
         Обнови страницу жёстко (Ctrl+F5), если превью не совпадает с садом.</p>
     </div>
@@ -50,20 +50,20 @@
     <div class="lab-controls">
         <div class="sliders" id="sliders"></div>
         <div class="lab-row">
-            <button class="btn btn-primary btn-sm" id="labExport">Экспорт JSON</button>
-            <button class="btn btn-secondary btn-sm" id="labReset">Сбросить</button>
-            <a class="btn btn-secondary btn-sm" href="explore.html">Открыть сад</a>
+            <button class="btn btn-primary btn-sm" id="labExport" data-i18n="flora.export">Экспорт JSON</button>
+            <button class="btn btn-secondary btn-sm" id="labReset" data-i18n="flora.reset">Сбросить</button>
+            <a class="btn btn-secondary btn-sm" href="explore.html" data-i18n="flora.open">Открыть сад</a>
         </div>
-        <textarea id="labOut" readonly placeholder="Сюда приедет JSON после экспорта…"></textarea>
+        <textarea id="labOut" readonly data-i18n-attr="placeholder:flora.placeholder" placeholder="Сюда приедет JSON после экспорта…"></textarea>
     </div>
 
     <div class="lab-grid" id="labGrid"></div>
 
-    <script src="js/i18n.js?v=20261006-5" defer></script>
-    <script src="js/icons.js?v=20261006-5" defer></script>
-    <script src="js/theme.js?v=20261006-5" defer></script>
-    <script src="js/garden.js?v=20261006-5" defer></script>
-    <script src="js/anim.js?v=20261006-5" defer></script>
+    <script src="js/i18n.js?v=20261006-9" defer></script>
+    <script src="js/icons.js?v=20261006-9" defer></script>
+    <script src="js/theme.js?v=20261006-9" defer></script>
+    <script src="js/garden.js?v=20261006-9" defer></script>
+    <script src="js/anim.js?v=20261006-9" defer></script>
     <script>
 document.addEventListener('DOMContentLoaded', function () {
     (function () {
@@ -75,14 +75,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 { type: "mushroom", color: "#9C27B0", title: "Mushroom — гриб" },
                 { type: "sprout", color: "#CDDC39", title: "Sprout — росток" },
             ];
-            var COLORS = ["#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#CDDC39", "#FF9800", "#00BCD4", "#FF5722"];
+            // Подписи ползунков и названия растений собираются в JS,
+    // ключ туда не передать — переводим по самой русской подписи.
+    var FLORA_TEXT = {
+        "вариант формы": "shape variant",
+        "длина лепестков": "petal length",
+        "плотность короны": "crown density",
+        "размер кристаллов": "crystal size",
+        "толщина стеблей": "stem thickness",
+        "размер орб": "orb size",
+        "сила свечения": "glow strength",
+        "радиус ауры": "aura radius",
+        "Tree — дерево": "Tree — tree",
+        "Vine — лиана": "Vine — vine",
+        "Flower — цветок": "Flower — flower",
+        "Mushroom — гриб": "Mushroom — mushroom",
+        "Sprout — росток": "Sprout — sprout"
+    };
+    function tr(ru) {
+        if (I18N.lang !== "en") return ru;
+        return FLORA_TEXT[ru] || ru;
+    }
+    var COLORS = ["#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#CDDC39", "#FF9800", "#00BCD4", "#FF5722"];
             var grid = document.getElementById("labGrid");
             var cards = TYPES.map(function (t, i) {
                 var card = document.createElement("div");
                 card.className = "lab-card";
                 var head = document.createElement("header");
                 var b = document.createElement("b");
-                b.textContent = t.title;
+                b.textContent = tr(t.title);
                 var sel = document.createElement("select");
                 sel.className = "lab-color";
                 COLORS.forEach(function (c) {
@@ -154,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var wrap = document.createElement("label");
                 wrap.className = "sl";
                 var name = document.createElement("span");
-                name.textContent = p[4] + " · " + key;
+                name.textContent = tr(p[4]) + " · " + key;
                 var inp = document.createElement("input");
                 inp.type = "range"; inp.min = p[1]; inp.max = p[2]; inp.step = p[3]; inp.value = FLORA[key];
                 var out = document.createElement("output");
