@@ -683,3 +683,46 @@ html.is-pressing .nav-menu a:hover {
     .compare-card { left: 12px; right: 12px; width: auto; }
     .recent-panel { left: 12px; right: 12px; max-width: none; }
 }
+
+/* ==========================================================================
+   СВЕТЛАЯ ТЕМА: КОНТРАСТ
+   --text-faint (#93a3a0) на --bg (#eef2ef) давал 2.33:1 — подписи и метаданные
+   не читались. Значение подобрано под AA (>= 4.5) для 12–13px.
+   ======================================================================== */
+[data-theme="light"] { --text-faint: #5b6b67; }
+
+/* .pc-link — единственное место, где --cyan используется как цвет текста:
+   на светлом фоне #22d3ee даёт ~1.6:1. */
+[data-theme="light"] .pc-link { color: #0b6f86; }
+
+/* ==========================================================================
+   ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
+   Нативный View Transitions API: тот же сайт, без библиотек.
+   Если браузер не поддерживает — мгновенная навигация, как раньше.
+   ======================================================================== */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) { animation: rfc-out .16s ease both; }
+::view-transition-new(root) { animation: rfc-in .26s cubic-bezier(.22, .9, .24, 1) both; }
+
+@keyframes rfc-out { to { opacity: 0; } }
+@keyframes rfc-in  { from { opacity: 0; transform: translateY(6px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+
+/* ==========================================================================
+   SKIP-LINK
+   Часть страниц была без быстрого перехода к содержимому. Ссылка ставится
+   скриптом (theme.js) и появляется по Tab.
+   ======================================================================== */
+.skip-link {
+  position: fixed; top: 10px; left: 10px; z-index: 999;
+  padding: 10px 16px; border-radius: 10px;
+  background: var(--accent); color: #06281c;
+  font-weight: 700; font-size: 14px; text-decoration: none;
+  transform: translateY(-160%); transition: transform .18s ease;
+}
+.skip-link:focus-visible { transform: translateY(0); outline: 2px solid var(--text); outline-offset: 2px; }

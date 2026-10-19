@@ -30,3 +30,46 @@
         });
     });
 })();
+/* ==========================================================================
+   НАВИГАЦИЯ — один источник правды
+   В разметке 18 страниц .active был проставлен руками: где-то его не было,
+   где-то он стоял не на той ссылке. Считаем активный пункт по location и
+   дублируем его в aria-current — состояние видно и скринридеру, и CSS.
+   ======================================================================== */
+(function () {
+  "use strict";
+
+  function pageName() {
+    var p = (location.pathname || "").split("/").pop();
+    return p || "index.html";
+  }
+
+  function decorate() {
+    var here = pageName();
+    var links = document.querySelectorAll(".nav-menu a[href]");
+    for (var i = 0; i < links.length; i++) {
+      var href = (links[i].getAttribute("href") || "").split("?")[0].split("#")[0];
+      var target = href.split("/").pop() || "index.html";
+      var isHere = target === here;
+      links[i].classList.toggle("active", isHere);
+      if (isHere) links[i].setAttribute("aria-current", "page");
+      else links[i].removeAttribute("aria-current");
+    }
+
+    var main = document.getElementById("mainContent") || document.querySelector("main");
+    if (main && !document.querySelector(".skip-link")) {
+      if (!main.id) main.id = "mainContent";
+      var a = document.createElement("a");
+      a.className = "skip-link";
+      a.href = "#" + main.id;
+      a.textContent = "К содержанию";
+      document.body.insertBefore(a, document.body.firstChild);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", decorate);
+  } else {
+    decorate();
+  }
+})();
