@@ -40,7 +40,8 @@ ok(load("article.html").includes("URLSearchParams"), "article: reads ?id param")
 ok(load("article.html").includes("article.html?id="), "article: prev/next links");
 
 // nav -> encyclopedia everywhere
-const pages = fs.readdirSync(dir).filter((f) => f.endsWith(".html"));
+const STANDALONE = new Set(["promo.html"]);
+const pages = fs.readdirSync(dir).filter((f) => f.endsWith(".html") && !STANDALONE.has(f));
 for (const page of pages) {
   const html = load(page);
   if (!html.includes('href="encyclopedia.html"')) ok(false, page + ": no nav link to encyclopedia");

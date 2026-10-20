@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RFC Garden — Promo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f12;
+    --bg-2:#0f151b;
+    --ink:#e6edf3;
+    --muted:#8b98a5;
+    --dim:#5c6873;
+    --teal:#34d399;
+    --mint:#7ef0c8;
+    --violet:#a78bfa;
+    --amber:#fbbf24;
+    --blue:#22d3ee;
+    --pink:#f472b6;
+    --line:rgba(148,163,184,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    overflow:hidden;
+    background:#05090c;
+    color:var(--ink);
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .stage{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:1920px;
+    height:1080px;
+    transform:translate(-50%,-50%);
+    transform-origin:center;
+    overflow:hidden;
+    isolation:isolate;
+    background:var(--bg);
+  }
+  .stage.reset *,
+  .stage.reset *::before,
+  .stage.reset *::after{animation:none!important}
+  .stage.still *,
+  .stage.still *::before,
+  .stage.still *::after{animation:none!important;transition:none!important}
+
+  .bg{
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(52% 70% at 72% 42%,rgba(52,211,153,.14),transparent 64%),
+      radial-gradient(46% 60% at 18% 14%,rgba(167,139,250,.13),transparent 68%),
+      radial-gradient(60% 66% at 52% 108%,rgba(52,211,153,.11),transparent 70%),
+      linear-gradient(135deg,#0a0f12 0%,#0f151b 52%,#0b1116 100%);
+  }
+  .bg::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(72% 72% at 52% 50%,transparent 42%,rgba(1,6,4,.72) 100%);
+  }
+  .grid{
+    position:absolute;
+    inset:-2px;
+    background-image:radial-gradient(rgba(170,255,225,.16) 1px,transparent 1.4px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(62% 62% at 62% 48%,#000 12%,transparent 78%);
+    -webkit-mask-image:radial-gradient(62% 62% at 62% 48%,#000 12%,transparent 78%);
+    opacity:.55;
+  }
+  #fx{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:2;
+    pointer-events:none;
+  }
+  .veil{
+    position:absolute;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+    background:
+      linear-gradient(90deg,rgba(6,10,14,.94) 0%,rgba(6,10,14,.78) 30%,rgba(6,10,14,.16) 58%,transparent 72%),
+      linear-gradient(0deg,rgba(6,10,14,.55) 0%,transparent 24%);
+  }
+  .grain{
+    position:absolute;
+    inset:0;
+    z-index:20;
+    pointer-events:none;
+    opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+  }
+
+  .brand{
+    position:absolute;
+    left:68px;
+    top:58px;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-transform:uppercase;
+  }
+  .brand svg{width:28px;height:28px;color:var(--teal)}
+  .brand b{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.24em;
+    color:rgba(238,248,241,.92);
+  }
+  .brand i{
+    display:block;
+    width:1px;
+    height:18px;
+    background:var(--line);
+    margin:0 2px;
+  }
+  .brand span{
+    font-size:10px;
+    font-weight:500;
+    letter-spacing:.17em;
+    color:var(--dim);
+  }
+  .chapter{
+    position:absolute;
+    right:68px;
+    top:62px;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.24em;
+    color:var(--dim);
+  }
+  .chapter b{color:var(--teal);font-weight:600}
+  .chapter i{width:46px;height:1px;background:var(--line)}
+
+  .scene{
+    position:absolute;
+    inset:0;
+    z-index:6;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    padding:0 120px;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .62s ease,visibility .62s ease;
+  }
+  .scene.active{opacity:1;visibility:visible}
+  .scene .anim{
+    opacity:0;
+    transform:translateY(28px);
+    transition:opacity .85s cubic-bezier(.16,1,.3,1),transform .85s cubic-bezier(.16,1,.3,1);
+  }
+  .scene.active .anim{opacity:1;transform:none}
+  .scene.active .d1{transition-delay:.08s}
+  .scene.active .d2{transition-delay:.18s}
+  .scene.active .d3{transition-delay:.28s}
+  .scene.active .d4{transition-delay:.38s}
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:11.5px;
+    font-weight:500;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--mint);
+  }
+  .eyebrow::before{
+    content:"";
+    width:26px;
+    height:1px;
+    background:linear-gradient(90deg,var(--teal),transparent);
+  }
+
+  .s1 h1{
+    margin:30px 0 26px;
+    font-size:128px;
+    line-height:.9;
+    font-weight:800;
+    letter-spacing:-.055em;
+    text-wrap:balance;
+  }
+  .s1 h1 em{
+    font-family:inherit;
+    font-style:italic;
+    font-weight:400;
+    letter-spacing:-.035em;
+    background:linear-gradient(100deg,var(--mint) 0%,var(--teal) 46%,#8de9ff 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .lede{
+    max-width:560px;
+    font-size:21px;
+    line-height:1.55;
+    color:var(--muted);
+    font-weight:400;
+  }
+  .s1 .lede b{color:var(--ink);font-weight:600}
+  .meta{
+    display:flex;
+    gap:34px;
+    margin-top:44px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+  .meta b{color:var(--muted);font-weight:500}
+
+  .s2 h2{
+    margin:24px 0 14px;
+    font-size:52px;
+    line-height:1.05;
+    letter-spacing:-.035em;
+    font-weight:750;
+    max-width:620px;
+  }
+  .bigstat{
+    display:flex;
+    align-items:flex-end;
+    gap:22px;
+    margin-top:22px;
+    line-height:1;
+  }
+  .bigstat b{
+    font-size:238px;
+    font-weight:800;
+    letter-spacing:-.07em;
+    color:var(--mint);
+    font-variant-numeric:tabular-nums;
+    text-shadow:0 0 70px rgba(45,212,191,.24);
+  }
+  .bigstat span{
+    padding-bottom:34px;
+    font-size:18px;
+    color:var(--muted);
+    letter-spacing:.02em;
+  }
+  .stats{
+    display:flex;
+    gap:46px;
+    margin-top:18px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+  .stats div{display:flex;flex-direction:column;gap:7px}
+  .stats b{
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:24px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .stats span{
+    font-size:10.5px;
+    letter-spacing:.17em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+  .s2 .note{
+    margin-top:34px;
+    font-size:16px;
+    line-height:1.5;
+    color:var(--dim);
+    max-width:420px;
+  }
+
+  .s3 h2{
+    margin:26px 0 24px;
+    font-size:82px;
+    line-height:.95;
+    letter-spacing:-.045em;
+    font-weight:780;
+    max-width:640px;
+  }
+  .s3 h2 em{
+    font-family:inherit;
+    font-style:italic;
+    font-weight:400;
+    color:var(--mint);
+    letter-spacing:-.02em;
+  }
+  .chips{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:38px;
+  }
+  .chips span{
+    padding:10px 16px;
+    border:1px solid rgba(126,240,200,.24);
+    border-radius:999px;
+    background:rgba(8,29,22,.72);
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:.02em;
+  }
+  .chips span:last-child{border-color:rgba(251,191,36,.4);color:var(--amber)}
+  .chips i{color:var(--dim);font-style:normal;font-size:15px}
+  .s3 .lede{margin-top:28px;font-size:18px;max-width:470px}
+
+  .card3{
+    position:absolute;
+    right:120px;
+    top:190px;
+    width:372px;
+    padding:26px 28px;
+    border:1px solid rgba(190,255,230,.18);
+    border-radius:18px;
+    background:linear-gradient(160deg,rgba(12,38,30,.9),rgba(6,20,16,.82));
+    box-shadow:0 30px 100px -30px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
+    opacity:0;
+    transform:translateX(40px) rotate(.6deg);
+    transition:opacity .8s ease .45s,transform .8s cubic-bezier(.16,1,.3,1) .45s;
+  }
+  .s3.active .card3{opacity:1;transform:none}
+  .card3 .rfc{
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:10px;
+    letter-spacing:.2em;
+    color:var(--teal);
+  }
+  .card3 h3{
+    margin:14px 0 6px;
+    font-size:34px;
+    font-weight:750;
+    letter-spacing:-.03em;
+  }
+  .card3 .sub{
+    font-size:12.5px;
+    color:var(--muted);
+    padding-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+  .card3 .dep{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-top:18px;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+  .card3 .dep b{
+    padding:6px 12px;
+    border-radius:8px;
+    background:rgba(167,139,250,.14);
+    border:1px solid rgba(167,139,250,.35);
+    color:var(--violet);
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+  }
+  .card3 .bar{
+    display:flex;
+    gap:5px;
+    margin-top:20px;
+  }
+  .card3 .bar i{
+    height:3px;
+    flex:1;
+    border-radius:2px;
+    background:rgba(45,212,191,.22);
+  }
+  .card3 .bar i:nth-child(-n+3){background:var(--teal)}
+
+  .s4{
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 200px;
+    background:radial-gradient(48% 44% at 50% 46%,rgba(6,17,13,.92) 0%,rgba(6,17,13,.55) 58%,transparent 100%);
+  }
+  .endmark{
+    width:74px;
+    height:74px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(126,240,200,.28);
+    border-radius:50%;
+    color:var(--teal);
+    background:radial-gradient(circle,rgba(45,212,191,.18),rgba(45,212,191,.02) 70%);
+    box-shadow:0 0 70px rgba(45,212,191,.18);
+    margin-bottom:34px;
+  }
+  .endmark svg{width:38px;height:38px}
+  .s4 h2{
+    margin:22px 0 30px;
+    font-size:104px;
+    line-height:.92;
+    letter-spacing:-.052em;
+    font-weight:800;
+  }
+  .s4 h2 em{
+    font-family:inherit;
+    font-style:italic;
+    font-weight:400;
+    background:linear-gradient(100deg,var(--mint),var(--teal) 55%,#8de9ff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .url{
+    display:inline-flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 28px;
+    border:1px solid rgba(126,240,200,.32);
+    border-radius:999px;
+    background:rgba(7,26,19,.76);
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:16px;
+    color:var(--ink);
+    letter-spacing:.01em;
+    box-shadow:0 18px 60px -24px rgba(45,212,191,.45);
+  }
+  .url b{color:var(--teal);font-size:18px;font-weight:400}
+  .fine{
+    margin-top:22px;
+    font-size:11.5px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+
+  .progress{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:3px;
+    z-index:12;
+    background:rgba(190,255,230,.09);
+  }
+  .progress i{
+    display:block;
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,var(--teal),var(--mint) 60%,#8de9ff);
+    box-shadow:0 0 18px rgba(45,212,191,.6);
+  }
+  .timecode{
+    position:absolute;
+    left:68px;
+    bottom:26px;
+    z-index:12;
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.18em;
+    color:var(--dim);
+  }
+  .corner{
+    position:absolute;
+    right:68px;
+    bottom:26px;
+    z-index:12;
+    font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.18em;
+    color:rgba(95,128,114,.72);
+  }
+  .replay{
+    position:absolute;
+    right:68px;
+    top:104px;
+    z-index:14;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 15px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:rgba(6,20,15,.55);
+    color:var(--muted);
+    font:500 11px/1 ui-monospace,"JetBrains Mono",Consolas,monospace;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    cursor:pointer;
+    backdrop-filter:blur(10px);
+    transition:color .25s ease,border-color .25s ease,background .25s ease;
+  }
+  .replay:hover{color:var(--mint);border-color:rgba(126,240,200,.45);background:rgba(45,212,191,.08)}
+  .replay svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7}
+  .skip{
+    position:absolute;
+    right:54px;
+    bottom:46px;
+    z-index:40;
+    display:none;
+    align-items:center;
+    gap:10px;
+    padding:12px 20px;
+    border:1px solid rgba(126,240,200,.34);
+    border-radius:999px;
+    background:rgba(10,15,18,.72);
+    color:var(--mint);
+    font:600 11px/1 "JetBrains Mono",Consolas,monospace;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    cursor:pointer;
+    backdrop-filter:blur(12px);
+    transition:background .2s ease,border-color .2s ease,color .2s ease;
+  }
+  .skip:hover,.skip:focus-visible{background:rgba(52,211,153,.12);border-color:var(--teal);color:#fff;outline:none}
+  .skip svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
+  body.embed .replay,
+  body.embed .corner,
+  body.embed .timecode{display:none}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <canvas id="fx" width="1920" height="1080"></canvas>
+  <div class="veil"></div>
+  <div class="grain"></div>
+
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22V8M12 8c0-3 2-5 5-5 0 3-2 5-5 5zm0 0c0-3-2-5-5-5 0 3 2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+    <b>RFC Garden</b><i></i><span>живая карта сети</span>
+  </div>
+  <div class="chapter"><b id="chapNum">01</b><i></i><span id="chapName">КОРНИ</span></div>
+
+  <section class="scene s1 active" data-scene="0">
+    <p class="eyebrow anim d1">Интерактивная карта сети</p>
+    <h1 class="anim d2">Интернет —<br><em>это сад.</em></h1>
+    <p class="lede anim d3">72 протокола растут из одних корней.<br>Проследи, как устроена сеть — <b>от RFC до пакета.</b></p>
+    <div class="meta anim d4"><span><b>1969—2026</b> · история</span><span><b>72</b> объекта</span><span><b>7</b> ярусов OSI</span></div>
+  </section>
+
+  <section class="scene s2" data-scene="1">
+    <p class="eyebrow anim d1">Живая карта</p>
+    <div class="bigstat anim d2"><b id="count">0</b><span>протоколов<br>в одном саду</span></div>
+    <div class="stats anim d3">
+      <div><b>7</b><span>ярусов OSI</span></div>
+      <div><b>1969</b><span>первый RFC</span></div>
+      <div><b>∞</b><span>связей</span></div>
+    </div>
+    <p class="note anim d4">Каждый RFC — растение.<br>Корни — зависимости. Плоды — то, что стоит на нём.</p>
+  </section>
+
+  <section class="scene s3" data-scene="2">
+    <p class="eyebrow anim d1">Проследи путь</p>
+    <h2 class="anim d2">Найди <em>связи.</em></h2>
+    <p class="lede anim d3">Открой карточку протокола, спустись по корням и собери маршрут пакета.</p>
+    <div class="chips anim d4"><span>HTTP/1.1</span><i>→</i><span>TCP</span><i>→</i><span>IPv4</span></div>
+    <aside class="card3">
+      <div class="rfc">RFC 2616 · 1999</div>
+      <h3>HTTP/1.1</h3>
+      <div class="sub">Application · active · 65 связей</div>
+      <div class="dep"><span>Зависит от</span><b>TCP</b></div>
+      <div class="bar"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </aside>
+  </section>
+
+  <section class="scene s4" data-scene="3">
+    <div class="endmark anim d1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22V8M12 8c0-3 2-5 5-5 0 3-2 5-5 5zm0 0c0-3-2-5-5-5 0 3 2 5 5 5z"/><path d="M12 22c4 0 7-3 7-7h-7z"/></svg>
+    </div>
+    <p class="eyebrow anim d2">RFC Garden</p>
+    <h2 class="anim d3">Вырасти свой<br><em>маршрут.</em></h2>
+    <div class="url anim d4">kidjinbruh-del.github.io/rfc-garden <b>↗</b></div>
+    <p class="fine anim d4">72 протокола · RU / EN · без регистрации</p>
+  </section>
+
+  <div class="progress"><i id="bar"></i></div>
+  <div class="timecode" id="timecode">00:00</div>
+  <div class="corner">1920 × 1080 · 12 SEC</div>
+  <button class="replay" id="replay" type="button"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Replay</button>
+  <button class="skip" id="skip" type="button">Пропустить<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('fx');
+  const ctx = canvas.getContext('2d');
+  const bar = document.getElementById('bar');
+  const timecode = document.getElementById('timecode');
+  const chapNum = document.getElementById('chapNum');
+  const chapName = document.getElementById('chapName');
+  const countEl = document.getElementById('count');
+  const W = 1920;
+  const H = 1080;
+  const DURATION = 12000;
+  const scenes = [...document.querySelectorAll('.scene')];
+  const chapterNames = ['КОРНИ', 'РОСТ', 'СВЯЗИ', 'МАРШРУТ'];
+  const bounds = [0, 3400, 6600, 9800, 12000];
+
+  const params = new URLSearchParams(location.search);
+  const isEmbed = params.has('embed');
+  if (isEmbed) document.body.classList.add('embed');
+  const seekParam = parseFloat(params.get('t') || '0');
+  let frozen = params.has('still');
+  const seek = Number.isFinite(seekParam) ? Math.max(0, Math.min(11.99, seekParam)) * 1000 : 0;
+  let start = performance.now() - seek;
+  let stopped = false;
+  let ended = false;
+  let seekStyle = null;
+  let rafId = 0;
+
+  function post(type){
+    try {
+      if (window.parent && window.parent !== window) window.parent.postMessage({ type }, '*');
+    } catch (e) {}
+  }
+  function finish(){
+    if (ended) return;
+    ended = true;
+    stopped = true;
+    cancelAnimationFrame(rafId);
+    render(DURATION - 1);
+    post('rfc-promo-done');
+  }
+
+  if (seek > 0 || frozen) {
+    seekStyle = document.createElement('style');
+    seekStyle.textContent = `.stage *,.stage *::before,.stage *::after{animation-delay:-${seek}ms!important;animation-play-state:paused!important}`;
+    document.head.appendChild(seekStyle);
+  }
+  if (frozen) stage.classList.add('still');
+
+  function fit(){
+    const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+    stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  const C = {
+    teal:'#34d399',
+    mint:'#7ef0c8',
+    violet:'#a78bfa',
+    amber:'#fbbf24',
+    blue:'#22d3ee',
+    pink:'#f472b6'
+  };
+
+  const named = [
+    ['HTTP/1.1', 1395, 286, C.teal, 'app'],
+    ['HTTP/2', 1548, 342, C.teal, 'app'],
+    ['HTTP/3', 1648, 468, C.teal, 'app'],
+    ['TLS 1.3', 1510, 505, C.violet, 'sec'],
+    ['QUIC', 1698, 606, C.violet, 'transport'],
+    ['TCP', 1296, 598, C.violet, 'transport'],
+    ['UDP', 1472, 708, C.violet, 'transport'],
+    ['IPv4', 1092, 792, C.amber, 'network'],
+    ['IPv6', 1270, 852, C.amber, 'network'],
+    ['DNS', 1642, 766, C.teal, 'app'],
+    ['SMTP', 1558, 188, C.teal, 'app'],
+    ['SSH', 1452, 166, C.teal, 'app'],
+    ['FTP', 1712, 238, C.teal, 'app'],
+    ['BGP', 962, 610, C.amber, 'network'],
+    ['ARP', 898, 862, C.blue, 'link'],
+    ['DHCP', 1762, 846, C.teal, 'app'],
+    ['RTSP', 1168, 326, C.teal, 'app'],
+    ['SIP', 1320, 224, C.teal, 'app'],
+    ['MQTT', 1604, 672, C.teal, 'app'],
+    ['NTP', 1770, 398, C.teal, 'app'],
+    ['LDAP', 1732, 546, C.teal, 'app'],
+    ['WebSocket', 1496, 424, C.teal, 'app'],
+    ['RTP', 1240, 452, C.violet, 'transport'],
+    ['ICMP', 1018, 706, C.amber, 'network'],
+    ['Ethernet', 812, 784, C.blue, 'link'],
+    ['Wi-Fi', 754, 618, C.blue, 'link']
+  ];
+  const pathNames = ['HTTP/1.1', 'TCP', 'IPv4'];
+
+  const EXACT_KIND = {
+    'HTTP/1.1':'flower', 'HTTP/2':'flower', 'HTTP/3':'flower',
+    DNS:'flower', SMTP:'flower', SSH:'flower', 'TLS 1.3':'flower',
+    SIP:'flower', RTSP:'flower', MQTT:'flower', LDAP:'flower',
+    WebSocket:'flower', RTP:'flower',
+    TCP:'vine', UDP:'vine', QUIC:'vine', IMAP:'vine',
+    IPv4:'tree', IPv6:'tree', BGP:'tree',
+    ICMP:'sprout', DHCP:'sprout',
+    ARP:'mushroom', Ethernet:'mushroom', 'Wi-Fi':'mushroom', FTP:'mushroom'
+  };
+  function kindFor(label, layer){
+    if (label && EXACT_KIND[label]) return EXACT_KIND[label];
+    if (layer === 'transport') return 'vine';
+    if (layer === 'network') return 'tree';
+    if (layer === 'link') return 'mushroom';
+    return 'flower';
+  }
+  function randomKind(){
+    const r = rnd();
+    if (r < .38) return 'flower';
+    if (r < .6) return 'sprout';
+    if (r < .78) return 'vine';
+    if (r < .92) return 'mushroom';
+    return 'tree';
+  }
+
+  let seed = 20261020;
+  function rnd(){
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  }
+
+  const nodes = named.map(([label, x, y, color, layer], i) => ({
+    label, x, y, color, layer,
+    kind: kindFor(label, layer),
+    size: .9 + rnd() * .5,
+    phase: rnd() * Math.PI * 2,
+    named: true,
+    index: i
+  }));
+
+  const palette = [C.teal, C.teal, C.teal, C.violet, C.amber, C.blue, C.pink];
+  const clusters = [
+    [1180, 430, 340, 250], [1500, 560, 330, 300], [1300, 760, 380, 190], [930, 700, 230, 230], [1650, 330, 240, 220]
+  ];
+  for (let i = 0; i < 46; i++){
+    const c = clusters[i % clusters.length];
+    const a = rnd() * Math.PI * 2;
+    const r = Math.sqrt(rnd());
+    nodes.push({
+      x: Math.max(720, Math.min(1840, c[0] + Math.cos(a) * c[2] * r)),
+      y: Math.max(150, Math.min(930, c[1] + Math.sin(a) * c[3] * r)),
+      color: palette[Math.floor(rnd() * palette.length)],
+      kind: randomKind(),
+      size: .42 + rnd() * .55,
+      phase: rnd() * Math.PI * 2,
+      named: false
+    });
+  }
+
+  const byLabel = {};
+  nodes.forEach(n => { if (n.label) byLabel[n.label] = n; });
+
+  const links = [
+    ['HTTP/1.1','TCP'],['HTTP/2','TCP'],['HTTP/3','QUIC'],['TLS 1.3','TCP'],
+    ['QUIC','UDP'],['TCP','IPv4'],['UDP','IPv4'],['IPv6','IPv4'],
+    ['DNS','UDP'],['SMTP','TCP'],['SSH','TCP'],['FTP','TCP'],['BGP','TCP'],
+    ['ARP','Ethernet'],['DHCP','UDP'],['RTSP','TCP'],['SIP','UDP'],
+    ['MQTT','TCP'],['NTP','UDP'],['LDAP','TCP'],['WebSocket','TCP'],
+    ['RTP','UDP'],['ICMP','IPv4'],['Wi-Fi','Ethernet'],['TLS 1.3','QUIC'],
+    ['HTTP/2','HTTP/1.1'],['HTTP/3','HTTP/2'],['BGP','IPv4'],['DNS','IPv4'],
+    ['SSH','IPv4'],['SMTP','DNS'],['DHCP','IPv4'],['ARP','IPv4'],['FTP','DNS']
+  ].map(([a,b]) => [byLabel[a], byLabel[b]]).filter(e => e[0] && e[1]);
+
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function smooth(v){ v = clamp(v, 0, 1); return v * v * (3 - 2 * v); }
+  function easeOut(v){ v = clamp(v, 0, 1); return 1 - Math.pow(1 - v, 3); }
+
+  function rgba(hex, a){
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  }
+
+  function camera(t){
+    const cam = [
+      [1190, 540, 1.00],
+      [1236, 548, 1.05],
+      [1118, 566, 1.19],
+      [1120, 540, .93]
+    ];
+    let i = 0;
+    for (let k = 1; k < 4; k++) if (t >= bounds[k]) i = k;
+    if (i === 0) return cam[0];
+    const p = smooth((t - (bounds[i] - 900)) / 900);
+    const a = cam[i - 1];
+    const b = cam[i];
+    return [
+      a[0] + (b[0] - a[0]) * p,
+      a[1] + (b[1] - a[1]) * p,
+      a[2] + (b[2] - a[2]) * p
+    ];
+  }
+
+  function drawBackdrop(t){
+    ctx.clearRect(0, 0, W, H);
+    const p = smooth((t - 900) / 1800);
+    ctx.save();
+    ctx.globalAlpha = .35;
+    for (let y = 110; y < 1000; y += 48){
+      for (let x = 720; x < 1880; x += 48){
+        const d = Math.hypot(x - 1230, y - 548);
+        const a = Math.max(0, 1 - d / 720);
+        if (a <= 0) continue;
+        ctx.fillStyle = `rgba(150,240,210,${a * .13})`;
+        ctx.fillRect(x, y, 1.4, 1.4);
+      }
+    }
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = .34 * p;
+    ctx.strokeStyle = 'rgba(126,240,200,.14)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 7; i++){
+      const y = 140 + i * 124;
+      ctx.beginPath();
+      ctx.moveTo(680, y);
+      ctx.bezierCurveTo(1020, y - 26, 1450, y + 30, 1900, y - 8);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function pathSegments(){
+    const a = byLabel['HTTP/1.1'];
+    const b = byLabel['TCP'];
+    const c = byLabel['IPv4'];
+    const dx = (c.x - a.x) / 6;
+    const dy = (c.y - a.y) / 6;
+    return [
+      [a, {x:a.x + dx, y:a.y + dy}, {x:b.x - dx, y:b.y - dy}, b],
+      [b, {x:b.x + dx, y:b.y + dy}, {x:c.x - (c.x - b.x) / 6, y:c.y - (c.y - b.y) / 6}, c]
+    ];
+  }
+
+  function drawLinks(t, pathP, endP, scale){
+    const segments = pathSegments();
+    let pathDrawn = false;
+    for (const [a,b] of links){
+      const isPath = (a.label === 'HTTP/1.1' && b.label === 'TCP') || (a.label === 'TCP' && b.label === 'IPv4');
+      if (isPath){
+        if (pathP <= 0 || pathDrawn) continue;
+        pathDrawn = true;
+        ctx.save();
+        ctx.strokeStyle = rgba(C.mint, .8 * pathP);
+        ctx.lineWidth = 2.2 / scale;
+        ctx.shadowColor = rgba(C.teal, .9);
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.moveTo(segments[0][0].x, segments[0][0].y);
+        for (const s of segments) ctx.bezierCurveTo(s[1].x, s[1].y, s[2].x, s[2].y, s[3].x, s[3].y);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
+      const dim = 1 - .78 * pathP;
+      const alpha = .075 * dim * (1 - .75 * endP) * smooth((t - 700) / 1600);
+      if (alpha <= 0) continue;
+      ctx.strokeStyle = rgba(a.color, alpha);
+      ctx.lineWidth = .9;
+      ctx.beginPath();
+      const mx = (a.x + b.x) / 2 + (a.y - b.y) * .08;
+      const my = (a.y + b.y) / 2 + (b.x - a.x) * .08;
+      ctx.moveTo(a.x, a.y);
+      ctx.quadraticCurveTo(mx, my, b.x, b.y);
+      ctx.stroke();
+    }
+  }
+
+  function drawRoots(t, growth){
+    for (const n of nodes){
+      if (!n.named && n.kind !== 'tree') continue;
+      const endY = n.y + (1080 - n.y) * growth;
+      for (let r = 0; r < 3; r++){
+        const spread = (r - 1) * 26;
+        const pts = [];
+        for (let i = 0; i <= 5; i++){
+          const u = i / 5;
+          const y = n.y + 8 + (endY - n.y - 8) * u;
+          const x = n.x + spread * u + Math.sin(u * 3 + r) * 10 * u;
+          pts.push([x, y]);
+        }
+        tube(pts, 1.8, .3, n.color, .16 * growth);
+      }
+    }
+  }
+
+  const ABYSS = '#06121a';
+  function mix(h1, h2, t){
+    const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16);
+    const r = Math.round(((a>>16)&255) + (((b>>16)&255) - ((a>>16)&255)) * t);
+    const g = Math.round(((a>>8)&255) + (((b>>8)&255) - ((a>>8)&255)) * t);
+    const c = Math.round((a&255) + ((b&255) - (a&255)) * t);
+    return `rgb(${r},${g},${c})`;
+  }
+
+  function tube(pts, w0, w1, color, k){
+    if (!pts || pts.length < 2) return;
+    k = k == null ? 1 : k;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = rgba(color, .1 * k);
+    ctx.lineWidth = Math.max(1, w0 * 2.2);
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.stroke();
+    for (let i = 1; i < pts.length; i++){
+      const u = i / (pts.length - 1);
+      ctx.strokeStyle = rgba(color, (.45 + .35 * u) * k);
+      ctx.lineWidth = Math.max(.6, w0 + (w1 - w0) * u);
+      ctx.beginPath();
+      ctx.moveTo(pts[i-1][0], pts[i-1][1]);
+      ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = `rgba(223,246,255,${(.8 * k).toFixed(3)})`;
+    ctx.lineWidth = Math.max(.6, w1 * .5);
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.stroke();
+  }
+
+  function shard(bx, by, tx, ty, w, color, pulse, seed, k){
+    k = k == null ? 1 : k;
+    let dx = tx - bx, dy = ty - by;
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len; dy /= len;
+    const breathe = 1 + .05 * Math.sin(pulse * 1.3 + seed);
+    const L = len * breathe, W = w * (1 + .06 * Math.sin(pulse * 1.7 + seed * 2));
+    const px = -dy, py = dx;
+    const sx = bx + dx * L * .36, sy = by + dy * L * .36;
+    const m1x = sx + px * W, m1y = sy + py * W;
+    const m2x = sx - px * W, m2y = sy - py * W;
+    const tipx = bx + dx * L, tipy = by + dy * L;
+    const g = ctx.createLinearGradient(bx, by, tipx, tipy);
+    g.addColorStop(0, mix(color, ABYSS, .5));
+    g.addColorStop(.55, rgba(color, .92 * k));
+    g.addColorStop(1, mix(color, '#ffffff', .72));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(bx, by); ctx.lineTo(m1x, m1y);
+    ctx.lineTo(tipx, tipy); ctx.lineTo(m2x, m2y);
+    ctx.closePath(); ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(255,255,255,${(.5 * k).toFixed(3)})`;
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(m1x, m1y); ctx.lineTo(tipx, tipy); ctx.stroke();
+    ctx.strokeStyle = rgba(color, .55 * k);
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(m2x, m2y); ctx.lineTo(tipx, tipy); ctx.stroke();
+    ctx.fillStyle = `rgba(255,255,255,${(.9 * k).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.arc(bx + dx * L * .72, by + dy * L * .72, Math.max(.6, W * .2), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function orb(x, y, r, color, pulse, seed, k){
+    k = k == null ? 1 : k;
+    if (r <= 0) return;
+    const R = r * (1 + .07 * Math.sin(pulse * 2 + seed));
+    let g = ctx.createRadialGradient(x, y, 0, x, y, R * 3);
+    g.addColorStop(0, rgba(color, .28 * k));
+    g.addColorStop(1, rgba(color, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, R * 3, 0, Math.PI * 2); ctx.fill();
+    g = ctx.createRadialGradient(x - R * .3, y - R * .3, 0, x, y, R);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(.35, mix(color, '#ffffff', .6));
+    g.addColorStop(1, mix(color, ABYSS, .3));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.beginPath(); ctx.arc(x - R * .32, y - R * .34, Math.max(.5, R * .26), 0, Math.PI * 2); ctx.fill();
+  }
+
+  function glowDot(x, y, r, color){
+    ctx.fillStyle = rgba(color, .22);
+    ctx.beginPath(); ctx.arc(x, y, r * 2.6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function plantHeight(kind, s){
+    if (kind === 'tree') return s * 1.42;
+    if (kind === 'flower') return s * 1.38;
+    if (kind === 'vine') return s * 1.2;
+    if (kind === 'mushroom') return s * .86;
+    return s * .72;
+  }
+
+  function plantCore(kind, s){
+    if (kind === 'tree') return s * 1.02;
+    if (kind === 'flower') return s * .94;
+    if (kind === 'vine') return s * 1.08;
+    if (kind === 'mushroom') return s * .58;
+    return s * .54;
+  }
+
+  function drawFlower(n, s, k, pulse){
+    const stem = [[0,0],[-s*.03,-s*.18],[s*.04,-s*.42],[-s*.02,-s*.66],[0,-s*.9]];
+    tube(stem, s*.032, s*.012, n.color, k);
+    const hx = 0, hy = -s*.94;
+    const rings = [{count:7, len:s*.42, w:s*.115, tilt:0}, {count:5, len:s*.28, w:s*.1, tilt:.4}];
+    for (let ring = 1; ring >= 0; ring--){
+      const rg = rings[ring];
+      for (let i = 0; i < rg.count; i++){
+        const a = (Math.PI * 2 / rg.count) * i + rg.tilt + pulse * .1;
+        shard(hx, hy, hx + Math.cos(a) * rg.len, hy + Math.sin(a) * rg.len,
+          rg.w, n.color, pulse, 60 + ring * 9 + i * 1.3, ring === 0 ? k : k * .8);
+      }
+    }
+    orb(hx, hy, s*.075, n.color, pulse, 3, k);
+  }
+
+  function drawTree(n, s, k, pulse){
+    const trunk = [[0,0],[s*.02,-s*.28],[-s*.03,-s*.6],[0,-s*.92]];
+    tube(trunk, s*.055, s*.02, n.color, k);
+    const branches = [
+      [[0,-s*.56],[-s*.26,-s*.76],[-s*.38,-s*.98]],
+      [[0,-s*.66],[s*.25,-s*.84],[s*.34,-s*1.05]],
+      [[0,-s*.86],[-s*.12,-s*1.05],[-s*.18,-s*1.2]]
+    ];
+    for (let i = 0; i < branches.length; i++){
+      const b = branches[i];
+      tube(b, s*.026, s*.008, n.color, k * .9);
+      const tip = b[b.length - 1];
+      shard(tip[0], tip[1], tip[0] + (i % 2 ? 1 : -1) * s*.2, tip[1] - s*.12,
+        s*.075, n.color, pulse, i * 1.7, k);
+    }
+    const crown = [[-.28,-1.0],[-.1,-1.16],[.12,-1.19],[.3,-1.04],[.05,-.94],[-.16,-.9]];
+    for (let i = 0; i < crown.length; i++){
+      const c = crown[i];
+      shard(0, -s*.9, c[0] * s, c[1] * s, s*.06, n.color, pulse, 20 + i * 2.3, k);
+    }
+    glowDot(0, -s*1.18, Math.max(1.1, s*.022), n.color);
+  }
+
+  function drawVine(n, s, k, pulse){
+    const main = [[0,0],[-s*.12,-s*.22],[s*.16,-s*.46],[-s*.1,-s*.72],[s*.08,-s*.94],[0,-s*1.08]];
+    tube(main, s*.04, s*.015, n.color, k);
+    const tendrils = [
+      [[0,-s*.44],[s*.28,-s*.55],[s*.3,-s*.78]],
+      [[0,-s*.68],[-s*.3,-s*.78],[-s*.32,-s*1.0]],
+      [[0,-s*.9],[s*.22,-s*1.0],[s*.2,-s*1.15]]
+    ];
+    for (let i = 0; i < tendrils.length; i++){
+      const td = tendrils[i];
+      tube(td, s*.018, s*.006, n.color, k * .8);
+      const tip = td[td.length - 1];
+      shard(tip[0], tip[1], tip[0] + (i % 2 ? 1 : -1) * s*.13, tip[1] - s*.06,
+        s*.06, n.color, pulse, 40 + i * 1.9, k);
+    }
+    orb(0, -s*1.1, s*.055, n.color, pulse, 7, k);
+  }
+
+  function drawMushroom(n, s, k, pulse){
+    ctx.fillStyle = mix(n.color, ABYSS, .62);
+    ctx.fillRect(-s*.028, -s*.46, s*.056, s*.46);
+    ctx.strokeStyle = rgba(n.color, .55 * k);
+    ctx.lineWidth = 1;
+    for (let i = 1; i <= 3; i++){
+      const y = -s*.46 + s*.46 * i / 4;
+      ctx.beginPath(); ctx.moveTo(-s*.028, y); ctx.lineTo(s*.028, y); ctx.stroke();
+    }
+    ctx.strokeStyle = `rgba(223,246,255,${.5 * k})`;
+    ctx.beginPath(); ctx.moveTo(0, -s*.46); ctx.lineTo(0, 0); ctx.stroke();
+    const cy = -s*.58, rx = s*.38, ry = s*.24;
+    const g = ctx.createLinearGradient(-rx, cy - ry, rx, cy);
+    g.addColorStop(0, mix(n.color, ABYSS, .25));
+    g.addColorStop(.45, mix(n.color, '#ffffff', .35));
+    g.addColorStop(1, mix(n.color, ABYSS, .45));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(0, cy, rx, ry, 0, Math.PI, 0); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = rgba(n.color, .6 * k);
+    ctx.beginPath(); ctx.ellipse(0, cy, rx, ry, 0, Math.PI, 0); ctx.stroke();
+    ctx.strokeStyle = rgba(n.color, .5 * k);
+    for (let i = -3; i <= 3; i++){
+      const gx = i * rx / 4;
+      ctx.beginPath(); ctx.moveTo(gx, cy); ctx.lineTo(gx * .92, cy - ry * .85); ctx.stroke();
+    }
+    for (let i = 0; i < 4; i++){
+      glowDot(-rx*.5 + i * rx*.34, cy - ry*.28, Math.max(.7, s*.012), n.color);
+    }
+    for (let i = 0; i < 3; i++){
+      const bob = Math.sin(pulse * 1.2 + i * 2.1) * s*.02;
+      glowDot((i - 1) * s*.16, -s*.86 + bob, Math.max(.6, s*.01), n.color);
+    }
+  }
+
+  function drawSprout(n, s, k, pulse){
+    ctx.fillStyle = mix(n.color, ABYSS, .6);
+    ctx.beginPath(); ctx.ellipse(0, s*.38, s*.19, s*.07, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = rgba(n.color, .65 * k);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.ellipse(0, s*.38, s*.19, s*.07, 0, 0, Math.PI*2); ctx.stroke();
+    const stem = [[0,0],[s*.02,-s*.16],[-s*.02,-s*.32],[0,-s*.5]];
+    tube(stem, s*.03, s*.01, n.color, k);
+    shard(0, -s*.28, -s*.28, -s*.42, s*.07, n.color, pulse, 80, k);
+    shard(0, -s*.4, s*.27, -s*.56, s*.07, n.color, pulse, 82.7, k);
+    const bx = 0, by = -s*.54;
+    for (let i = 0; i < 5; i++){
+      const a = -2.4 + i * 1.2;
+      shard(bx, by, bx + Math.cos(a) * s*.16, by + Math.sin(a) * s*.12,
+        s*.055, n.color, pulse, 90 + i * 1.5, k * .9);
+    }
+    orb(bx, by, s*.06, n.color, pulse, 11, k);
+  }
+
+  function drawPlant(n, t, bloom, pathP, endP, isPath, pathGlow){
+    const grow = bloom * (n.named ? 1 : .74);
+    if (grow <= .01) return;
+    const s = 34 + n.size * 28;
+    const sway = Math.sin(t * .0011 + n.phase) * (n.named ? .022 : .014);
+    const h = plantHeight(n.kind, s);
+    const topY = n.y - h * grow;
+    const dim = isPath ? 1 : 1 - .72 * pathP;
+    const k = (n.named ? .9 : .55) * dim * (1 - .22 * endP);
+    const pulse = t * .0012 + n.phase;
+
+    ctx.save();
+    ctx.translate(n.x, n.y + 7);
+    ctx.rotate(sway);
+    ctx.scale(grow, grow);
+
+    if (n.named || n.kind === 'tree'){
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, s * .8);
+      g.addColorStop(0, rgba(n.color, .1 * k));
+      g.addColorStop(1, rgba(n.color, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.ellipse(0, 0, s*.66, s*.17, 0, 0, Math.PI*2); ctx.fill();
+    }
+
+    if (n.kind === 'tree') drawTree(n, s, k, pulse);
+    else if (n.kind === 'vine') drawVine(n, s, k, pulse);
+    else if (n.kind === 'mushroom') drawMushroom(n, s, k, pulse);
+    else if (n.kind === 'sprout') drawSprout(n, s, k, pulse);
+    else drawFlower(n, s, k, pulse);
+    ctx.restore();
+
+    if (isPath && pathGlow > 0){
+      const coreY = n.y - plantCore(n.kind, s) * grow;
+      ctx.strokeStyle = rgba(C.mint, .85 * pathGlow);
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.arc(n.x + sway * 50, coreY, s * .5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    if (n.named && n.label){
+      const la = (pathP > .4 ? (isPath ? .96 : .16) : .58 * smooth((t - 2200) / 900)) * grow * (1 - .95 * endP);
+      if (la > .02){
+        ctx.font = '600 11px "JetBrains Mono",ui-monospace,Consolas,monospace';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = rgba(isPath ? C.mint : '#dff5e9', la);
+        ctx.fillText(n.label, n.x + 13, topY - 4);
+      }
+    }
+  }
+
+  function drawPackets(t, pathP){
+    if (pathP <= 0.02) return;
+    const points = [];
+    const steps = 18;
+    for (const [p0,c1,c2,p3] of pathSegments()){
+      for (let i = 0; i <= steps; i++){
+        const u = i / steps;
+        const v = 1 - u;
+        points.push([
+          v*v*v*p0.x + 3*v*v*u*c1.x + 3*v*u*u*c2.x + u*u*u*p3.x,
+          v*v*v*p0.y + 3*v*v*u*c1.y + 3*v*u*u*c2.y + u*u*u*p3.y
+        ]);
+      }
+    }
+    const cycle = ((t * .00042) % 1 + 1) % 1;
+    for (let k = 0; k < 5; k++){
+      const pos = (cycle + k / 5) % 1;
+      const idx = Math.floor(pos * (points.length - 1));
+      const pt = points[idx];
+      const alpha = pathP * (0.35 + 0.65 * Math.sin(Math.PI * pos));
+      const g = ctx.createRadialGradient(pt[0], pt[1], 0, pt[0], pt[1], 12);
+      g.addColorStop(0, rgba('#d8fff0', alpha));
+      g.addColorStop(1, rgba(C.teal, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(pt[0], pt[1], 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = rgba('#eafff7', alpha);
+      ctx.beginPath();
+      ctx.arc(pt[0], pt[1], 2.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const pollen = Array.from({ length: 58 }, () => ({
+    x: 700 + rnd() * 1160,
+    y: 130 + rnd() * 830,
+    r: .5 + rnd() * 1.4,
+    a: .12 + rnd() * .34,
+    ph: rnd() * Math.PI * 2,
+    sp: .2 + rnd() * .5
+  }));
+
+  function drawPollen(t){
+    for (const p of pollen){
+      const x = p.x + Math.sin(t * .00032 * p.sp + p.ph) * 22;
+      const y = p.y + Math.cos(t * .00026 * p.sp + p.ph * 1.3) * 16;
+      ctx.fillStyle = rgba('#bfffe6', p.a);
+      ctx.beginPath();
+      ctx.arc(x, y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function draw(t){
+    const cam = camera(t);
+    const scale = cam[2];
+    const growth = easeOut((t - 250) / 2600);
+    const bloom = smooth((t - 900) / 2600);
+    const pathP = smooth((t - 6350) / 950);
+    const endP = smooth((t - 9750) / 800);
+
+    drawBackdrop(t);
+
+    ctx.save();
+    ctx.translate(W / 2, H / 2);
+    ctx.scale(scale, scale);
+    ctx.translate(-cam[0], -cam[1]);
+
+    drawRoots(t, growth);
+    drawLinks(t, pathP * (1 - endP), endP, scale);
+
+    const ordered = [...nodes].sort((a,b) => a.y - b.y);
+    for (const n of ordered){
+      const isPath = pathNames.includes(n.label);
+      ctx.globalAlpha = 1 - .62 * endP;
+      drawPlant(n, t, bloom, pathP, endP, isPath, pathP * (1 - endP));
+    }
+    ctx.globalAlpha = 1;
+    drawPackets(t, pathP * (1 - endP));
+    ctx.restore();
+
+    drawPollen(t);
+  }
+
+  function setScene(t){
+    let idx = 0;
+    for (let i = 0; i < 4; i++) if (t >= bounds[i]) idx = i;
+    scenes.forEach((el, i) => el.classList.toggle('active', i === idx));
+    chapNum.textContent = String(idx + 1).padStart(2, '0');
+    chapName.textContent = chapterNames[idx];
+    if (idx === 1){
+      const p = easeOut((t - 3450) / 1400);
+      const v = Math.round(72 * p);
+      if (countEl.textContent !== String(v)) countEl.textContent = String(v);
+    } else {
+      countEl.textContent = '0';
+    }
+    return idx;
+  }
+
+  function render(t){
+    setScene(t);
+    draw(t);
+    bar.style.width = ((t / DURATION) * 100).toFixed(2) + '%';
+    const sec = Math.floor(t / 1000);
+    timecode.textContent = '00:' + String(sec).padStart(2, '0');
+  }
+
+  function restart(){
+    frozen = false;
+    stopped = false;
+    ended = false;
+    cancelAnimationFrame(rafId);
+    stage.classList.remove('still');
+    if (seekStyle){ seekStyle.remove(); seekStyle = null; }
+    stage.classList.add('reset');
+    void stage.offsetWidth;
+    stage.classList.remove('reset');
+    start = performance.now();
+    rafId = requestAnimationFrame(tick);
+  }
+  document.getElementById('replay').addEventListener('click', restart);
+  document.getElementById('skip').addEventListener('click', finish);
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && isEmbed) finish();
+    else if (e.key.toLowerCase() === 'r') restart();
+  });
+
+  function tick(now){
+    if (stopped) return;
+    const raw = now - start;
+    if (isEmbed && raw >= DURATION){
+      finish();
+      return;
+    }
+    const t = frozen ? seek : (isEmbed ? Math.max(0, Math.min(DURATION - 1, raw)) : ((raw + DURATION) % DURATION));
+    render(t);
+    if (frozen){
+      stopped = true;
+      return;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  render(seek);
+  rafId = requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

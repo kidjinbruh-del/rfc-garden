@@ -4,7 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const dir = path.resolve(__dirname, "..");
 
-const pages = fs.readdirSync(dir).filter((f) => f.endsWith(".html"));
+const STANDALONE = new Set(["promo.html"]);
+const pages = fs.readdirSync(dir).filter((f) => f.endsWith(".html") && !STANDALONE.has(f));
 const i18nSrc = fs.readFileSync(path.join(dir, "js", "i18n.js"), "utf8");
 
 // collect dict keys: "key": ...

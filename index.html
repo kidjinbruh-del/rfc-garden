@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b1220">
-    <link rel="manifest" href="manifest.webmanifest?v=20261020-1">
+    <link rel="manifest" href="manifest.webmanifest?v=20261020-2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -12,7 +12,7 @@
     <meta name="author" content="Трофимов Петр">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 22V8M12 8c0-3 2-5 5-5s-2 5-5 5zm0 0c0-3-2-5-5-5s2 5 5 5z'/><path d='M12 22c4 0 7-3 7-7h-7z'/></svg>">
     <title data-i18n="title.index">RFC Garden — Сад сетевых протоколов</title>
-    <link rel="stylesheet" href="css/style.css?v=20261020-1">
+    <link rel="stylesheet" href="css/style.css?v=20261020-2">
     <style>
         .hero-content { pointer-events: auto; }
         /* ---- entrance: появление при первой загрузке ---- */
@@ -126,9 +126,62 @@
         .layer-card .lc-count { font-family: 'JetBrains Mono', monospace;
                                 color: var(--lc); font-size: 13px; }
         .layer-card .lc-desc { font-size: 12.5px; color: var(--text-dim); margin-top: 6px; }
+
+        /* ---- промо-интро: играет один раз за сессию, пропускается ---- */
+        #promoIntro {
+            position: fixed; inset: 0; z-index: 1200;
+            display: none; background: #05090c;
+            opacity: 1; transition: opacity .55s ease;
+        }
+        html.promo-intro #promoIntro { display: block; }
+        html.promo-intro, html.promo-intro body { overflow: hidden; }
+        #promoIntro.out { opacity: 0; pointer-events: none; }
+        #promoIntro iframe {
+            display: block; width: 100%; height: 100%; border: 0; background: #05090c;
+        }
+        .promo-skip {
+            position: fixed; right: 28px; bottom: 28px; z-index: 1300;
+            display: inline-flex; align-items: center; gap: 9px;
+            padding: 12px 18px; border-radius: 999px;
+            border: 1px solid rgba(52,211,153,.38);
+            background: rgba(10,15,18,.78); color: var(--accent);
+            font: 600 11px/1 'JetBrains Mono', monospace;
+            letter-spacing: .14em; text-transform: uppercase;
+            backdrop-filter: blur(12px);
+            transition: background .2s, border-color .2s, color .2s;
+        }
+        .promo-skip:hover, .promo-skip:focus-visible {
+            background: rgba(52,211,153,.14); border-color: var(--accent); color: #fff;
+        }
+        .promo-skip svg { width: 13px; height: 13px; }
+        @media (max-width: 600px) {
+            .promo-skip { right: 14px; bottom: 14px; padding: 11px 15px; }
+        }
     </style>
+    <script>
+    (function () {
+        try {
+            var q = location.search;
+            var force = /(?:\?|&)promo=1(?:&|$)/.test(q);
+            var skip = /(?:\?|&)skipPromo=1(?:&|$)/.test(q);
+            var seen = sessionStorage.getItem('rfc-garden-promo-seen') === '1';
+            var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var narrow = window.innerWidth < 760;
+            if (!skip && !narrow && (force || !seen) && !reduced) {
+                document.documentElement.classList.add('promo-intro');
+            }
+        } catch (e) {}
+    })();
+    </script>
 </head>
 <body data-theme="dark">
+    <div id="promoIntro" role="dialog" aria-modal="true" aria-label="Промо RFC Garden">
+        <iframe id="promoFrame" title="Промо RFC Garden — живая карта сети" data-src="promo.html?embed=1" allow="autoplay"></iframe>
+        <button class="promo-skip" id="promoSkip" type="button">
+            Пропустить
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+    </div>
     <a class="skip-link" href="#mainContent" data-i18n="a11y.skip">Перейти к содержимому</a>
     <nav class="navbar">
         <div class="logo">
@@ -305,16 +358,17 @@
 
     <footer>
         <div><h4>RFC Garden</h4><p data-i18n="foot.open">Open Source. Данные из публичных RFC IETF.</p></div>
-        <div><h4 data-i18n="foot.links">Ссылки</h4><a href="https://www.rfc-editor.org/" target="_blank" rel="noopener">RFC Editor</a><a href="https://github.com/kidjinbruh-del/rfc-garden" target="_blank" rel="noopener" data-i18n="foot.source">Исходный код</a></div>
+        <div><h4 data-i18n="foot.links">Ссылки</h4><a href="promo.html">Промо-ролик</a><a href="https://www.rfc-editor.org/" target="_blank" rel="noopener">RFC Editor</a><a href="https://github.com/kidjinbruh-del/rfc-garden" target="_blank" rel="noopener" data-i18n="foot.source">Исходный код</a></div>
         <div><h4 data-i18n="foot.author">Автор</h4><p>Трофимов Петр</p><p>© 2026 · MIT</p></div>
     </footer>
 
-    <script src="js/i18n.js?v=20261020-1" defer></script>
-    <script src="js/icons.js?v=20261020-1" defer></script>
-    <script src="js/data.js?v=20261020-1" defer></script>
-    <script src="js/garden.js?v=20261020-1" defer></script>
-    <script src="js/theme.js?v=20261020-1" defer></script>
-    <script src="js/main.js?v=20261020-1" defer></script>
-    <script src="js/anim.js?v=20261020-1" defer></script>
+    <script src="js/i18n.js?v=20261020-2" defer></script>
+    <script src="js/icons.js?v=20261020-2" defer></script>
+    <script src="js/data.js?v=20261020-2" defer></script>
+    <script src="js/garden.js?v=20261020-2" defer></script>
+    <script src="js/theme.js?v=20261020-2" defer></script>
+    <script src="js/main.js?v=20261020-2" defer></script>
+    <script src="js/promo-intro.js?v=20261020-2" defer></script>
+    <script src="js/anim.js?v=20261020-2" defer></script>
 </body>
 </html>
