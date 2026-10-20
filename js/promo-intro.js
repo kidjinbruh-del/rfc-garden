@@ -18,7 +18,7 @@
     let loaded = false;
     const failTimer = setTimeout(() => {
         if (!loaded) close(false);
-    }, 6000);
+    }, 8000);
 
     try {
         if (window.rfcGarden && window.rfcGarden.stop) window.rfcGarden.stop();
@@ -43,7 +43,7 @@
         }, 560);
     }
 
-    frame.src = frame.getAttribute("data-src") || "promo.html?embed=1";
+    frame.src = frame.getAttribute("data-src") || "promo.html?embed=1&v=20261020-3";
     frame.addEventListener("load", () => {
         loaded = true;
         clearTimeout(failTimer);

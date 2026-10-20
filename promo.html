@@ -1214,8 +1214,8 @@
   function draw(t){
     const cam = camera(t);
     const scale = cam[2];
-    const growth = easeOut((t - 250) / 2600);
-    const bloom = smooth((t - 900) / 2600);
+    const growth = easeOut((t - 180) / 1800);
+    const bloom = smooth((t - 500) / 2200);
     const pathP = smooth((t - 6350) / 950);
     const endP = smooth((t - 9750) / 800);
 
